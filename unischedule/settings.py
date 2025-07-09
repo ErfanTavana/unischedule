@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     # My App
     'accounts',
     'institutions',
-    'semester',
+    'semesters',
 
 ]
 
