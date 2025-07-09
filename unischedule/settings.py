@@ -34,13 +34,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.admin',
     # Drf Setting
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
     # My App
-    'semester',
+    'accounts',
     'institutions',
+    'semester',
+
 ]
 
 MIDDLEWARE = [
@@ -123,7 +126,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 CORS_ALLOW_ALL_ORIGINS = True
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
@@ -139,3 +141,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+AUTH_USER_MODEL = 'accounts.User'
