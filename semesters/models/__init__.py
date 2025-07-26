@@ -1,1 +1,1 @@
-from .semester import Semester
+from .semester import *
