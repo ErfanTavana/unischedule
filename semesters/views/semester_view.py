@@ -26,6 +26,11 @@ def list_semesters_view(request):
     )
 
 
+from rest_framework.exceptions import ValidationError
+
+from rest_framework.exceptions import ValidationError
+from unischedule.core.error_codes import ErrorCodes
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_semester_view(request):
@@ -34,6 +39,7 @@ def create_semester_view(request):
     """
     institution = request.user.institution
     data = request.data
+
     try:
         semester = semester_service.create_semester(data, institution)
         return BaseResponse.success(
@@ -42,8 +48,15 @@ def create_semester_view(request):
             data={"semester": semester},
             status_code=status.HTTP_201_CREATED
         )
+    except ValidationError as e:
+        return BaseResponse.error(
+            message=ErrorCodes.VALIDATION_FAILED["message"],
+            code=ErrorCodes.VALIDATION_FAILED["code"],
+            status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
+            errors=e.detail
+        )
     except Exception:
-        raise CustomValidationError(
+        return BaseResponse.error(
             message=ErrorCodes.SEMESTER_CREATION_FAILED["message"],
             code=ErrorCodes.SEMESTER_CREATION_FAILED["code"],
             status_code=ErrorCodes.SEMESTER_CREATION_FAILED["status_code"],
@@ -59,6 +72,7 @@ def update_semester_view(request, semester_id):
     """
     institution = request.user.institution
     semester = semester_service.get_semester_by_id_or_404(semester_id, institution)
+
     try:
         updated_semester = semester_service.update_semester(semester, request.data)
         return BaseResponse.success(
@@ -66,8 +80,17 @@ def update_semester_view(request, semester_id):
             code=SuccessCodes.SEMESTER_UPDATED["code"],
             data={"semester": updated_semester}
         )
+
+    except ValidationError as e:
+        return BaseResponse.error(
+            message=ErrorCodes.VALIDATION_FAILED["message"],
+            code=ErrorCodes.VALIDATION_FAILED["code"],
+            status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
+            errors=e.detail
+        )
+
     except Exception:
-        raise CustomValidationError(
+        return BaseResponse.error(
             message=ErrorCodes.SEMESTER_UPDATE_FAILED["message"],
             code=ErrorCodes.SEMESTER_UPDATE_FAILED["code"],
             status_code=ErrorCodes.SEMESTER_UPDATE_FAILED["status_code"],

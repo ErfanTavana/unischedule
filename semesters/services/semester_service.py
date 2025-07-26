@@ -5,6 +5,8 @@ from serializers.semester_serializer import (
     CreateSemesterSerializer,
     UpdateSemesterSerializer,
 )
+from unischedule.core.exceptions import CustomValidationError
+from unischedule.core.error_codes import ErrorCodes
 
 
 def list_semesters(institution):
@@ -57,14 +59,18 @@ def delete_semester(semester):
 
 def get_semester_by_id_or_404(semester_id, institution):
     """
-    Retrieve semester by ID, or raise CustomValidationError if not found.
+    Retrieve a semester by ID for the given institution.
+    If not found, raise a structured CustomValidationError.
     """
     semester = semester_repository.get_semester_by_id_and_institution(semester_id, institution)
+
     if not semester:
         raise CustomValidationError(
-            message="Semester not found.",
-            code="404",
-            status_code=404,
+            message=ErrorCodes.SEMESTER_NOT_FOUND["message"],
+            code=ErrorCodes.SEMESTER_NOT_FOUND["code"],
+            status_code=ErrorCodes.SEMESTER_NOT_FOUND["status_code"],
+            errors=ErrorCodes.SEMESTER_NOT_FOUND["errors"],
+            data=ErrorCodes.SEMESTER_NOT_FOUND["data"],
         )
     return semester
 

@@ -16,6 +16,13 @@ class ErrorCodes:
         "errors": [],
         "data": {}
     }
+    VALIDATION_FAILED = {
+        "code": "4102",
+        "message": "اطلاعات وارد شده نامعتبر است.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "errors": [],
+        "data": {}
+    }
 
     SEMESTER_UPDATE_FAILED = {
         "code": "4102",
