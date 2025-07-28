@@ -28,3 +28,32 @@ class SuccessCodes:
         "message": "ترم فعال با موفقیت تنظیم شد.",
         "data": {}
     }
+    PROFESSOR_LISTED = {
+        "code": "2201",
+        "message": "لیست اساتید با موفقیت دریافت شد.",
+        "data": {}
+    }
+
+    PROFESSOR_RETRIEVED = {
+        "code": "2202",
+        "message": "اطلاعات استاد با موفقیت دریافت شد.",
+        "data": {}
+    }
+
+    PROFESSOR_CREATED = {
+        "code": "2203",
+        "message": "استاد با موفقیت ایجاد شد.",
+        "data": {}
+    }
+
+    PROFESSOR_UPDATED = {
+        "code": "2204",
+        "message": "اطلاعات استاد با موفقیت به‌روزرسانی شد.",
+        "data": {}
+    }
+
+    PROFESSOR_DELETED = {
+        "code": "2205",
+        "message": "استاد با موفقیت حذف شد.",
+        "data": {}
+    }

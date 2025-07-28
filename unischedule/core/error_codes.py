@@ -47,3 +47,34 @@ class ErrorCodes:
         "errors": [],
         "data": {}
     }
+    PROFESSOR_NOT_FOUND = {
+        "code": "4200",
+        "message": "استاد مورد نظر یافت نشد.",
+        "status_code": status.HTTP_404_NOT_FOUND,
+        "errors": [],
+        "data": {}
+    }
+
+    PROFESSOR_CREATION_FAILED = {
+        "code": "4201",
+        "message": "ایجاد استاد با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {}
+    }
+
+    PROFESSOR_UPDATE_FAILED = {
+        "code": "4202",
+        "message": "به‌روزرسانی اطلاعات استاد با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {}
+    }
+
+    PROFESSOR_DELETION_FAILED = {
+        "code": "4203",
+        "message": "حذف استاد با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {}
+    }

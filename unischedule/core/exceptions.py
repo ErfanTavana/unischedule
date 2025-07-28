@@ -1,29 +1,31 @@
 from rest_framework.exceptions import APIException
+from rest_framework import status
 
 
 class CustomValidationError(APIException):
     """
-    استثنای سفارشی برای مدیریت خطاهای منطقی یا اعتبارسنجی در لایه سرویس‌ها.
+    Custom exception for handling logical or validation-related errors in service layer.
 
-    این کلاس برای شرایطی مانند "OTP هنوز منقضی نشده" یا "ترم تکراری است" استفاده می‌شود و با DRF کاملاً سازگار است.
+    This is used in cases like "OTP not expired", "duplicate semester", etc., and fully integrates with DRF's exception system.
     """
 
     def __init__(
         self,
-        message="خطایی رخ داده است.",
+        message="An error occurred.",
         code=2000,
         errors=None,
-        status_code=400,
+        status_code=status.HTTP_400_BAD_REQUEST,
         data=None
     ):
         """
         Args:
-            message (str): پیام اصلی خطا برای کاربر
-            code (int): کد منطقی اپلیکیشن (مثلاً: 3001)
-            errors (list): لیست خطاهای قابل نمایش (برای ولیدیشن یا توضیح بیشتر)
-            status_code (int): کد HTTP مورد نظر برای پاسخ (مثل 400 یا 403)
-            data (dict): اطلاعات اضافی مفید برای کلاینت (مثلاً زمان باقی‌مانده OTP)
+            message (str): Main error message for client
+            code (int or str): Logical error code used in API (e.g., "3001")
+            errors (list or dict): Validation errors or extra error info
+            status_code (int): HTTP status code (e.g., 400, 403)
+            data (dict): Optional additional data to return to the client
         """
+        self.status_code = status_code
         self.detail = {
             "success": False,
             "message": message,
@@ -31,4 +33,3 @@ class CustomValidationError(APIException):
             "errors": errors or [],
             "data": data or {}
         }
-        self.status_code = status_code

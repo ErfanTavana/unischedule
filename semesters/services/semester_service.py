@@ -1,6 +1,5 @@
-from unischedule.core.exceptions import CustomValidationError
 from semesters.repositories import semester_repository
-from serializers.semester_serializer import (
+from semesters.serializers.semester_serializer import (
     SemesterSerializer,
     CreateSemesterSerializer,
     UpdateSemesterSerializer,
