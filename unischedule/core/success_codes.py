@@ -1,4 +1,5 @@
 class SuccessCodes:
+    # Semesters
     SEMESTER_CREATED = {
         "code": "2100",
         "message": "ترم با موفقیت ایجاد شد.",
@@ -28,6 +29,7 @@ class SuccessCodes:
         "message": "ترم فعال با موفقیت تنظیم شد.",
         "data": {}
     }
+    # Professors
     PROFESSOR_LISTED = {
         "code": "2201",
         "message": "لیست اساتید با موفقیت دریافت شد.",
@@ -87,4 +89,26 @@ class SuccessCodes:
         "code": "2305",
         "message": "درس با موفقیت حذف شد.",
         "data": {}
+    }
+
+    # Buildings
+    BUILDING_CREATED = {
+        "code": "2401",
+        "message": "ساختمان با موفقیت ایجاد شد."
+    }
+    BUILDING_RETRIEVED = {
+        "code": "2402",
+        "message": "اطلاعات ساختمان با موفقیت دریافت شد."
+    }
+    BUILDING_UPDATED = {
+        "code": "2403",
+        "message": "اطلاعات ساختمان با موفقیت به‌روزرسانی شد."
+    }
+    BUILDING_DELETED = {
+        "code": "2404",
+        "message": "ساختمان با موفقیت حذف شد."
+    }
+    BUILDING_LISTED = {
+        "code": "2405",
+        "message": "لیست ساختمان‌ها با موفقیت دریافت شد."
     }

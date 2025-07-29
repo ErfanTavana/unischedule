@@ -119,3 +119,29 @@ class ErrorCodes:
         "errors": [],
         "data": {}
     }
+
+    # Buildings
+    BUILDING_NOT_FOUND = {
+        "code": "4100",
+        "message": "ساختمان مورد نظر یافت نشد.",
+        "status_code": 404,
+        "errors": []
+    }
+    BUILDING_CREATION_FAILED = {
+        "code": "4401",
+        "message": "ایجاد ساختمان با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": []
+    }
+    BUILDING_UPDATE_FAILED = {
+        "code": "4402",
+        "message": "به‌روزرسانی اطلاعات ساختمان با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": []
+    }
+    BUILDING_DELETION_FAILED = {
+        "code": "4403",
+        "message": "حذف ساختمان با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": []
+    }
