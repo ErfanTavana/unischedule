@@ -1,5 +1,6 @@
 from rest_framework import status
 
+
 class ErrorCodes:
     SEMESTER_NOT_FOUND = {
         "code": "4100",
@@ -75,6 +76,46 @@ class ErrorCodes:
         "code": "4203",
         "message": "حذف استاد با خطا مواجه شد.",
         "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {}
+    }
+    # === COURSE ===
+    COURSE_CREATION_FAILED = {
+        "code": "4301",
+        "message": "ایجاد درس با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": [],
+        "data": {}
+    }
+
+    COURSE_UPDATE_FAILED = {
+        "code": "4302",
+        "message": "به‌روزرسانی اطلاعات درس با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": [],
+        "data": {}
+    }
+
+    COURSE_DELETION_FAILED = {
+        "code": "4303",
+        "message": "حذف درس با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": [],
+        "data": {}
+    }
+
+    COURSE_NOT_FOUND = {
+        "code": "4304",
+        "message": "درس مورد نظر یافت نشد.",
+        "status_code": 404,
+        "errors": [],
+        "data": {}
+    }
+
+    COURSE_VALIDATION_FAILED = {
+        "code": "4305",
+        "message": "اطلاعات وارد شده نامعتبر است.",
+        "status_code": 400,
         "errors": [],
         "data": {}
     }

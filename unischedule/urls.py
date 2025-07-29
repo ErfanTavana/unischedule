@@ -22,4 +22,6 @@ urlpatterns = [
     path('api/semesters/', include('semesters.urls', namespace='semesters')),
 
     path("api/professors/", include("professors.urls")),
+
+    path("api/courses/", include("courses.urls")),
 ]

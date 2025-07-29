@@ -57,3 +57,34 @@ class SuccessCodes:
         "message": "استاد با موفقیت حذف شد.",
         "data": {}
     }
+
+    # === COURSE ===
+    COURSE_CREATED = {
+        "code": "2301",
+        "message": "درس جدید با موفقیت ایجاد شد.",
+        "data": {}
+    }
+
+    COURSE_LISTED = {
+        "code": "2302",
+        "message": "لیست دروس با موفقیت دریافت شد.",
+        "data": {}
+    }
+
+    COURSE_RETRIEVED = {
+        "code": "2303",
+        "message": "اطلاعات درس با موفقیت دریافت شد.",
+        "data": {}
+    }
+
+    COURSE_UPDATED = {
+        "code": "2304",
+        "message": "اطلاعات درس با موفقیت به‌روزرسانی شد.",
+        "data": {}
+    }
+
+    COURSE_DELETED = {
+        "code": "2305",
+        "message": "درس با موفقیت حذف شد.",
+        "data": {}
+    }
