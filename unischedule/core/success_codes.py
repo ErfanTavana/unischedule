@@ -112,3 +112,28 @@ class SuccessCodes:
         "code": "2405",
         "message": "لیست ساختمان‌ها با موفقیت دریافت شد."
     }
+    # --------- Classroom Success Codes ---------
+    CLASSROOM_LISTED = {
+        "code": "2501",
+        "message": "لیست کلاس‌ها با موفقیت دریافت شد."
+    }
+
+    CLASSROOM_RETRIEVED = {
+        "code": "2502",
+        "message": "اطلاعات کلاس با موفقیت دریافت شد."
+    }
+
+    CLASSROOM_CREATED = {
+        "code": "2503",
+        "message": "کلاس جدید با موفقیت ایجاد شد."
+    }
+
+    CLASSROOM_UPDATED = {
+        "code": "2504",
+        "message": "اطلاعات کلاس با موفقیت به‌روزرسانی شد."
+    }
+
+    CLASSROOM_DELETED = {
+        "code": "2505",
+        "message": "کلاس با موفقیت حذف شد."
+    }

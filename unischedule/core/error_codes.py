@@ -145,3 +145,32 @@ class ErrorCodes:
         "status_code": 500,
         "errors": []
     }
+
+    # --------- Classroom Error Codes ---------
+    CLASSROOM_NOT_FOUND = {
+        "code": "4100",
+        "message": "کلاس مورد نظر یافت نشد.",
+        "status_code": 404,
+        "errors": []
+    }
+
+    CLASSROOM_CREATION_FAILED = {
+        "code": "4501",
+        "message": "ایجاد کلاس با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": []
+    }
+
+    CLASSROOM_UPDATE_FAILED = {
+        "code": "4502",
+        "message": "به‌روزرسانی اطلاعات کلاس با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": []
+    }
+
+    CLASSROOM_DELETION_FAILED = {
+        "code": "4503",
+        "message": "حذف کلاس با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": []
+    }

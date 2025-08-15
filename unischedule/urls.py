@@ -25,5 +25,5 @@ urlpatterns = [
 
     path("api/courses/", include("courses.urls")),
 
-    path("api/locations/", include("locations.urls")),  # اگر urls/__init__.py داری
+    path("api/locations/", include("locations.urls")),
 ]
