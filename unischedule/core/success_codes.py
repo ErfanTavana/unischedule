@@ -137,3 +137,12 @@ class SuccessCodes:
         "code": "2505",
         "message": "کلاس با موفقیت حذف شد."
     }
+    # ✅ Auth
+    LOGIN_SUCCESS = {
+        "code": 2001,
+        "message": "ورود با موفقیت انجام شد.",
+    }
+    LOGOUT_SUCCESS = {
+        "code": 2201,
+        "message": "خروج از حساب با موفقیت انجام شد."
+    }

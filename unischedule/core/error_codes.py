@@ -174,3 +174,32 @@ class ErrorCodes:
         "status_code": 500,
         "errors": []
     }
+
+    # ✅ Auth
+    INVALID_CREDENTIALS = {
+        "code": 4101,
+        "message": "نام کاربری یا رمز عبور اشتباه است.",
+        "status_code": 401,
+        "errors": ["Invalid username or password."]
+    }
+
+    LOGIN_FAILED = {
+        "code": 4501,
+        "message": "ورود با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": ["Login failed due to a server error."]
+    }
+
+    TOKEN_NOT_FOUND = {
+        "code": 4201,
+        "message": "توکن کاربر یافت نشد.",
+        "status_code": 404,
+        "errors": [],
+    }
+
+    LOGOUT_FAILED = {
+        "code": 4501,
+        "message": "خروج از حساب با خطا مواجه شد.",
+        "status_code": 500,
+        "errors": [],
+    }
