@@ -9,7 +9,10 @@ from unischedule.core.success_codes import SuccessCodes
 from unischedule.core.error_codes import ErrorCodes
 
 from professors.services import professor_service
-import traceback
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
@@ -110,10 +113,8 @@ def update_professor_view(request, professor_id):
             errors=e.detail
         )
 
-    except Exception as e:
-        import traceback
-        print("Unhandled Exception:", str(e))
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Unhandled exception while updating professor")
         return BaseResponse.error(
             message=ErrorCodes.PROFESSOR_UPDATE_FAILED["message"],
             code=ErrorCodes.PROFESSOR_UPDATE_FAILED["code"],
@@ -137,9 +138,8 @@ def delete_professor_view(request, professor_id):
             message=SuccessCodes.PROFESSOR_DELETED["message"],
             code=SuccessCodes.PROFESSOR_DELETED["code"]
         )
-    except Exception as e:
-        print("Unhandled Exception:", str(e))
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Unhandled exception while deleting professor")
         return BaseResponse.error(
             message=ErrorCodes.PROFESSOR_DELETION_FAILED["message"],
             code=ErrorCodes.PROFESSOR_DELETION_FAILED["code"],

@@ -9,7 +9,10 @@ from unischedule.core.success_codes import SuccessCodes
 from unischedule.core.error_codes import ErrorCodes
 
 from locations.services import building_service
-import traceback
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
@@ -62,8 +65,7 @@ def create_building_view(request):
             status_code=status.HTTP_201_CREATED
         )
     except CustomValidationError as e:
-        print("Unhandled Exception:", str(e))
-        traceback.print_exc()
+        logger.exception("Validation error while creating building")
         return BaseResponse.error(
             message=e.detail["message"],
             code=e.detail["code"],
@@ -71,9 +73,8 @@ def create_building_view(request):
             errors=e.detail["errors"],
             data=e.detail["data"]
         )
-    except Exception as e:
-        print("Unhandled Exception:", str(e))
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Unhandled exception while creating building")
         return BaseResponse.error(
             message=ErrorCodes.BUILDING_CREATION_FAILED["message"],
             code=ErrorCodes.BUILDING_CREATION_FAILED["code"],
