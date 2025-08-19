@@ -175,6 +175,42 @@ class ErrorCodes:
         "errors": []
     }
 
+    # Class Session Errors
+    CLASS_SESSION_NOT_FOUND = {
+        "code": "4600",
+        "message": "جلسه کلاس مورد نظر یافت نشد.",
+        "status_code": status.HTTP_404_NOT_FOUND,
+        "errors": [],
+        "data": {},
+    }
+    CLASS_SESSION_CONFLICT = {
+        "code": "4601",
+        "message": "تداخل در زمان یا مکان کلاس وجود دارد.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "errors": [],
+        "data": {},
+    }
+    CLASS_SESSION_CREATION_FAILED = {
+        "code": "4602",
+        "message": "ایجاد جلسه کلاس با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    CLASS_SESSION_UPDATE_FAILED = {
+        "code": "4603",
+        "message": "به‌روزرسانی جلسه کلاس با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    CLASS_SESSION_DELETION_FAILED = {
+        "code": "4604",
+        "message": "حذف جلسه کلاس با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
     # ✅ Auth
     INVALID_CREDENTIALS = {
         "code": 4101,
