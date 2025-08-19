@@ -873,6 +873,188 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "برنامهٔ کلاسی",
+            "item": [
+                {
+                    "name": "List Sessions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Token {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/schedules/list/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "schedules",
+                                "list"
+                            ]
+                        },
+                        "description": "فهرست تمام جلسات برنامهٔ کلاسی"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Session",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Token {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"Saturday\",\n  \"start_time\": \"08:00\",\n  \"end_time\": \"10:00\",\n  \"week_type\": \"odd\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"Introductory session\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/schedules/create/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "schedules",
+                                "create"
+                            ]
+                        },
+                        "description": "ایجاد یک جلسهٔ جدید"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const jsonData = pm.response.json();",
+                                    "pm.environment.set(\"session_id\", jsonData.data.session.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Retrieve Session",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Token {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/schedules/{{session_id}}/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "schedules",
+                                "{{session_id}}"
+                            ]
+                        },
+                        "description": "جزییات یک جلسه"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Session",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Token {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"Sunday\",\n  \"start_time\": \"10:00\",\n  \"end_time\": \"12:00\",\n  \"week_type\": \"even\",\n  \"group_code\": \"A1\",\n  \"capacity\": 25,\n  \"note\": \"Updated session\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/schedules/{{session_id}}/update/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "schedules",
+                                "{{session_id}}",
+                                "update"
+                            ]
+                        },
+                        "description": "ویرایش یک جلسه"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Session",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Token {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/schedules/{{session_id}}/delete/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "schedules",
+                                "{{session_id}}",
+                                "delete"
+                            ]
+                        },
+                        "description": "حذف نرم جلسه"
+                    },
+                    "response": []
+                }
+            ]
         }
     ],
     "auth": {
