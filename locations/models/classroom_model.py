@@ -7,8 +7,17 @@ class Classroom(BaseModel):
     Represents a physical classroom within a building (e.g., کلاس ۱۰۱، آزمایشگاه کامپیوتر).
     """
 
-    title = models.CharField(max_length=100, help_text="مثلاً کلاس ۱۰۱ یا آزمایشگاه شبکه")
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name="classrooms")
+    title = models.CharField(
+        max_length=100,
+        help_text="مثلاً کلاس ۱۰۱ یا آزمایشگاه شبکه",
+        verbose_name="عنوان",
+    )
+    building = models.ForeignKey(
+        Building,
+        on_delete=models.CASCADE,
+        related_name="classrooms",
+        verbose_name="ساختمان",
+    )
 
     class Meta:
         verbose_name = "کلاس"

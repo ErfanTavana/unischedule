@@ -8,9 +8,9 @@ class Institution(BaseModel):
     Each semester and related data are associated with a specific institution.
     """
 
-    name = models.CharField(max_length=255, unique=True)
-    slug = models.SlugField(max_length=255, unique=True)
-    is_active = models.BooleanField(default=True)
+    name = models.CharField(max_length=255, unique=True, verbose_name="نام")
+    slug = models.SlugField(max_length=255, unique=True, verbose_name="نامک")
+    is_active = models.BooleanField(default=True, verbose_name="فعال")
 
     class Meta:
         verbose_name = "مؤسسه"
