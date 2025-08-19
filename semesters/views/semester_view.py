@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 
 from unischedule.core.base_response import BaseResponse
 from unischedule.core.exceptions import CustomValidationError
@@ -26,11 +27,6 @@ def list_semesters_view(request):
     )
 
 
-from rest_framework.exceptions import ValidationError
-
-from rest_framework.exceptions import ValidationError
-from unischedule.core.error_codes import ErrorCodes
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_semester_view(request):
@@ -47,6 +43,14 @@ def create_semester_view(request):
             code=SuccessCodes.SEMESTER_CREATED["code"],
             data={"semester": semester},
             status_code=status.HTTP_201_CREATED
+        )
+    except CustomValidationError as e:
+        return BaseResponse.error(
+            message=e.detail["message"],
+            code=e.detail["code"],
+            status_code=e.status_code,
+            errors=e.detail["errors"],
+            data=e.detail["data"]
         )
     except ValidationError as e:
         return BaseResponse.error(
@@ -81,6 +85,14 @@ def update_semester_view(request, semester_id):
             data={"semester": updated_semester}
         )
 
+    except CustomValidationError as e:
+        return BaseResponse.error(
+            message=e.detail["message"],
+            code=e.detail["code"],
+            status_code=e.status_code,
+            errors=e.detail["errors"],
+            data=e.detail["data"]
+        )
     except ValidationError as e:
         return BaseResponse.error(
             message=ErrorCodes.VALIDATION_FAILED["message"],
