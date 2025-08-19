@@ -1,19 +1,13 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 
-from accounts.services import login_user
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
+from accounts.services import login_user, logout_user
 
 from unischedule.core.base_response import BaseResponse
 from unischedule.core.success_codes import SuccessCodes
 from unischedule.core.error_codes import ErrorCodes
 from unischedule.core.exceptions import CustomValidationError
-
-from accounts.services.auth_service import logout_user
 
 
 @api_view(["POST"])
