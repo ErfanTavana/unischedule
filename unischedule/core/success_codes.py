@@ -137,6 +137,32 @@ class SuccessCodes:
         "code": "2505",
         "message": "کلاس با موفقیت حذف شد."
     }
+    # Class Sessions
+    CLASS_SESSION_CREATED = {
+        "code": "2601",
+        "message": "جلسه کلاس با موفقیت ایجاد شد.",
+        "data": {},
+    }
+    CLASS_SESSION_LISTED = {
+        "code": "2602",
+        "message": "لیست جلسات کلاس با موفقیت دریافت شد.",
+        "data": {},
+    }
+    CLASS_SESSION_RETRIEVED = {
+        "code": "2603",
+        "message": "اطلاعات جلسه کلاس با موفقیت دریافت شد.",
+        "data": {},
+    }
+    CLASS_SESSION_UPDATED = {
+        "code": "2604",
+        "message": "جلسه کلاس با موفقیت به‌روزرسانی شد.",
+        "data": {},
+    }
+    CLASS_SESSION_DELETED = {
+        "code": "2605",
+        "message": "جلسه کلاس با موفقیت حذف شد.",
+        "data": {},
+    }
     # ✅ Auth
     LOGIN_SUCCESS = {
         "code": 2001,
