@@ -11,8 +11,8 @@ class Classroom(BaseModel):
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name="classrooms")
 
     class Meta:
-        verbose_name = "Classroom"
-        verbose_name_plural = "Classrooms"
+        verbose_name = "کلاس"
+        verbose_name_plural = "کلاس‌ها"
 
     def __str__(self):
         return f"{self.title} ({self.building.title})"

@@ -41,8 +41,8 @@ class ClassSession(BaseModel):
     note = models.TextField(blank=True, null=True)
 
     class Meta:
-        verbose_name = "Class Session"
-        verbose_name_plural = "Class Sessions"
+        verbose_name = "جلسه کلاس"
+        verbose_name_plural = "جلسات کلاس"
 
     def __str__(self) -> str:  # pragma: no cover - simple representation
         return f"{self.course.title} - {self.day_of_week}" 

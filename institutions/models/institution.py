@@ -13,8 +13,8 @@ class Institution(BaseModel):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = "Institution"
-        verbose_name_plural = "Institutions"
+        verbose_name = "مؤسسه"
+        verbose_name_plural = "مؤسسات"
 
     def __str__(self):
         return self.name

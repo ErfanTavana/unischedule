@@ -18,5 +18,9 @@ class User(AbstractUser):
         help_text="The institution this user belongs to."
     )
 
+    class Meta:
+        verbose_name = "کاربر"
+        verbose_name_plural = "کاربران"
+
     def __str__(self):
         return f"{self.username} ({self.institution.name if self.institution else 'No Institution'})"

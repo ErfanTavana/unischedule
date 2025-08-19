@@ -18,8 +18,8 @@ class Course(BaseModel):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = "Course"
-        verbose_name_plural = "Courses"
+        verbose_name = "درس"
+        verbose_name_plural = "دروس"
 
     def __str__(self):
         return f"{self.title} ({self.offer_code})"

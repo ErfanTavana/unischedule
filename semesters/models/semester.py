@@ -29,8 +29,8 @@ class Semester(BaseModel):
     )
 
     class Meta:
-        verbose_name = "Semester"
-        verbose_name_plural = "Semesters"
+        verbose_name = "ترم"
+        verbose_name_plural = "ترم‌ها"
 
     def __str__(self):
         return f"{self.title} - {self.institution.name}"
