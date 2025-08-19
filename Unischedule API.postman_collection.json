@@ -318,45 +318,39 @@
 				},
 				{
 					"name": "Update Professor",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "first_name",
-									"value": "عرفان",
-									"type": "text"
-								},
-								{
-									"key": "last_name",
-									"value": "رضایی2",
-									"type": "text"
-								},
-								{
-									"key": "national_code",
-									"value": "0912345610",
-									"type": "text"
-								},
-								{
-									"key": "phone_number",
-									"value": "09033483116",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base_url}}api/professors/create/",
-							"host": [
-								"{{base_url}}api"
-							],
-							"path": [
-								"professors",
-								"create",
-								""
-							]
-						},
+                                        "request": {
+                                                "method": "PUT",
+                                                "header": [
+                                                        {
+                                                                "key": "Authorization",
+                                                                "value": "Token {{token}}"
+                                                        },
+                                                        {
+                                                                "key": "Content-Type",
+                                                                "value": "application/json"
+                                                        }
+                                                ],
+                                                "body": {
+                                                        "mode": "raw",
+                                                        "raw": "{\n    \"first_name\": \"Ali\",\n    \"last_name\": \"Ahmadi\",\n    \"phone_number\": \"09123456789\"\n}",
+                                                        "options": {
+                                                                "raw": {
+                                                                        "language": "json"
+                                                                }
+                                                        }
+                                                },
+                                                "url": {
+                                                        "raw": "{{base_url}}/api/professors/{{professor_id}}/update/",
+                                                        "host": [
+                                                                "{{base_url}}"
+                                                        ],
+                                                        "path": [
+                                                                "api",
+                                                                "professors",
+                                                                "{{professor_id}}",
+                                                                "update"
+                                                        ]
+                                                },
 						"description": "StartFragment\n\n### 🟡 PUT - Update Professor\n\n**Endpoint:**\n\n```\nPUT api/professors/:id/update/\n\n ```\n\n**Description:**\n\nUpdate an existing professor's profile (first name, last name, or phone number) in the authenticated user's institution.\n\n---\n\n### 🔐 Authorization\n\n- Required: ✅ Yes\n    \n- Type: Bearer Token (use `{{token}}` in environment)\n    \n\n---\n\n### 📥 Request Parameters\n\n#### 🔹 Path Parameters:\n\n| Param | Type | Required | Description |\n| --- | --- | --- | --- |\n| id | int | ✅ | ID of the professor to update |\n\n#### 🔸 Body (JSON):\n\n``` json\n{\n  \"first_name\": \"Ali\",\n  \"last_name\": \"Ahmadi\",\n  \"phone_number\": \"09123456789\"\n}\n\n ```\n\n- All fields are optional (partial update supported)\n    \n- If field is not included, it will remain unchanged.\n    \n\n---\n\n### 📤 Success Response (200 OK)\n\n``` json\n{\n  \"status\": true,\n  \"code\": \"PROFESSOR_UPDATED\",\n  \"message\": \"Professor updated successfully.\",\n  \"data\": {\n    \"professor\": {\n      \"id\": 5,\n      \"first_name\": \"Ali\",\n      \"last_name\": \"Ahmadi\",\n      \"national_code\": \"0076543210\",\n      \"phone_number\": \"09123456789\",\n      \"institution\": 1\n    }\n  }\n}\n\n ```\n\n---\n\n### ❌ Error Responses\n\n#### 🔸 404 - Professor Not Found\n\n``` json\n{\n  \"status\": false,\n  \"code\": \"PROFESSOR_NOT_FOUND\",\n  \"message\": \"Professor not found.\",\n  \"errors\": {},\n  \"data\": null\n}\n\n ```\n\n#### 🔸 400 - Validation Error\n\n``` json\n{\n  \"status\": false,\n  \"code\": \"VALIDATION_FAILED\",\n  \"message\": \"Validation failed.\",\n  \"errors\": {\n    \"phone_number\": [\"Enter a valid phone number.\"]\n  },\n  \"data\": null\n}\n\n ```\n\n#### 🔸 500 - Update Failed\n\n``` json\n{\n  \"status\": false,\n  \"code\": \"PROFESSOR_UPDATE_FAILED\",\n  \"message\": \"Could not update professor.\",\n  \"errors\": {},\n  \"data\": null\n}\n\n ```\n\n---\n\n### 🧠 Notes\n\n- Fields are partially updatable (no need to send all fields).\n    \n- If professor with given ID doesn't exist or doesn't belong to the user's institution, 404 will be returned.\n    \n- All validation errors return `4102` project-specific code (`VALIDATION_FAILED`).\n    \n- Uses standard `BaseResponse` structure.\n    \n\n---\n\n### 📁 Folder in Postman\n\n```\nProfessors/\n  └── PUT - Update\n\n ```\n\n### 🔧 Environment Variables Required\n\n- `{{base_url}}`\n    \n- `{{token}}`\n    \n\nEndFragment"
 					},
 					"response": []
