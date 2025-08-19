@@ -15,6 +15,7 @@ class User(AbstractUser):
         related_name="users",
         null=True,
         blank=True,
+        verbose_name='مؤسسه',
         help_text="The institution this user belongs to."
     )
 

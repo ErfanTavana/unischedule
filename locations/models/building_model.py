@@ -9,12 +9,17 @@ class Building(BaseModel):
     Each building belongs to a specific institution.
     """
 
-    title = models.CharField(max_length=255, help_text="ساختمان آموزشی شماره یک",
-                             unique=False)  # e.g., "ساختمان آموزشی شماره ۲"
+    title = models.CharField(
+        max_length=255,
+        help_text="ساختمان آموزشی شماره یک",
+        unique=False,
+        verbose_name="عنوان",
+    )  # e.g., "ساختمان آموزشی شماره ۲"
     institution = models.ForeignKey(
         Institution,
         on_delete=models.CASCADE,
-        related_name="buildings"
+        related_name="buildings",
+        verbose_name="مؤسسه",
     )
 
     class Meta:

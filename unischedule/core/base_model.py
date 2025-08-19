@@ -16,9 +16,9 @@ class BaseModel(models.Model):
     Includes timestamp fields and cascade soft delete logic.
     """
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="ایجاد شده در")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="به‌روزرسانی شده در")
+    is_deleted = models.BooleanField(default=False, verbose_name="حذف شده")
 
     # Managers
     objects = ActiveManager()           # Default manager: active records only

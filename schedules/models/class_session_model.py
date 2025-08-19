@@ -25,20 +25,50 @@ class ClassSession(BaseModel):
         ("جمعه", "جمعه"),
     ]
 
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name="class_sessions")
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="class_sessions")
-    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, related_name="class_sessions")
-    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="class_sessions")
-    semester = models.ForeignKey(Semester, on_delete=models.CASCADE, related_name="class_sessions")
+    institution = models.ForeignKey(
+        Institution,
+        on_delete=models.CASCADE,
+        related_name="class_sessions",
+        verbose_name="مؤسسه",
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="class_sessions",
+        verbose_name="درس",
+    )
+    professor = models.ForeignKey(
+        Professor,
+        on_delete=models.CASCADE,
+        related_name="class_sessions",
+        verbose_name="استاد",
+    )
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.CASCADE,
+        related_name="class_sessions",
+        verbose_name="کلاس",
+    )
+    semester = models.ForeignKey(
+        Semester,
+        on_delete=models.CASCADE,
+        related_name="class_sessions",
+        verbose_name="ترم",
+    )
 
-    day_of_week = models.CharField(max_length=10, choices=DAY_OF_WEEK_CHOICES)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    day_of_week = models.CharField(max_length=10, choices=DAY_OF_WEEK_CHOICES, verbose_name="روز هفته")
+    start_time = models.TimeField(verbose_name="زمان شروع")
+    end_time = models.TimeField(verbose_name="زمان پایان")
 
-    week_type = models.CharField(max_length=5, choices=WeekTypeChoices.choices, default=WeekTypeChoices.EVERY)
-    group_code = models.CharField(max_length=50, blank=True, null=True)
-    capacity = models.PositiveIntegerField(default=0)
-    note = models.TextField(blank=True, null=True)
+    week_type = models.CharField(
+        max_length=5,
+        choices=WeekTypeChoices.choices,
+        default=WeekTypeChoices.EVERY,
+        verbose_name="نوع هفته",
+    )
+    group_code = models.CharField(max_length=50, blank=True, null=True, verbose_name="کد گروه")
+    capacity = models.PositiveIntegerField(default=0, verbose_name="ظرفیت")
+    note = models.TextField(blank=True, null=True, verbose_name="یادداشت")
 
     class Meta:
         verbose_name = "جلسه کلاس"
