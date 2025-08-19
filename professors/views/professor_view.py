@@ -15,39 +15,7 @@ import traceback
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_professors_view(request):
-    """
-    GET - List all professors for the authenticated user's institution.
-    """
-    institution = request.user.institution
-    professors = professor_service.list_professors(institution)
-
-    return BaseResponse.success(
-        message=SuccessCodes.PROFESSOR_LISTED["message"],
-        code=SuccessCodes.PROFESSOR_LISTED["code"],
-        data={"professors": professors}
-    )
-
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
-
-from unischedule.core.base_response import BaseResponse
-from unischedule.core.exceptions import CustomValidationError
-from unischedule.core.success_codes import SuccessCodes
-from unischedule.core.error_codes import ErrorCodes
-
-from professors.services import professor_service
-import traceback
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def list_professors_view(request):
-    """
-    GET - List all professors for the authenticated user's institution.
-    """
+    """GET - List all professors for the authenticated user's institution."""
     institution = request.user.institution
     professors = professor_service.list_professors(institution)
 
