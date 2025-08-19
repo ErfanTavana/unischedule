@@ -854,6 +854,153 @@
 				}
 			]
 		}
+	,
+		{
+			"name": "Class Sessions",
+			"item": [
+				{
+					"name": "List Sessions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/schedules/",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"schedules",
+								""
+							]
+						},
+						"description": "StartFragment\n\n### 📘 GET - List Sessions\n\n**Description**\n\nRetrieves all class sessions for the authenticated user's institution.\n\n---\n\n### 🔗 Endpoint\n\n```\nGET {{base_url}}/api/schedules/\n```\n\n---\n\n### 🔐 Authentication\n\nToken required\n\n``` http\nAuthorization: Token {{token}}\n```\n\n---\n\n### 📤 Response (200)\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2601\",\n  \"message\": \"لیست جلسات با موفقیت دریافت شد.\",\n  \"data\": {\n	\"sessions\": []\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n---\n\n### ❗ Possible Errors\n\n| Code | Message | HTTP Status |\n| --- | --- | --- |\n| 401 | Authentication credentials were not provided. | 401 Unauthorized |\n| 403 | You do not have permission to perform this action. | 403 Forbidden |\n\n---\n\n### 🧪 Scenarios\n\n- ✅ Valid token → returns list of sessions.\n- ❌ Missing token → 401 Unauthorized.\n\n---\n\n### 🏷️ Tags\n\n`#Schedules` `#List` `#GET`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 2,\n  \"semester\": 3,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسهٔ اول\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}api/schedules/create/",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"schedules",
+								"create",
+								""
+							]
+						},
+						"description": "StartFragment\n\n### 🆕 POST - Create Session\n\n**Description**\n\nCreates a new class session.\n\n---\n\n### 🔗 Endpoint\n\n```\nPOST {{base_url}}/api/schedules/create/\n```\n\n---\n\n### 🔐 Authentication\n\nToken required\n\n``` http\nAuthorization: Token {{token}}\nContent-Type: application/json\n```\n\n---\n\n### 📥 Request Body\n\n``` json\n{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 2,\n  \"semester\": 3,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسهٔ اول\"\n}\n```\n\n---\n\n### 📤 Response (201)\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2602\",\n  \"message\": \"جلسه با موفقیت ایجاد شد.\",\n  \"data\": {\n	\"session\": {\n	  \"id\": 10\n	}\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n---\n\n### ❗ Possible Errors\n\n| Code | Message | HTTP Status |\n| --- | --- | --- |\n| 4102 | اطلاعات وارد شده نامعتبر است. | 400 Bad Request |\n| 401 | Authentication credentials were not provided. | 401 Unauthorized |\n\n---\n\n### 🧪 Scenarios\n\n- ✅ Valid data → session created → 201.\n- ❌ Missing token → 401.\n- ❌ Validation error → 400.\n\n---\n\n### 🏷️ Tags\n\n`#Schedules` `#Create` `#POST`\n\nEndFragment"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									"pm.collectionVariables.set(\"session_id\", pm.response.json().data.session.id);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Retrieve Session",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/schedules/{{session_id}}/",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"schedules",
+								"{{session_id}}",
+								""
+							]
+						},
+						"description": "StartFragment\n\n### 📘 GET - Retrieve Session\n\n**Description**\n\nRetrieves details of a specific class session.\n\n---\n\n### 🔗 Endpoint\n\n```\nGET {{base_url}}/api/schedules/{{session_id}}/\n```\n\n---\n\n### 🔐 Authentication\n\nToken required\n\n``` http\nAuthorization: Token {{token}}\n```\n\n---\n\n### 📤 Response (200)\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2603\",\n  \"message\": \"جزئیات جلسه با موفقیت دریافت شد.\",\n  \"data\": {\n	\"session\": {\n	  \"id\": {{session_id}},\n	  \"course\": 1,\n	  \"professor\": 1,\n	  \"classroom\": 2,\n	  \"semester\": 3,\n	  \"day_of_week\": \"شنبه\",\n	  \"start_time\": \"09:00\",\n	  \"end_time\": \"11:00\",\n	  \"week_type\": \"every\",\n	  \"group_code\": \"A1\",\n	  \"capacity\": 30,\n	  \"note\": \"جلسهٔ اول\"\n	}\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n---\n\n### ❗ Possible Errors\n\n| Code | Message | HTTP Status |\n| --- | --- | --- |\n| 404 | جلسه مورد نظر یافت نشد. | 404 Not Found |\n| 401 | Authentication credentials were not provided. | 401 Unauthorized |\n\n---\n\n### 🧪 Scenarios\n\n- ✅ Valid ID → returns session info.\n- ❌ Invalid ID → 404 Not Found.\n- ❌ Missing token → 401 Unauthorized.\n\n---\n\n### 🏷️ Tags\n\n`#Schedules` `#Retrieve` `#GET`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Session",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 2,\n  \"semester\": 3,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسهٔ اول\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}api/schedules/{{session_id}}/update/",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"schedules",
+								"{{session_id}}",
+								"update",
+								""
+							]
+						},
+						"description": "StartFragment\n\n### ✏️ PUT - Update Session\n\n**Description**\n\nUpdates an existing class session.\n\n---\n\n### 🔗 Endpoint\n\n```\nPUT {{base_url}}/api/schedules/{{session_id}}/update/\n```\n\n---\n\n### 🔐 Authentication\n\nToken required\n\n``` http\nAuthorization: Token {{token}}\nContent-Type: application/json\n```\n\n---\n\n### 📥 Request Body\n\n``` json\n{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 2,\n  \"semester\": 3,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسهٔ اول\"\n}\n```\n\n---\n\n### 📤 Response (200)\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2604\",\n  \"message\": \"جلسه با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n	\"session\": {\n	  \"id\": {{session_id}}\n	}\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n---\n\n### ❗ Possible Errors\n\n| Code | Message | HTTP Status |\n| --- | --- | --- |\n| 404 | جلسه مورد نظر یافت نشد. | 404 Not Found |\n| 4102 | اطلاعات وارد شده نامعتبر است. | 400 Bad Request |\n| 401 | Authentication credentials were not provided. | 401 Unauthorized |\n\n---\n\n### 🧪 Scenarios\n\n- ✅ Valid ID and data → 200 OK.\n- ❌ Invalid ID → 404.\n- ❌ Missing token → 401.\n\n---\n\n### 🏷️ Tags\n\n`#Schedules` `#Update` `#PUT`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Session",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/schedules/{{session_id}}/delete/",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"schedules",
+								"{{session_id}}",
+								"delete",
+								""
+							]
+						},
+						"description": "StartFragment\n\n### 🗑️ DELETE - Delete Session\n\n**Description**\n\nDeletes an existing class session.\n\n---\n\n### 🔗 Endpoint\n\n```\nDELETE {{base_url}}/api/schedules/{{session_id}}/delete/\n```\n\n---\n\n### 🔐 Authentication\n\nToken required\n\n``` http\nAuthorization: Token {{token}}\n```\n\n---\n\n### 📤 Response (200)\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2605\",\n  \"message\": \"جلسه با موفقیت حذف شد.\",\n  \"data\": {},\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n---\n\n### ❗ Possible Errors\n\n| Code | Message | HTTP Status |\n| --- | --- | --- |\n| 404 | جلسه مورد نظر یافت نشد. | 404 Not Found |\n| 401 | Authentication credentials were not provided. | 401 Unauthorized |\n\n---\n\n### 🧪 Scenarios\n\n- ✅ Valid ID → session deleted → 200 OK.\n- ❌ Invalid ID → 404 Not Found.\n- ❌ Missing token → 401 Unauthorized.\n\n---\n\n### 🏷️ Tags\n\n`#Schedules` `#Delete` `#DELETE`\n\nEndFragment"
+					},
+					"response": []
+				}
+			]
+		}
 	],
 	"auth": {
 		"type": "apikey",
