@@ -1,0 +1,31 @@
+# یونی‌شدول
+
+## معرفی پروژه
+یونی‌شدول یک پروژهٔ جنگو برای مدیریت برنامه‌ریزی دانشگاهی است که شامل اپ‌های مختلف برای حساب‌های کاربری، دوره‌ها، زمان‌بندی کلاس‌ها و سایر اجزای مرتبط می‌باشد.
+
+## پیش‌نیازها
+- Python 3.10 یا بالاتر
+- pip و virtualenv برای ایجاد محیط مجازی
+- پایگاه دادهٔ SQLite (به صورت پیش‌فرض استفاده می‌شود)
+
+## نصب و اجرای سرور
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+## ساختار اپ‌ها
+پروژه شامل اپ‌های زیر است:
+- `accounts`: مدیریت کاربران و احراز هویت
+- `courses`: اطلاعات مربوط به دروس
+- `institutions`: نهادها و دانشکده‌ها
+- `locations`: مکان‌ها و کلاس‌ها
+- `professors`: اساتید و اطلاعات مربوطه
+- `schedules`: مدیریت برنامه‌های درسی
+- `semesters`: ترم‌های تحصیلی
+
+## مستندات بیشتر
+برای آشنایی با API و نمونه درخواست‌ها می‌توانید به فایل [Unischedule API.postman_collection.json](Unischedule%20API.postman_collection.json) مراجعه کنید.
