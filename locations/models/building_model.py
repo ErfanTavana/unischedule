@@ -25,6 +25,12 @@ class Building(BaseModel):
     class Meta:
         verbose_name = "ساختمان"
         verbose_name_plural = "ساختمان‌ها"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["institution", "title"],
+                name="unique_building_title_per_institution",
+            )
+        ]
 
     def __str__(self):
         return self.title
