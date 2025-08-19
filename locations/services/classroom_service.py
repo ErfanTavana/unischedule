@@ -4,8 +4,8 @@ from locations.serializers.classroom_serializer import (
     CreateClassroomSerializer,
     UpdateClassroomSerializer,
 )
-from unischedule.core.exceptions import CustomValidationError
 from unischedule.core.error_codes import ErrorCodes
+from unischedule.core.exceptions import CustomValidationError
 
 
 def create_classroom(data: dict, building) -> dict:
@@ -91,9 +91,6 @@ def list_classrooms(building) -> list[dict]:
     return ClassroomSerializer(queryset, many=True).data
 
 
-from locations.repositories import classroom_repository
-
-
 def get_classroom_by_id_and_institution_or_404(classroom_id: int, institution) -> dict:
     """
     Retrieve classroom by ID if it belongs to the given institution or raise error.
@@ -109,9 +106,6 @@ def get_classroom_by_id_and_institution_or_404(classroom_id: int, institution) -
         )
 
     return ClassroomSerializer(classroom).data
-
-
-from locations.repositories import classroom_repository
 
 
 def get_classroom_instance_by_institution_or_404(classroom_id: int, institution):
