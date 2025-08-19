@@ -1,3 +1,6 @@
+from django.db import IntegrityError
+from rest_framework import serializers
+
 from unischedule.core.exceptions import CustomValidationError
 from professors import repositories as professor_repository
 from professors.serializers import (
@@ -13,19 +16,31 @@ def create_professor(data: dict, institution) -> dict:
     """
     Create a new professor for the given institution.
     """
-    serializer = CreateProfessorSerializer(data=data)
-    if not serializer.is_valid():
+    serializer = CreateProfessorSerializer(data=data, context={"institution": institution})
+
+    try:
+        serializer.is_valid(raise_exception=True)
+    except serializers.ValidationError as e:
         raise CustomValidationError(
             message=ErrorCodes.VALIDATION_FAILED["message"],
             code=ErrorCodes.VALIDATION_FAILED["code"],
             status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
-            errors=serializer.errors,
+            errors=e.detail,
         )
 
     validated_data = serializer.validated_data
     validated_data["institution"] = institution
 
-    professor = professor_repository.create_professor(validated_data)
+    try:
+        professor = professor_repository.create_professor(validated_data)
+    except IntegrityError:
+        raise CustomValidationError(
+            message=ErrorCodes.VALIDATION_FAILED["message"],
+            code=ErrorCodes.VALIDATION_FAILED["code"],
+            status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
+            errors={"national_code": ["استادی با این کد ملی وجود دارد."]},
+        )
+
     return ProfessorSerializer(professor).data
 
 

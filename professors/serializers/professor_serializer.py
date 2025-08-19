@@ -35,6 +35,15 @@ class CreateProfessorSerializer(serializers.ModelSerializer):
     def validate_national_code(self, value):
         if not value.isdigit() or len(value) != 10:
             raise serializers.ValidationError("کد ملی باید ۱۰ رقم و فقط عدد باشد.")
+
+        institution = self.context.get("institution")
+        if (
+            institution
+            and Professor.objects.filter(national_code=value, institution=institution).exists()
+        ):
+            raise serializers.ValidationError(
+                "استادی با این کد ملی در این مؤسسه وجود دارد."
+            )
         return value
 
 
