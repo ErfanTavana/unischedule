@@ -15,8 +15,8 @@ class Professor(BaseModel):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
 
     class Meta:
-        verbose_name = "Professor"
-        verbose_name_plural = "Professors"
+        verbose_name = "استاد"
+        verbose_name_plural = "اساتید"
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

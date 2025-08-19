@@ -18,8 +18,8 @@ class Building(BaseModel):
     )
 
     class Meta:
-        verbose_name = "Building"
-        verbose_name_plural = "Buildings"
+        verbose_name = "ساختمان"
+        verbose_name_plural = "ساختمان‌ها"
 
     def __str__(self):
         return self.title
