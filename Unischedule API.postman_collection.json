@@ -855,10 +855,10 @@
       ]
     },
     {
-      "name": "برنامهٔ کلاسی",
+      "name": "Class Schedules",
       "item": [
         {
-          "name": "فهرست جلسات",
+          "name": "List Schedules",
           "request": {
             "method": "GET",
             "header": [
@@ -883,27 +883,74 @@
           "response": []
         },
         {
-          "name": "ایجاد جلسه",
+          "name": "Create Schedule",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "course",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "professor",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "classroom",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "semester",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "day_of_week",
+                  "value": "شنبه",
+                  "type": "text"
+                },
+                {
+                  "key": "start_time",
+                  "value": "09:00",
+                  "type": "text"
+                },
+                {
+                  "key": "end_time",
+                  "value": "11:00",
+                  "type": "text"
+                },
+                {
+                  "key": "week_type",
+                  "value": "every",
+                  "type": "text"
+                },
+                {
+                  "key": "group_code",
+                  "value": "A1",
+                  "type": "text"
+                },
+                {
+                  "key": "capacity",
+                  "value": "30",
+                  "type": "text"
+                },
+                {
+                  "key": "note",
+                  "value": "جلسه اول",
+                  "type": "text"
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{base_url}}/api/schedules/create/",
@@ -916,8 +963,7 @@
                 "create",
                 ""
               ]
-            },
-            "description": "### شرح\nایجاد یک جلسهٔ جدید برای درس مشخص.\n\n### Endpoint\n`POST {{base_url}}/api/schedules/create/`\n\n### Authentication\n`Authorization: Token {{token}}`\n`Content-Type: application/json`\n\n### Request Sample\n```json\n{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}\n```\n\n### Response Sample\n#### ✅ موفق (201)\n```json\n{\n  \"success\": true,\n  \"code\": \"2601\",\n  \"message\": \"جلسه کلاس با موفقیت ایجاد شد.\",\n  \"data\": {\n    \"class_session\": {\n      \"id\": 1,\n      \"course\": 1,\n      \"professor\": 1,\n      \"classroom\": 1,\n      \"semester\": 1,\n      \"day_of_week\": \"شنبه\",\n      \"start_time\": \"09:00\",\n      \"end_time\": \"11:00\",\n      \"week_type\": \"every\",\n      \"group_code\": \"A1\",\n      \"capacity\": 30,\n      \"note\": \"جلسه اول\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ خطای اعتبارسنجی (400)\n```json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"course\": [\"This field is required.\"]\n  },\n  \"data\": {}\n}\n```\n#### ❌ تداخل زمانی (409)\n```json\n{\n  \"success\": false,\n  \"code\": \"4601\",\n  \"message\": \"تداخل در زمان یا مکان کلاس وجود دارد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ نبود توکن (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"4602\",\n  \"message\": \"ایجاد جلسه کلاس با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ دادهٔ معتبر → 201 Created\n- ❌ دادهٔ ناقص → 400 Bad Request\n- ❌ تداخل زمانی → 409 Conflict\n- ❌ نبود توکن → 401 Unauthorized\n- ❌ خطای سرور → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#Create` `#POST`"
+            }
           },
           "response": [],
           "event": [
@@ -933,7 +979,7 @@
           ]
         },
         {
-          "name": "جزئیات جلسه",
+          "name": "Retrieve Schedule",
           "request": {
             "method": "GET",
             "header": [
@@ -959,27 +1005,74 @@
           "response": []
         },
         {
-          "name": "ویرایش جلسه",
+          "name": "Update Schedule",
           "request": {
             "method": "PUT",
             "header": [
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "course",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "professor",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "classroom",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "semester",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "day_of_week",
+                  "value": "شنبه",
+                  "type": "text"
+                },
+                {
+                  "key": "start_time",
+                  "value": "09:00",
+                  "type": "text"
+                },
+                {
+                  "key": "end_time",
+                  "value": "11:00",
+                  "type": "text"
+                },
+                {
+                  "key": "week_type",
+                  "value": "every",
+                  "type": "text"
+                },
+                {
+                  "key": "group_code",
+                  "value": "A1",
+                  "type": "text"
+                },
+                {
+                  "key": "capacity",
+                  "value": "30",
+                  "type": "text"
+                },
+                {
+                  "key": "note",
+                  "value": "جلسه اول",
+                  "type": "text"
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{base_url}}/api/schedules/{{session_id}}/update/",
@@ -993,13 +1086,12 @@
                 "update",
                 ""
               ]
-            },
-            "description": "### شرح\nویرایش اطلاعات یک جلسهٔ موجود.\n\n### Endpoint\n`PUT {{base_url}}/api/schedules/{{session_id}}/update/`\n\n### Authentication\n`Authorization: Token {{token}}`\n`Content-Type: application/json`\n\n### Request Sample\n```json\n{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}\n```\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2604\",\n  \"message\": \"جلسه کلاس با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"class_session\": {\n      \"id\": {{session_id}}\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ خطای اعتبارسنجی (400)\n```json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"course\": [\"This field is required.\"]\n  },\n  \"data\": {}\n}\n```\n#### ❌ تداخل زمانی (409)\n```json\n{\n  \"success\": false,\n  \"code\": \"4601\",\n  \"message\": \"تداخل در زمان یا مکان کلاس وجود دارد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ شناسه ناموجود (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4600\",\n  \"message\": \"جلسه کلاس مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ نبود توکن (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"4603\",\n  \"message\": \"به‌روزرسانی جلسه کلاس با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ شناسه و دادهٔ معتبر → 200 OK\n- ❌ دادهٔ ناقص → 400 Bad Request\n- ❌ تداخل زمانی → 409 Conflict\n- ❌ شناسه ناموجود → 404 Not Found\n- ❌ نبود توکن → 401 Unauthorized\n- ❌ خطای سرور → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#Update` `#PUT`"
+            }
           },
           "response": []
         },
         {
-          "name": "حذف جلسه",
+          "name": "Delete Schedule",
           "request": {
             "method": "DELETE",
             "header": [
@@ -1025,7 +1117,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "slug": "schedules"
     }
   ],
   "auth": {
