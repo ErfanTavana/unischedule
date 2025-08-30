@@ -868,16 +868,17 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}api/schedules/list/",
+              "raw": "{{base_url}}/api/schedules/",
               "host": [
-                "{{base_url}}api"
+                "{{base_url}}"
               ],
               "path": [
+                "api",
                 "schedules",
-                "list"
+                ""
               ]
             },
-            "description": "### شرح\nنمایش فهرست تمام جلسات کلاسی ثبت‌شده در سامانه.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/list/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2601\",\n  \"message\": \"لیست جلسات با موفقیت دریافت شد.\",\n  \"data\": {\n    \"sessions\": []\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"success\": false,\n  \"code\": \"401\",\n  \"message\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ درخواست معتبر با توکن → 200\n- ❌ نبود توکن → 401\n\n### Tags\n`#Schedules` `#List` `#GET`"
+            "description": "### شرح\nنمایش فهرست تمام جلسات کلاسی ثبت‌شده.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2602\",\n  \"message\": \"لیست جلسات کلاس با موفقیت دریافت شد.\",\n  \"data\": {\n    \"class_sessions\": [\n      {\n        \"id\": 1,\n        \"course\": 1,\n        \"professor\": 1,\n        \"classroom\": 1,\n        \"semester\": 1,\n        \"day_of_week\": \"شنبه\",\n        \"start_time\": \"09:00\",\n        \"end_time\": \"11:00\",\n        \"week_type\": \"every\",\n        \"group_code\": \"A1\",\n        \"capacity\": 30,\n        \"note\": \"جلسه اول\"\n      }\n    ]\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"500\",\n  \"message\": \"خطای داخلی سرور.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ درخواست معتبر با توکن → 200 OK\n- ❌ نبود توکن → 401 Unauthorized\n- ❌ خطای سرور → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#List` `#GET`"
           },
           "response": []
         },
@@ -897,7 +898,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 2,\n  \"semester\": 3,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسهٔ اول\"\n}",
+              "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -905,16 +906,18 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}api/schedules/create/",
+              "raw": "{{base_url}}/api/schedules/create/",
               "host": [
-                "{{base_url}}api"
+                "{{base_url}}"
               ],
               "path": [
+                "api",
                 "schedules",
-                "create"
+                "create",
+                ""
               ]
             },
-            "description": "### شرح\nایجاد یک جلسهٔ جدید برای درس مشخص.\n\n### Endpoint\n`POST {{base_url}}/api/schedules/create/`\n\n### Authentication\n`Authorization: Token {{token}}`\n`Content-Type: application/json`\n\n### Request Sample\n```json\n{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 2,\n  \"semester\": 3,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسهٔ اول\"\n}\n```\n\n### Response Sample\n#### ✅ موفق (201)\n```json\n{\n  \"success\": true,\n  \"code\": \"2602\",\n  \"message\": \"جلسه با موفقیت ایجاد شد.\",\n  \"data\": {\n    \"id\": 10\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n#### ❌ خطای اعتبارسنجی (400)\n```json\n{\n  \"success\": false,\n  \"code\": \"4102\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\"\n}\n```\n\n#### ❌ تداخل زمانی (409)\n```json\n{\n  \"success\": false,\n  \"code\": \"4103\",\n  \"message\": \"جلسهٔ دیگری در این بازه زمانی وجود دارد.\"\n}\n```\n\n### Scenarios\n- ✅ دادهٔ معتبر → 201 Created\n- ❌ دادهٔ نامعتبر → 400 Bad Request\n- ❌ تداخل زمانی → 409 Conflict\n- ❌ نبود توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Create` `#POST`"
+            "description": "### شرح\nایجاد یک جلسهٔ جدید برای درس مشخص.\n\n### Endpoint\n`POST {{base_url}}/api/schedules/create/`\n\n### Authentication\n`Authorization: Token {{token}}`\n`Content-Type: application/json`\n\n### Request Sample\n```json\n{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}\n```\n\n### Response Sample\n#### ✅ موفق (201)\n```json\n{\n  \"success\": true,\n  \"code\": \"2601\",\n  \"message\": \"جلسه کلاس با موفقیت ایجاد شد.\",\n  \"data\": {\n    \"class_session\": {\n      \"id\": 1,\n      \"course\": 1,\n      \"professor\": 1,\n      \"classroom\": 1,\n      \"semester\": 1,\n      \"day_of_week\": \"شنبه\",\n      \"start_time\": \"09:00\",\n      \"end_time\": \"11:00\",\n      \"week_type\": \"every\",\n      \"group_code\": \"A1\",\n      \"capacity\": 30,\n      \"note\": \"جلسه اول\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ خطای اعتبارسنجی (400)\n```json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"course\": [\"This field is required.\"]\n  },\n  \"data\": {}\n}\n```\n#### ❌ تداخل زمانی (409)\n```json\n{\n  \"success\": false,\n  \"code\": \"4601\",\n  \"message\": \"تداخل در زمان یا مکان کلاس وجود دارد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ نبود توکن (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"4602\",\n  \"message\": \"ایجاد جلسه کلاس با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ دادهٔ معتبر → 201 Created\n- ❌ دادهٔ ناقص → 400 Bad Request\n- ❌ تداخل زمانی → 409 Conflict\n- ❌ نبود توکن → 401 Unauthorized\n- ❌ خطای سرور → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#Create` `#POST`"
           },
           "response": [],
           "event": [
@@ -923,7 +926,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set(\"session_id\", pm.response.json().data.id);"
+                  "pm.collectionVariables.set(\"session_id\", pm.response.json().data.class_session.id);"
                 ]
               }
             }
@@ -940,16 +943,18 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}api/schedules/{{session_id}}/",
+              "raw": "{{base_url}}/api/schedules/{{session_id}}/",
               "host": [
-                "{{base_url}}api"
+                "{{base_url}}"
               ],
               "path": [
+                "api",
                 "schedules",
-                "{{session_id}}"
+                "{{session_id}}",
+                ""
               ]
             },
-            "description": "### شرح\nدریافت جزئیات یک جلسه بر اساس شناسه.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/{{session_id}}/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2603\",\n  \"message\": \"جزئیات جلسه با موفقیت دریافت شد.\",\n  \"data\": {\n    \"id\": {{session_id}},\n    \"course\": 1,\n    \"professor\": 1,\n    \"classroom\": 2,\n    \"semester\": 3,\n    \"day_of_week\": \"شنبه\",\n    \"start_time\": \"09:00\",\n    \"end_time\": \"11:00\",\n    \"week_type\": \"every\",\n    \"group_code\": \"A1\",\n    \"capacity\": 30,\n    \"note\": \"جلسهٔ اول\"\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n#### ❌ شناسه ناموجود (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"404\",\n  \"message\": \"جلسه مورد نظر یافت نشد.\"\n}\n```\n\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"success\": false,\n  \"code\": \"401\",\n  \"message\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ شناسه معتبر → 200 OK\n- ❌ شناسه ناموجود → 404 Not Found\n- ❌ نبود توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Retrieve` `#GET`"
+            "description": "### شرح\nدریافت جزئیات یک جلسه بر اساس شناسه.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/{{session_id}}/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2603\",\n  \"message\": \"جزئیات جلسه با موفقیت دریافت شد.\",\n  \"data\": {\n    \"class_session\": {\n      \"id\": {{session_id}},\n      \"course\": 1,\n      \"professor\": 1,\n      \"classroom\": 1,\n      \"semester\": 1,\n      \"day_of_week\": \"شنبه\",\n      \"start_time\": \"09:00\",\n      \"end_time\": \"11:00\",\n      \"week_type\": \"every\",\n      \"group_code\": \"A1\",\n      \"capacity\": 30,\n      \"note\": \"جلسه اول\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ شناسه ناموجود (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4600\",\n  \"message\": \"جلسه کلاس مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"500\",\n  \"message\": \"خطای داخلی سرور.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ شناسه معتبر → 200 OK\n- ❌ شناسه ناموجود → 404 Not Found\n- ❌ نبود توکن → 401 Unauthorized\n- ❌ خطای سرور → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#Retrieve` `#GET`"
           },
           "response": []
         },
@@ -969,7 +974,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 2,\n  \"semester\": 3,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسهٔ اول\"\n}",
+              "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -977,17 +982,19 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}api/schedules/{{session_id}}/update/",
+              "raw": "{{base_url}}/api/schedules/{{session_id}}/update/",
               "host": [
-                "{{base_url}}api"
+                "{{base_url}}"
               ],
               "path": [
+                "api",
                 "schedules",
                 "{{session_id}}",
-                "update"
+                "update",
+                ""
               ]
             },
-            "description": "### شرح\nویرایش اطلاعات یک جلسهٔ موجود.\n\n### Endpoint\n`PUT {{base_url}}/api/schedules/{{session_id}}/update/`\n\n### Authentication\n`Authorization: Token {{token}}`\n`Content-Type: application/json`\n\n### Request Sample\n```json\n{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 2,\n  \"semester\": 3,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسهٔ اول\"\n}\n```\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2604\",\n  \"message\": \"جلسه با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"id\": {{session_id}}\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n#### ❌ خطای اعتبارسنجی (400)\n```json\n{\n  \"success\": false,\n  \"code\": \"4102\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\"\n}\n```\n\n#### ❌ تداخل زمانی (409)\n```json\n{\n  \"success\": false,\n  \"code\": \"4103\",\n  \"message\": \"جلسهٔ دیگری در این بازه زمانی وجود دارد.\"\n}\n```\n\n#### ❌ شناسه ناموجود (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"404\",\n  \"message\": \"جلسه مورد نظر یافت نشد.\"\n}\n```\n\n### Scenarios\n- ✅ شناسه و دادهٔ معتبر → 200 OK\n- ❌ دادهٔ نامعتبر → 400 Bad Request\n- ❌ تداخل زمانی → 409 Conflict\n- ❌ شناسه ناموجود → 404 Not Found\n- ❌ نبود توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Update` `#PUT`"
+            "description": "### شرح\nویرایش اطلاعات یک جلسهٔ موجود.\n\n### Endpoint\n`PUT {{base_url}}/api/schedules/{{session_id}}/update/`\n\n### Authentication\n`Authorization: Token {{token}}`\n`Content-Type: application/json`\n\n### Request Sample\n```json\n{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"every\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}\n```\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2604\",\n  \"message\": \"جلسه کلاس با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"class_session\": {\n      \"id\": {{session_id}}\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ خطای اعتبارسنجی (400)\n```json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"course\": [\"This field is required.\"]\n  },\n  \"data\": {}\n}\n```\n#### ❌ تداخل زمانی (409)\n```json\n{\n  \"success\": false,\n  \"code\": \"4601\",\n  \"message\": \"تداخل در زمان یا مکان کلاس وجود دارد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ شناسه ناموجود (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4600\",\n  \"message\": \"جلسه کلاس مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ نبود توکن (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"4603\",\n  \"message\": \"به‌روزرسانی جلسه کلاس با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ شناسه و دادهٔ معتبر → 200 OK\n- ❌ دادهٔ ناقص → 400 Bad Request\n- ❌ تداخل زمانی → 409 Conflict\n- ❌ شناسه ناموجود → 404 Not Found\n- ❌ نبود توکن → 401 Unauthorized\n- ❌ خطای سرور → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#Update` `#PUT`"
           },
           "response": []
         },
@@ -1002,17 +1009,19 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}api/schedules/{{session_id}}/delete/",
+              "raw": "{{base_url}}/api/schedules/{{session_id}}/delete/",
               "host": [
-                "{{base_url}}api"
+                "{{base_url}}"
               ],
               "path": [
+                "api",
                 "schedules",
                 "{{session_id}}",
-                "delete"
+                "delete",
+                ""
               ]
             },
-            "description": "### شرح\nحذف یک جلسهٔ موجود بر اساس شناسه.\n\n### Endpoint\n`DELETE {{base_url}}/api/schedules/{{session_id}}/delete/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2605\",\n  \"message\": \"جلسه با موفقیت حذف شد.\",\n  \"data\": {},\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n#### ❌ شناسه ناموجود (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"404\",\n  \"message\": \"جلسه مورد نظر یافت نشد.\"\n}\n```\n\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"success\": false,\n  \"code\": \"401\",\n  \"message\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ شناسه معتبر → 200 OK\n- ❌ شناسه ناموجود → 404 Not Found\n- ❌ نبود توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Delete` `#DELETE`"
+            "description": "### شرح\nحذف یک جلسهٔ موجود بر اساس شناسه.\n\n### Endpoint\n`DELETE {{base_url}}/api/schedules/{{session_id}}/delete/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2605\",\n  \"message\": \"جلسه کلاس با موفقیت حذف شد.\",\n  \"data\": {},\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ شناسه ناموجود (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4600\",\n  \"message\": \"جلسه کلاس مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"4604\",\n  \"message\": \"حذف جلسه کلاس با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ شناسه معتبر → 200 OK\n- ❌ شناسه ناموجود → 404 Not Found\n- ❌ نبود توکن → 401 Unauthorized\n- ❌ خطای سرور → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#Delete` `#DELETE`"
           },
           "response": []
         }
