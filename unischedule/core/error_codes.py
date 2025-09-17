@@ -219,6 +219,71 @@ class ErrorCodes:
         "data": {},
     }
 
+    # Display screens
+    DISPLAY_SCREEN_NOT_FOUND = {
+        "code": "4800",
+        "message": "صفحه نمایش مورد نظر یافت نشد.",
+        "status_code": status.HTTP_404_NOT_FOUND,
+        "errors": [],
+        "data": {},
+    }
+    DISPLAY_SCREEN_CREATION_FAILED = {
+        "code": "4801",
+        "message": "ایجاد صفحه نمایش با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    DISPLAY_SCREEN_UPDATE_FAILED = {
+        "code": "4802",
+        "message": "به‌روزرسانی صفحه نمایش با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    DISPLAY_SCREEN_DELETION_FAILED = {
+        "code": "4803",
+        "message": "حذف صفحه نمایش با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    DISPLAY_FILTER_NOT_FOUND = {
+        "code": "4810",
+        "message": "فیلتر نمایش مورد نظر یافت نشد.",
+        "status_code": status.HTTP_404_NOT_FOUND,
+        "errors": [],
+        "data": {},
+    }
+    DISPLAY_FILTER_CREATION_FAILED = {
+        "code": "4811",
+        "message": "ایجاد فیلتر نمایش با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    DISPLAY_FILTER_UPDATE_FAILED = {
+        "code": "4812",
+        "message": "به‌روزرسانی فیلتر نمایش با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    DISPLAY_FILTER_DELETION_FAILED = {
+        "code": "4813",
+        "message": "حذف فیلتر نمایش با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    DISPLAY_FILTER_INVALID = {
+        "code": "4814",
+        "message": "پیکربندی فیلتر نمایش نامعتبر است.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "errors": [],
+        "data": {},
+    }
+
     # Auth
     INVALID_CREDENTIALS = {
         "code": "4700",

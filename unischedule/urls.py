@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from displays import urls as display_urls
+
 urlpatterns = [
     path('api/admin/', admin.site.urls),
     path('api/semesters/', include('semesters.urls', namespace='semesters')),
@@ -29,4 +31,12 @@ urlpatterns = [
 
     path("api/auth/", include("accounts.urls")),
     path("api/schedules/", include("schedules.urls")),
+    path(
+        "api/displays/",
+        include((display_urls.api_urlpatterns, "displays"), namespace="displays"),
+    ),
+    path(
+        "displays/",
+        include((display_urls.public_urlpatterns, "displays"), namespace="public-displays"),
+    ),
 ]

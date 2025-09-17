@@ -163,6 +163,57 @@ class SuccessCodes:
         "message": "جلسه کلاس با موفقیت حذف شد.",
         "data": {},
     }
+    # Display screens
+    DISPLAY_SCREEN_CREATED = {
+        "code": "2701",
+        "message": "صفحه نمایش با موفقیت ایجاد شد.",
+        "data": {},
+    }
+    DISPLAY_SCREEN_LISTED = {
+        "code": "2702",
+        "message": "لیست صفحات نمایش با موفقیت دریافت شد.",
+        "data": {},
+    }
+    DISPLAY_SCREEN_RETRIEVED = {
+        "code": "2703",
+        "message": "صفحه نمایش با موفقیت دریافت شد.",
+        "data": {},
+    }
+    DISPLAY_SCREEN_UPDATED = {
+        "code": "2704",
+        "message": "صفحه نمایش با موفقیت به‌روزرسانی شد.",
+        "data": {},
+    }
+    DISPLAY_SCREEN_DELETED = {
+        "code": "2705",
+        "message": "صفحه نمایش با موفقیت حذف شد.",
+        "data": {},
+    }
+    DISPLAY_FILTER_CREATED = {
+        "code": "2711",
+        "message": "فیلتر نمایش با موفقیت ایجاد شد.",
+        "data": {},
+    }
+    DISPLAY_FILTER_LISTED = {
+        "code": "2712",
+        "message": "فیلترهای صفحه نمایش با موفقیت دریافت شدند.",
+        "data": {},
+    }
+    DISPLAY_FILTER_UPDATED = {
+        "code": "2713",
+        "message": "فیلتر نمایش با موفقیت به‌روزرسانی شد.",
+        "data": {},
+    }
+    DISPLAY_FILTER_DELETED = {
+        "code": "2714",
+        "message": "فیلتر نمایش با موفقیت حذف شد.",
+        "data": {},
+    }
+    DISPLAY_SCREEN_RENDERED = {
+        "code": "2790",
+        "message": "اطلاعات صفحه نمایش با موفقیت بارگذاری شد.",
+        "data": {},
+    }
     # ✅ Auth
     LOGIN_SUCCESS = {
         "code": 2001,
