@@ -11,6 +11,7 @@ from semesters.models import Semester
 from schedules.models import ClassSession
 from schedules.services import class_session_service
 from unischedule.core.exceptions import CustomValidationError
+from unischedule.core.error_codes import ErrorCodes
 
 
 class ClassSessionModelServiceViewTests(TestCase):
@@ -41,6 +42,11 @@ class ClassSessionModelServiceViewTests(TestCase):
         }
         data.update(overrides)
         return data
+
+    def _assert_institution_required_response(self, response):
+        self.assertEqual(response.status_code, ErrorCodes.INSTITUTION_REQUIRED["status_code"])
+        self.assertEqual(response.data["code"], ErrorCodes.INSTITUTION_REQUIRED["code"])
+        self.assertEqual(response.data["message"], ErrorCodes.INSTITUTION_REQUIRED["message"])
 
     def test_model_creation_and_soft_delete(self):
         session = ClassSession.objects.create(
@@ -80,3 +86,38 @@ class ClassSessionModelServiceViewTests(TestCase):
         del_res = self.client.delete(f"/api/schedules/{session_id}/delete/")
         self.assertEqual(del_res.status_code, 200)
         self.assertTrue(ClassSession.objects_with_deleted.get(id=session_id).is_deleted)
+
+    def test_views_require_institution_for_authenticated_user(self):
+        user_without_institution = User.objects.create_user(username="noinst", password="pass")
+        other_client = APIClient()
+        other_client.force_authenticate(user=user_without_institution)
+
+        session = ClassSession.objects.create(
+            institution=self.institution,
+            course=self.course,
+            professor=self.professor,
+            classroom=self.classroom,
+            semester=self.semester,
+            day_of_week="شنبه",
+            start_time=time(8, 0),
+            end_time=time(10, 0),
+        )
+
+        list_response = other_client.get("/api/schedules/")
+        self._assert_institution_required_response(list_response)
+
+        retrieve_response = other_client.get(f"/api/schedules/{session.id}/")
+        self._assert_institution_required_response(retrieve_response)
+
+        create_response = other_client.post("/api/schedules/create/", self._session_payload(), format="json")
+        self._assert_institution_required_response(create_response)
+
+        update_response = other_client.put(
+            f"/api/schedules/{session.id}/update/",
+            {"note": "Updated"},
+            format="json",
+        )
+        self._assert_institution_required_response(update_response)
+
+        delete_response = other_client.delete(f"/api/schedules/{session.id}/delete/")
+        self._assert_institution_required_response(delete_response)

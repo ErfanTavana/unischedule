@@ -9,6 +9,17 @@ from schedules import repositories as class_session_repository
 from schedules.models import ClassSession
 
 
+def _ensure_institution(institution) -> None:
+    if not institution:
+        raise CustomValidationError(
+            message=ErrorCodes.INSTITUTION_REQUIRED["message"],
+            code=ErrorCodes.INSTITUTION_REQUIRED["code"],
+            status_code=ErrorCodes.INSTITUTION_REQUIRED["status_code"],
+            errors=ErrorCodes.INSTITUTION_REQUIRED["errors"],
+            data=ErrorCodes.INSTITUTION_REQUIRED["data"],
+        )
+
+
 def _check_conflict(data, institution):
     if class_session_repository.has_time_conflict(
         institution=institution,
@@ -30,6 +41,7 @@ def _check_conflict(data, institution):
 
 
 def create_class_session(data: dict, institution) -> dict:
+    _ensure_institution(institution)
     serializer = CreateClassSessionSerializer(data=data)
     if not serializer.is_valid():
         raise CustomValidationError(
@@ -46,6 +58,7 @@ def create_class_session(data: dict, institution) -> dict:
 
 
 def update_class_session(session: ClassSession, data: dict) -> dict:
+    _ensure_institution(session.institution)
     serializer = UpdateClassSessionSerializer(instance=session, data=data, partial=True)
     if not serializer.is_valid():
         raise CustomValidationError(
@@ -63,6 +76,7 @@ def update_class_session(session: ClassSession, data: dict) -> dict:
 
 
 def get_class_session_instance_or_404(session_id: int, institution) -> ClassSession:
+    _ensure_institution(institution)
     session = class_session_repository.get_class_session_by_id_and_institution(session_id, institution)
     if not session:
         raise CustomValidationError(
@@ -80,9 +94,11 @@ def get_class_session_by_id_or_404(session_id: int, institution) -> dict:
 
 
 def delete_class_session(session: ClassSession) -> None:
+    _ensure_institution(session.institution)
     class_session_repository.soft_delete_class_session(session)
 
 
 def list_class_sessions(institution) -> list[dict]:
+    _ensure_institution(institution)
     queryset = class_session_repository.list_class_sessions_by_institution(institution)
     return ClassSessionSerializer(queryset, many=True).data

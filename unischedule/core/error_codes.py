@@ -10,6 +10,13 @@ class ErrorCodes:
         "errors": [],
         "data": {},
     }
+    INSTITUTION_REQUIRED = {
+        "code": "4001",
+        "message": "برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.",
+        "status_code": status.HTTP_403_FORBIDDEN,
+        "errors": [],
+        "data": {},
+    }
 
     # Semester
     SEMESTER_NOT_FOUND = {
