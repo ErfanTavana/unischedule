@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'professors',
     'courses',
     'locations',
-    'schedules'
+    'schedules',
+    'displays',
 
 ]
 

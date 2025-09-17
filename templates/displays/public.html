@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="utf-8" />
+    <title>{% if screen %}{{ screen.title }}{% else %}صفحه نمایش{% endif %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content="{{ refresh_interval|default:60 }}" />
+    <link rel="stylesheet" href="{% static 'displays/css/public.css' %}">
+</head>
+<body class="theme-{{ screen.layout_theme|default:'default' }}">
+    <div class="display-wrapper">
+        <header class="display-header">
+            <h1>{{ screen.title|default:"نمایش برنامه" }}</h1>
+            {% if generated_at %}
+            <p class="generated-at">به‌روزرسانی: {{ generated_at }}</p>
+            {% endif %}
+        </header>
+
+        {% if error %}
+            <section class="display-error">
+                <p>{{ error }}</p>
+            </section>
+        {% else %}
+            <section class="display-messages">
+                {% for message in messages %}
+                    <div class="message-item priority-{{ message.priority }}">{{ message.content }}</div>
+                {% empty %}
+                    <div class="message-item empty">پیامی موجود نیست.</div>
+                {% endfor %}
+            </section>
+
+            <section class="display-filters">
+                {% for filter in filters %}
+                    <div class="filter-card">
+                        <h2>{{ filter.title|default:"فیلتر" }}</h2>
+                        <p>
+                            {% if filter.computed_day_of_week %}
+                                روز: {{ filter.computed_day_of_week }}
+                            {% endif %}
+                            {% if filter.computed_week_type %}
+                                | نوع هفته: {{ filter.computed_week_type }}
+                            {% endif %}
+                        </p>
+                    </div>
+                {% endfor %}
+            </section>
+
+            <section class="display-sessions">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>درس</th>
+                            <th>استاد</th>
+                            <th>روز</th>
+                            <th>ساعت</th>
+                            <th>کلاس</th>
+                            <th>نوع هفته</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                            <tr>
+                                <td>{{ session.course_title }}</td>
+                                <td>{{ session.professor_name }}</td>
+                                <td>{{ session.day_of_week }}</td>
+                                <td>{{ session.start_time }} - {{ session.end_time }}</td>
+                                <td>{{ session.classroom_title }} ({{ session.building_title }})</td>
+                                <td>{{ session.week_type }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="empty">کلاسی برای نمایش وجود ندارد.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        {% endif %}
+    </div>
+    <script src="{% static 'displays/js/public.js' %}"></script>
+</body>
+</html>

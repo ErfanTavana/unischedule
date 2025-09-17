@@ -1119,6 +1119,154 @@
         }
       ],
       "slug": "schedules"
+    },
+    {
+      "name": "Displays",
+      "item": [
+        {
+          "name": "List Display Screens",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/displays/screens/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "displays",
+                "screens",
+                ""
+              ]
+            },
+            "description": "نمایش فهرست تمامی نمایشگرهای فعال برای مؤسسه کاربر."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Display Screen",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"Main Lobby\", \"refresh_interval\": 60, \"layout_theme\": \"default\", \"is_active\": true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/displays/screens/create/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "displays",
+                "screens",
+                "create",
+                ""
+              ]
+            },
+            "description": "ایجاد نمایشگر جدید برای یک سالن یا بخش."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Display Filter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"classroom\": 1, \"professor\": 1, \"semester\": 1, \"day_of_week\": \"شنبه\", \"week_type\": \"every\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/displays/screens/{{screen_id}}/filters/create/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "displays",
+                "screens",
+                "{{screen_id}}",
+                "filters",
+                "create",
+                ""
+              ]
+            },
+            "description": "افزودن فیلتر به نمایشگر برای محدود کردن کلاس‌های نمایش داده‌شده."
+          },
+          "response": []
+        },
+        {
+          "name": "Public Display JSON",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/displays/{{screen_slug}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "displays",
+                "{{screen_slug}}",
+                ""
+              ]
+            },
+            "description": "نمای عمومی JSON برای نمایشگر انتخاب شده."
+          },
+          "response": []
+        },
+        {
+          "name": "Public Display HTML",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/displays/{{screen_slug}}/?format=html",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "displays",
+                "{{screen_slug}}",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "html"
+                }
+              ]
+            },
+            "description": "نمای HTML برای نمایشگر جهت استفاده در مانیتور عمومی."
+          },
+          "response": []
+        }
+      ],
+      "slug": "displays"
     }
   ],
   "auth": {

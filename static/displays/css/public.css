@@ -1,0 +1,85 @@
+body {
+    margin: 0;
+    font-family: "IRANSans", sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+.display-wrapper {
+    padding: 2rem;
+}
+
+.display-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+.display-messages {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.message-item {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background: rgba(148, 163, 184, 0.2);
+    min-width: 200px;
+}
+
+.message-item.empty {
+    opacity: 0.6;
+}
+
+.display-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.filter-card {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background: rgba(30, 41, 59, 0.7);
+}
+
+.display-sessions table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(15, 23, 42, 0.8);
+}
+
+.display-sessions th,
+.display-sessions td {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    text-align: center;
+}
+
+.display-sessions tr:nth-child(even) {
+    background: rgba(30, 41, 59, 0.6);
+}
+
+.display-sessions .empty {
+    text-align: center;
+    padding: 2rem 0;
+    opacity: 0.7;
+}
+
+.theme-light {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.theme-light .display-sessions table {
+    background: rgba(226, 232, 240, 0.8);
+}
+
+.theme-light .display-sessions tr:nth-child(even) {
+    background: rgba(203, 213, 225, 0.7);
+}
