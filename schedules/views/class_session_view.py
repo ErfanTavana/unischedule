@@ -15,24 +15,42 @@ from schedules.services import class_session_service
 @permission_classes([IsAuthenticated])
 def list_class_sessions_view(request):
     institution = request.user.institution
-    sessions = class_session_service.list_class_sessions(institution)
-    return BaseResponse.success(
-        message=SuccessCodes.CLASS_SESSION_LISTED["message"],
-        code=SuccessCodes.CLASS_SESSION_LISTED["code"],
-        data={"class_sessions": sessions},
-    )
+    try:
+        sessions = class_session_service.list_class_sessions(institution)
+        return BaseResponse.success(
+            message=SuccessCodes.CLASS_SESSION_LISTED["message"],
+            code=SuccessCodes.CLASS_SESSION_LISTED["code"],
+            data={"class_sessions": sessions},
+        )
+    except CustomValidationError as e:
+        return BaseResponse.error(
+            message=e.detail["message"],
+            code=e.detail["code"],
+            status_code=e.status_code,
+            errors=e.detail["errors"],
+            data=e.detail["data"],
+        )
 
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def retrieve_class_session_view(request, session_id):
     institution = request.user.institution
-    session = class_session_service.get_class_session_by_id_or_404(session_id, institution)
-    return BaseResponse.success(
-        message=SuccessCodes.CLASS_SESSION_RETRIEVED["message"],
-        code=SuccessCodes.CLASS_SESSION_RETRIEVED["code"],
-        data={"class_session": session},
-    )
+    try:
+        session = class_session_service.get_class_session_by_id_or_404(session_id, institution)
+        return BaseResponse.success(
+            message=SuccessCodes.CLASS_SESSION_RETRIEVED["message"],
+            code=SuccessCodes.CLASS_SESSION_RETRIEVED["code"],
+            data={"class_session": session},
+        )
+    except CustomValidationError as e:
+        return BaseResponse.error(
+            message=e.detail["message"],
+            code=e.detail["code"],
+            status_code=e.status_code,
+            errors=e.detail["errors"],
+            data=e.detail["data"],
+        )
 
 
 @api_view(["POST"])
@@ -75,8 +93,8 @@ def create_class_session_view(request):
 @permission_classes([IsAuthenticated])
 def update_class_session_view(request, session_id):
     institution = request.user.institution
-    session = class_session_service.get_class_session_instance_or_404(session_id, institution)
     try:
+        session = class_session_service.get_class_session_instance_or_404(session_id, institution)
         updated = class_session_service.update_class_session(session, request.data)
         return BaseResponse.success(
             message=SuccessCodes.CLASS_SESSION_UPDATED["message"],
@@ -111,12 +129,20 @@ def update_class_session_view(request, session_id):
 @permission_classes([IsAuthenticated])
 def delete_class_session_view(request, session_id):
     institution = request.user.institution
-    session = class_session_service.get_class_session_instance_or_404(session_id, institution)
     try:
+        session = class_session_service.get_class_session_instance_or_404(session_id, institution)
         class_session_service.delete_class_session(session)
         return BaseResponse.success(
             message=SuccessCodes.CLASS_SESSION_DELETED["message"],
             code=SuccessCodes.CLASS_SESSION_DELETED["code"],
+        )
+    except CustomValidationError as e:
+        return BaseResponse.error(
+            message=e.detail["message"],
+            code=e.detail["code"],
+            status_code=e.status_code,
+            errors=e.detail["errors"],
+            data=e.detail["data"],
         )
     except Exception:
         return BaseResponse.error(
