@@ -1104,6 +1104,360 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Displays",
+			"item": [
+				{
+					"name": "List Display Screens",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/displays/screens/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"screens",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `GET - List Display Screens`\n\n**Folder:** `Displays/`  \n**Request Name:** `GET - List Display Screens`\n\n---\n\n## ✅ Description\n\nFetch all display screens that belong to the authenticated user's institution. Each record contains its generated slug, access token, refresh interval, active status, and nested filter/message definitions that will be rendered on the public display.\n\n---\n\n## 🔗 Endpoint\n\n```\nGET {{base_url}}/api/displays/screens/\n\n```\n\n---\n\n## 🔐 Authentication\n\nThis endpoint **requires authentication**.\n\n- Header:\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body\n\n_None_\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2702\",\n  \"message\": \"لیست صفحات نمایش با موفقیت دریافت شد.\",\n  \"data\": {\n    \"screens\": [\n      {\n        \"id\": 3,\n        \"institution\": 1,\n        \"title\": \"تابلو دانشکده مهندسی\",\n        \"slug\": \"engineering-hall\",\n        \"access_token\": \"m3P9sQ8zX1Y0kLmNpQrStUvWxYz12345\",\n        \"refresh_interval\": 60,\n        \"layout_theme\": \"default\",\n        \"is_active\": true,\n        \"filters\": [\n          {\n            \"id\": 12,\n            \"display_screen\": 3,\n            \"title\": \"نمایش استاد حسینی\",\n            \"classroom\": null,\n            \"professor\": 7,\n            \"course\": null,\n            \"semester\": 4,\n            \"day_of_week\": null,\n            \"week_type\": \"odd\",\n            \"date_override\": null,\n            \"position\": 1,\n            \"duration_seconds\": 45,\n            \"is_active\": true,\n            \"computed_day_of_week\": null,\n            \"computed_week_type\": \"odd\",\n            \"created_at\": \"2025-01-04T08:15:00Z\",\n            \"updated_at\": \"2025-01-04T08:15:00Z\"\n          }\n        ],\n        \"messages\": [\n          {\n            \"id\": 2,\n            \"content\": \"جلسات امروز به‌صورت حضوری برگزار می‌شوند.\",\n            \"is_active\": true,\n            \"priority\": 10,\n            \"starts_at\": \"2025-01-04T07:30:00Z\",\n            \"ends_at\": \"2025-01-04T15:00:00Z\",\n            \"created_at\": \"2025-01-03T10:00:00Z\",\n            \"updated_at\": \"2025-01-03T10:00:00Z\"\n          }\n        ],\n        \"created_at\": \"2025-01-02T09:00:00Z\",\n        \"updated_at\": \"2025-01-04T08:20:00Z\"\n      }\n    ]\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### 🔒 401 Unauthorized - Missing or Invalid Token\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\nیا:\n\n``` json\n{\n  \"detail\": \"Invalid token.\"\n}\n\n```\n\n### ⛔ 403 Forbidden\n\n``` json\n{\n  \"detail\": \"You do not have permission to perform this action.\"\n}\n\n```\n\n### ⚠️ 400 Bad Request - Institution Not Linked\n\nReturned when the authenticated user is not attached to any institution.\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4001\",\n  \"message\": \"برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 💥 500 Internal Server Error\n\n``` json\n{\n  \"detail\": \"Internal server error.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Valid Token** → Returns list of screens with nested filters/messages → `200`\n- ❌ **No Institution** → Returns `4001` with HTTP `400`\n- ❌ **Missing/Invalid Token** → Returns `401`\n- 💥 **Unexpected Failure** → Returns `500` with generic error payload\n\n---\n\n## 📌 Notes\n\n- Screens are always scoped to the authenticated user's institution and exclude soft-deleted items.\n- Nested `filters` and `messages` only contain active records associated with the screen.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayScreens` `#List` `#GET`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `list_display_screens_view`\n- **Service:** `display_service.list_display_screens`\n- **Repository:** `display_repository.list_display_screens`\n- **Serializer:** `DisplayScreenSerializer`\n- **Model:** `DisplayScreen`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Display Screen",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "تابلو اصلی لابی",
+									"type": "text"
+								},
+								{
+									"key": "refresh_interval",
+									"value": "45",
+									"type": "text"
+								},
+								{
+									"key": "layout_theme",
+									"value": "dark",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "True",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/displays/screens/create/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"screens",
+								"create",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `POST - Create Display Screen`\n\n**Folder:** `Displays/`  \n**Request Name:** `POST - Create Display Screen`\n\n---\n\n## ✅ Description\n\nCreate a new display screen for the authenticated institution. The slug and access token are generated automatically, and the screen starts without filters/messages until you add them.\n\n---\n\n## 🔗 Endpoint\n\n```\nPOST {{base_url}}/api/displays/screens/create/\n\n```\n\n---\n\n## 🔐 Authentication\n\nThis endpoint **requires authentication**.\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body (form-data)\n\n| Field | Type | Required | Description |\n| --- | --- | --- | --- |\n| `title` | string | ✅ | Name shown in the admin panel |\n| `refresh_interval` | integer | ❌ (default 60) | Refresh interval in seconds (must be > 0) |\n| `layout_theme` | enum(`default`, `dark`, `light`) | ❌ | Visual theme used by the public view |\n| `is_active` | boolean | ❌ | Whether the screen is available for the public link |\n\n``` json\n{\n  \"title\": \"تابلو اصلی لابی\",\n  \"refresh_interval\": 45,\n  \"layout_theme\": \"dark\",\n  \"is_active\": true\n}\n\n```\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `201 Created`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2701\",\n  \"message\": \"صفحه نمایش با موفقیت ایجاد شد.\",\n  \"data\": {\n    \"screen\": {\n      \"id\": 7,\n      \"institution\": 1,\n      \"title\": \"تابلو اصلی لابی\",\n      \"slug\": \"main-lobby\",\n      \"access_token\": \"5s7n9q12XYabcdEfGhIjKlMn\",\n      \"refresh_interval\": 45,\n      \"layout_theme\": \"dark\",\n      \"is_active\": true,\n      \"filters\": [],\n      \"messages\": [],\n      \"created_at\": \"2025-01-05T07:20:15Z\",\n      \"updated_at\": \"2025-01-05T07:20:15Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 400 Bad Request - Validation Failure\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"refresh_interval\": [\"بازه تازه‌سازی باید بزرگتر از صفر باشد.\"]\n  },\n  \"data\": {}\n}\n\n```\n\n### ⚠️ 400 Bad Request - Institution Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4001\",\n  \"message\": \"برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 💥 500 Internal Server Error - Creation Failed\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4801\",\n  \"message\": \"ایجاد صفحه نمایش با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 🔒 401 / ⛔ 403 Access Errors\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\nیا:\n\n``` json\n{\n  \"detail\": \"You do not have permission to perform this action.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Valid Payload** → Screen created with slug & token → `201`\n- ❌ **Negative `refresh_interval`** → Validation error `4000`\n- ❌ **User without institution** → `4001`\n- ❌ **Missing token** → `401`\n- 💥 **Repository failure** → `4801`\n\n---\n\n## 📌 Notes\n\n- Slug and access token are generated server-side and returned in the response.\n- `layout_theme` defaults to `default` if not provided.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayScreens` `#Create` `#POST`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `create_display_screen_view`\n- **Service:** `display_service.create_display_screen`\n- **Repository:** `display_repository.create_display_screen`\n- **Serializer:** `DisplayScreenWriteSerializer`\n- **Model:** `DisplayScreen`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Display Screen",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/displays/screens/3/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"screens",
+								"3",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `GET - Retrieve Display Screen`\n\n**Folder:** `Displays/`  \n**Request Name:** `GET - Retrieve Display Screen`\n\n---\n\n## ✅ Description\n\nRetrieve a single display screen by ID. The response includes nested filters and messages so you can inspect the configuration shown on the public board.\n\n---\n\n## 🔗 Endpoint\n\n```\nGET {{base_url}}/api/displays/screens/<screen_id>/\n\n```\n\nReplace `<screen_id>` with the numeric identifier.\n\n---\n\n## 🔐 Authentication\n\nToken authentication is **required**.\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body\n\n_None_\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2703\",\n  \"message\": \"صفحه نمایش با موفقیت دریافت شد.\",\n  \"data\": {\n    \"screen\": {\n      \"id\": 3,\n      \"institution\": 1,\n      \"title\": \"تابلو دانشکده مهندسی\",\n      \"slug\": \"engineering-hall\",\n      \"access_token\": \"m3P9sQ8zX1Y0kLmNpQrStUvWxYz12345\",\n      \"refresh_interval\": 60,\n      \"layout_theme\": \"default\",\n      \"is_active\": true,\n      \"filters\": [\n        {\n          \"id\": 12,\n          \"display_screen\": 3,\n          \"title\": \"نمایش استاد حسینی\",\n          \"classroom\": null,\n          \"professor\": 7,\n          \"course\": null,\n          \"semester\": 4,\n          \"day_of_week\": null,\n          \"week_type\": \"odd\",\n          \"date_override\": null,\n          \"position\": 1,\n          \"duration_seconds\": 45,\n          \"is_active\": true,\n          \"computed_day_of_week\": null,\n          \"computed_week_type\": \"odd\",\n          \"created_at\": \"2025-01-04T08:15:00Z\",\n          \"updated_at\": \"2025-01-04T08:15:00Z\"\n        }\n      ],\n      \"messages\": [\n        {\n          \"id\": 2,\n          \"content\": \"جلسات امروز به‌صورت حضوری برگزار می‌شوند.\",\n          \"is_active\": true,\n          \"priority\": 10,\n          \"starts_at\": \"2025-01-04T07:30:00Z\",\n          \"ends_at\": \"2025-01-04T15:00:00Z\",\n          \"created_at\": \"2025-01-03T10:00:00Z\",\n          \"updated_at\": \"2025-01-03T10:00:00Z\"\n        }\n      ],\n      \"created_at\": \"2025-01-02T09:00:00Z\",\n      \"updated_at\": \"2025-01-04T08:20:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 404 Not Found - Screen Not Available\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4800\",\n  \"message\": \"صفحه نمایش مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### ⚠️ 400 Bad Request - Institution Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4001\",\n  \"message\": \"برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 🔒 401 / ⛔ 403 Access Errors\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Existing Screen** → Returns `200` with screen payload\n- ❌ **Unknown ID** → `4800` with HTTP `404`\n- ❌ **User without institution** → `4001`\n- ❌ **Missing token** → `401`\n\n---\n\n## 📌 Notes\n\n- Soft-deleted screens are treated as not found.\n- `access_token` is returned for administrative reference only and should be kept secret.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayScreens` `#Retrieve` `#GET`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `retrieve_display_screen_view`\n- **Service:** `display_service.get_display_screen_by_id_or_404`\n- **Repository:** `display_repository.get_display_screen_by_id`\n- **Serializer:** `DisplayScreenSerializer`\n- **Model:** `DisplayScreen`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Display Screen",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "تابلو بروزشده لابی",
+									"type": "text"
+								},
+								{
+									"key": "refresh_interval",
+									"value": "90",
+									"type": "text"
+								},
+								{
+									"key": "layout_theme",
+									"value": "light",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "False",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/displays/screens/3/update/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"screens",
+								"3",
+								"update",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `PUT - Update Display Screen`\n\n**Folder:** `Displays/`  \n**Request Name:** `PUT - Update Display Screen`\n\n---\n\n## ✅ Description\n\nUpdate an existing display screen. All fields are optional; send the ones you need to modify. The cache for the related public display is invalidated automatically.\n\n---\n\n## 🔗 Endpoint\n\n```\nPUT {{base_url}}/api/displays/screens/<screen_id>/update/\n\n```\n\n---\n\n## 🔐 Authentication\n\nAuthentication is **required**.\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body (form-data)\n\n| Field | Type | Required | Description |\n| --- | --- | --- | --- |\n| `title` | string | ❌ | New administrative title |\n| `refresh_interval` | integer | ❌ | New refresh interval (> 0) |\n| `layout_theme` | enum | ❌ | Change visual theme |\n| `is_active` | boolean | ❌ | Toggle public availability |\n\n``` json\n{\n  \"title\": \"تابلو بروزشده لابی\",\n  \"refresh_interval\": 90,\n  \"layout_theme\": \"light\",\n  \"is_active\": false\n}\n\n```\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2704\",\n  \"message\": \"صفحه نمایش با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"screen\": {\n      \"id\": 3,\n      \"institution\": 1,\n      \"title\": \"تابلو بروزشده لابی\",\n      \"slug\": \"engineering-hall\",\n      \"access_token\": \"m3P9sQ8zX1Y0kLmNpQrStUvWxYz12345\",\n      \"refresh_interval\": 90,\n      \"layout_theme\": \"light\",\n      \"is_active\": false,\n      \"filters\": [\n        {\n          \"id\": 12,\n          \"display_screen\": 3,\n          \"title\": \"نمایش استاد حسینی\",\n          \"classroom\": null,\n          \"professor\": 7,\n          \"course\": null,\n          \"semester\": 4,\n          \"day_of_week\": null,\n          \"week_type\": \"odd\",\n          \"date_override\": null,\n          \"position\": 1,\n          \"duration_seconds\": 45,\n          \"is_active\": true,\n          \"computed_day_of_week\": null,\n          \"computed_week_type\": \"odd\",\n          \"created_at\": \"2025-01-04T08:15:00Z\",\n          \"updated_at\": \"2025-01-06T10:05:00Z\"\n        }\n      ],\n      \"messages\": [],\n      \"created_at\": \"2025-01-02T09:00:00Z\",\n      \"updated_at\": \"2025-01-06T10:05:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 400 Bad Request - Validation Failure\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"refresh_interval\": [\"بازه تازه‌سازی باید بزرگتر از صفر باشد.\"]\n  },\n  \"data\": {}\n}\n\n```\n\n### ❌ 404 Not Found - Screen Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4800\",\n  \"message\": \"صفحه نمایش مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### ⚠️ 400 Bad Request - Institution Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4001\",\n  \"message\": \"برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 💥 500 Internal Server Error - Update Failed\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4802\",\n  \"message\": \"به‌روزرسانی صفحه نمایش با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 🔒 401 / ⛔ 403 Access Errors\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Partial Update** → Provide only fields to change → `200`\n- ❌ **Invalid refresh interval** → `4000`\n- ❌ **Unknown screen ID** → `4800`\n- ❌ **Missing token** → `401`\n- 💥 **Database failure** → `4802`\n\n---\n\n## 📌 Notes\n\n- The request supports partial updates even though the verb is `PUT`.\n- Updating any field invalidates the cached public payload automatically.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayScreens` `#Update` `#PUT`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `update_display_screen_view`\n- **Service:** `display_service.update_display_screen`\n- **Repository:** `display_repository.get_display_screen_instance_or_404`\n- **Serializer:** `DisplayScreenWriteSerializer`\n- **Model:** `DisplayScreen`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Display Screen",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/displays/screens/3/delete/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"screens",
+								"3",
+								"delete",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `DELETE - Delete Display Screen`\n\n**Folder:** `Displays/`  \n**Request Name:** `DELETE - Delete Display Screen`\n\n---\n\n## ✅ Description\n\nSoft-delete a display screen. The screen becomes unavailable for listing and the public link stops serving data. Associated filters and messages are also excluded from future payloads.\n\n---\n\n## 🔗 Endpoint\n\n```\nDELETE {{base_url}}/api/displays/screens/<screen_id>/delete/\n\n```\n\n---\n\n## 🔐 Authentication\n\nToken authentication is **required**.\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body\n\n_None_\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2705\",\n  \"message\": \"صفحه نمایش با موفقیت حذف شد.\",\n  \"data\": {},\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 404 Not Found - Screen Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4800\",\n  \"message\": \"صفحه نمایش مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### ⚠️ 400 Bad Request - Institution Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4001\",\n  \"message\": \"برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 💥 500 Internal Server Error - Deletion Failed\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4803\",\n  \"message\": \"حذف صفحه نمایش با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 🔒 401 / ⛔ 403 Access Errors\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Valid screen** → Returns `2705`\n- ❌ **Unknown screen** → `4800`\n- ❌ **User without institution** → `4001`\n- ❌ **Missing token** → `401`\n- 💥 **Database failure** → `4803`\n\n---\n\n## 📌 Notes\n\n- Deletion is soft-delete; the record remains in the database with `is_deleted = True`.\n- Any cached public payload for the screen is invalidated after deletion.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayScreens` `#Delete` `#DELETE`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `delete_display_screen_view`\n- **Service:** `display_service.delete_display_screen`\n- **Repository:** `display_repository.soft_delete_display_screen`\n- **Model:** `DisplayScreen`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "List Display Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/displays/screens/3/filters/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"screens",
+								"3",
+								"filters",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `GET - List Display Filters`\n\n**Folder:** `Displays/`  \n**Request Name:** `GET - List Display Filters`\n\n---\n\n## ✅ Description\n\nList all filters configured for a specific display screen. Filters define how sessions are selected for rotation on the public board.\n\n---\n\n## 🔗 Endpoint\n\n```\nGET {{base_url}}/api/displays/screens/<screen_id>/filters/\n\n```\n\n---\n\n## 🔐 Authentication\n\nToken authentication is **required**.\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body\n\n_None_\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2712\",\n  \"message\": \"فیلترهای صفحه نمایش با موفقیت دریافت شدند.\",\n  \"data\": {\n    \"filters\": [\n      {\n        \"id\": 12,\n        \"display_screen\": 3,\n        \"title\": \"نمایش استاد حسینی\",\n        \"classroom\": null,\n        \"professor\": 7,\n        \"course\": null,\n        \"semester\": 4,\n        \"day_of_week\": null,\n        \"week_type\": \"odd\",\n        \"date_override\": null,\n        \"position\": 1,\n        \"duration_seconds\": 45,\n        \"is_active\": true,\n        \"computed_day_of_week\": null,\n        \"computed_week_type\": \"odd\",\n        \"created_at\": \"2025-01-04T08:15:00Z\",\n        \"updated_at\": \"2025-01-04T08:15:00Z\"\n      },\n      {\n        \"id\": 13,\n        \"display_screen\": 3,\n        \"title\": \"کلاس ۳۰۱\",\n        \"classroom\": 5,\n        \"professor\": null,\n        \"course\": null,\n        \"semester\": null,\n        \"day_of_week\": \"دوشنبه\",\n        \"week_type\": \"every\",\n        \"date_override\": null,\n        \"position\": 2,\n        \"duration_seconds\": 30,\n        \"is_active\": true,\n        \"computed_day_of_week\": \"دوشنبه\",\n        \"computed_week_type\": \"every\",\n        \"created_at\": \"2025-01-04T10:00:00Z\",\n        \"updated_at\": \"2025-01-04T10:00:00Z\"\n      }\n    ]\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 404 Not Found - Screen Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4800\",\n  \"message\": \"صفحه نمایش مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### ⚠️ 400 Bad Request - Institution Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4001\",\n  \"message\": \"برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 🔒 401 / ⛔ 403 Access Errors\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Screen with filters** → Returns `2712`\n- ✅ **Screen without filters** → Returns empty array `[]`\n- ❌ **Unknown screen** → `4800`\n- ❌ **Missing token** → `401`\n\n---\n\n## 📌 Notes\n\n- Filters are ordered by `position` and ID to match public rotation order.\n- Only non-deleted filters belonging to the target screen are returned.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayFilters` `#List` `#GET`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `list_display_filters_view`\n- **Service:** `display_service.list_display_filters`\n- **Repository:** `display_repository.list_display_filters`\n- **Serializer:** `DisplayFilterSerializer`\n- **Model:** `DisplayFilter`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Display Filter",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "جلسات استاد حسینی",
+									"type": "text"
+								},
+								{
+									"key": "professor",
+									"value": "7",
+									"type": "text"
+								},
+								{
+									"key": "semester",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "week_type",
+									"value": "odd",
+									"type": "text"
+								},
+								{
+									"key": "position",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "duration_seconds",
+									"value": "45",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "True",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/displays/screens/3/filters/create/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"screens",
+								"3",
+								"filters",
+								"create",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `POST - Create Display Filter`\n\n**Folder:** `Displays/`  \n**Request Name:** `POST - Create Display Filter`\n\n---\n\n## ✅ Description\n\nAdd a new filter to a display screen. At least one selector (course, professor, classroom, semester, day, week type, or date override) must be provided so the system knows which sessions to include.\n\n---\n\n## 🔗 Endpoint\n\n```\nPOST {{base_url}}/api/displays/screens/<screen_id>/filters/create/\n\n```\n\n---\n\n## 🔐 Authentication\n\nToken authentication is **required**.\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body (form-data)\n\n| Field | Type | Required | Description |\n| --- | --- | --- | --- |\n| `title` | string | ❌ | Optional friendly name |\n| `classroom` | integer | ❌ | Limit sessions to a classroom |\n| `professor` | integer | ❌ | Limit sessions to a professor |\n| `course` | integer | ❌ | Limit sessions to a course |\n| `semester` | integer | ❌ | Limit sessions to a semester |\n| `day_of_week` | enum | ❌ | Persian day label (e.g. `دوشنبه`) |\n| `week_type` | enum(`even`,`odd`,`every`) | ❌ | Week filter |\n| `date_override` | date | ❌ | Overrides day/week based on date |\n| `position` | integer | ❌ | Rotation order (default `0`) |\n| `duration_seconds` | integer | ❌ | Display duration in seconds |\n| `is_active` | boolean | ❌ | Toggle filter availability |\n\n``` json\n{\n  \"title\": \"جلسات استاد حسینی\",\n  \"professor\": 7,\n  \"semester\": 4,\n  \"week_type\": \"odd\",\n  \"position\": 1,\n  \"duration_seconds\": 45,\n  \"is_active\": true\n}\n\n```\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `201 Created`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2711\",\n  \"message\": \"فیلتر نمایش با موفقیت ایجاد شد.\",\n  \"data\": {\n    \"filter\": {\n      \"id\": 15,\n      \"display_screen\": 3,\n      \"title\": \"جلسات استاد حسینی\",\n      \"classroom\": null,\n      \"professor\": 7,\n      \"course\": null,\n      \"semester\": 4,\n      \"day_of_week\": null,\n      \"week_type\": \"odd\",\n      \"date_override\": null,\n      \"position\": 1,\n      \"duration_seconds\": 45,\n      \"is_active\": true,\n      \"computed_day_of_week\": null,\n      \"computed_week_type\": \"odd\",\n      \"created_at\": \"2025-01-05T09:10:00Z\",\n      \"updated_at\": \"2025-01-05T09:10:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 400 Bad Request - No Selector Provided\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"non_field_errors\": [\"حداقل یکی از معیارهای فیلتر باید مشخص شود.\"]\n  },\n  \"data\": {}\n}\n\n```\n\n### ❌ 400 Bad Request - Cross-Institution Validation\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"classroom\": [\"کلاس انتخاب‌شده متعلق به این مؤسسه نیست.\"]\n  },\n  \"data\": {}\n}\n\n```\n\n### ❌ 404 Not Found - Screen Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4800\",\n  \"message\": \"صفحه نمایش مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 💥 500 Internal Server Error - Creation Failed\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4811\",\n  \"message\": \"ایجاد فیلتر نمایش با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 🔒 401 / ⛔ 403 Access Errors\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Valid combination** → Filter created → `201`\n- ❌ **No selector fields** → `4000`\n- ❌ **Entity from another institution** → `4000`\n- ❌ **Unknown screen ID** → `4800`\n- 💥 **Unexpected failure** → `4811`\n\n---\n\n## 📌 Notes\n\n- Cache for the screen is invalidated after creation, so the public board reflects the change instantly.\n- `position` controls rotation order when multiple filters are active.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayFilters` `#Create` `#POST`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `create_display_filter_view`\n- **Service:** `display_service.create_display_filter`\n- **Repository:** `display_repository.create_display_filter`\n- **Serializer:** `DisplayFilterWriteSerializer`\n- **Model:** `DisplayFilter`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Display Filter",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "کلاس ۳۰۱ - بروزرسانی",
+									"type": "text"
+								},
+								{
+									"key": "day_of_week",
+									"value": "چهارشنبه",
+									"type": "text"
+								},
+								{
+									"key": "week_type",
+									"value": "even",
+									"type": "text"
+								},
+								{
+									"key": "position",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "duration_seconds",
+									"value": "60",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "True",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/displays/filters/8/update/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"filters",
+								"8",
+								"update",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `PUT - Update Display Filter`\n\n**Folder:** `Displays/`  \n**Request Name:** `PUT - Update Display Filter`\n\n---\n\n## ✅ Description\n\nUpdate the configuration of an existing filter. Any omitted field keeps its previous value. Cache invalidation ensures the public screen reflects the change immediately.\n\n---\n\n## 🔗 Endpoint\n\n```\nPUT {{base_url}}/api/displays/filters/<filter_id>/update/\n\n```\n\n---\n\n## 🔐 Authentication\n\nToken authentication is **required**.\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body (form-data)\n\n| Field | Type | Required | Description |\n| --- | --- | --- | --- |\n| `title` | string | ❌ | Updated filter name |\n| `classroom` | integer | ❌ | Change classroom selector |\n| `professor` | integer | ❌ | Change professor selector |\n| `course` | integer | ❌ | Change course selector |\n| `semester` | integer | ❌ | Change semester selector |\n| `day_of_week` | enum | ❌ | Override computed day |\n| `week_type` | enum | ❌ | Override computed week type |\n| `date_override` | date | ❌ | Apply a specific date |\n| `position` | integer | ❌ | Update rotation order |\n| `duration_seconds` | integer | ❌ | Update rotation duration |\n| `is_active` | boolean | ❌ | Enable/disable filter |\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2713\",\n  \"message\": \"فیلتر نمایش با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"filter\": {\n      \"id\": 8,\n      \"display_screen\": 3,\n      \"title\": \"کلاس ۳۰۱ - بروزرسانی\",\n      \"classroom\": 5,\n      \"professor\": null,\n      \"course\": null,\n      \"semester\": null,\n      \"day_of_week\": \"چهارشنبه\",\n      \"week_type\": \"even\",\n      \"date_override\": null,\n      \"position\": 2,\n      \"duration_seconds\": 60,\n      \"is_active\": true,\n      \"computed_day_of_week\": \"چهارشنبه\",\n      \"computed_week_type\": \"even\",\n      \"created_at\": \"2025-01-03T11:00:00Z\",\n      \"updated_at\": \"2025-01-06T09:45:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 400 Bad Request - Validation Failure\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"اطلاعات وارد شده نامعتبر است.\",\n  \"errors\": {\n    \"non_field_errors\": [\"حداقل یکی از معیارهای فیلتر باید مشخص شود.\"]\n  },\n  \"data\": {}\n}\n\n```\n\n### ❌ 404 Not Found - Filter Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4810\",\n  \"message\": \"فیلتر نمایش مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### ⚠️ 400 Bad Request - Institution Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4001\",\n  \"message\": \"برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 💥 500 Internal Server Error - Update Failed\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4812\",\n  \"message\": \"به‌روزرسانی فیلتر نمایش با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 🔒 401 / ⛔ 403 Access Errors\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Partial update** → `2713`\n- ❌ **Filter not found** → `4810`\n- ❌ **Invalid selector combination** → `4000`\n- ❌ **Missing token** → `401`\n- 💥 **Unexpected exception** → `4812`\n\n---\n\n## 📌 Notes\n\n- Validation still enforces that at least one selector remains defined (considering existing values).\n- Cache for the parent screen is cleared whenever a filter is updated.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayFilters` `#Update` `#PUT`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `update_display_filter_view`\n- **Service:** `display_service.update_display_filter`\n- **Repository:** `display_repository.get_display_filter_by_id`\n- **Serializer:** `DisplayFilterWriteSerializer`\n- **Model:** `DisplayFilter`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Display Filter",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/displays/filters/8/delete/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"displays",
+								"filters",
+								"8",
+								"delete",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `DELETE - Delete Display Filter`\n\n**Folder:** `Displays/`  \n**Request Name:** `DELETE - Delete Display Filter`\n\n---\n\n## ✅ Description\n\nSoft-delete a filter from a display screen. Deleted filters stop affecting the public payload immediately.\n\n---\n\n## 🔗 Endpoint\n\n```\nDELETE {{base_url}}/api/displays/filters/<filter_id>/delete/\n\n```\n\n---\n\n## 🔐 Authentication\n\nToken authentication is **required**.\n\n``` http\nAuthorization: Token {{token}}\n\n```\n\n---\n\n## 📥 Request Body\n\n_None_\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2714\",\n  \"message\": \"فیلتر نمایش با موفقیت حذف شد.\",\n  \"data\": {},\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 404 Not Found - Filter Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4810\",\n  \"message\": \"فیلتر نمایش مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### ⚠️ 400 Bad Request - Institution Missing\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4001\",\n  \"message\": \"برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 💥 500 Internal Server Error - Deletion Failed\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4813\",\n  \"message\": \"حذف فیلتر نمایش با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 🔒 401 / ⛔ 403 Access Errors\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Valid filter** → `2714`\n- ❌ **Unknown filter** → `4810`\n- ❌ **Missing token** → `401`\n- 💥 **Unexpected error** → `4813`\n\n---\n\n## 📌 Notes\n\n- The filter is soft-deleted; you can recreate it later with new criteria if needed.\n- The parent screen cache is invalidated after deletion.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#DisplayFilters` `#Delete` `#DELETE`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `delete_display_filter_view`\n- **Service:** `display_service.delete_display_filter`\n- **Repository:** `display_repository.soft_delete_display_filter`\n- **Model:** `DisplayFilter`\n\nEndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Public Display (JSON)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/displays/engineering-hall/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"displays",
+								"engineering-hall",
+								""
+							]
+						},
+						"description": "StartFragment\n\n# 📄 `GET - Public Display (JSON)`\n\n**Folder:** `Displays/`  \n**Request Name:** `GET - Public Display (JSON)`\n\n---\n\n## ✅ Description\n\nFetch the public payload for a display screen using its slug. This endpoint is anonymous and returns the assembled sessions, filters, and marquee messages that should be rendered on digital signage.\n\n---\n\n## 🔗 Endpoint\n\n```\nGET {{base_url}}/displays/<slug>/\n\n```\n\n---\n\n## 🔐 Authentication\n\nNo authentication required. The slug and optional access token can be embedded in the URL used by the kiosk or signage device.\n\n---\n\n## 📥 Request Body\n\n_None_\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2790\",\n  \"message\": \"اطلاعات صفحه نمایش با موفقیت بارگذاری شد.\",\n  \"data\": {\n    \"screen\": {\n      \"id\": 3,\n      \"title\": \"تابلو دانشکده مهندسی\",\n      \"slug\": \"engineering-hall\",\n      \"layout_theme\": \"default\",\n      \"refresh_interval\": 60,\n      \"is_active\": true,\n      \"access_token\": \"m3P9sQ8zX1Y0kLmNpQrStUvWxYz12345\"\n    },\n    \"filters\": [\n      {\n        \"title\": \"کلاس ۳۰۱\",\n        \"computed_day_of_week\": \"دوشنبه\",\n        \"computed_week_type\": \"every\",\n        \"duration_seconds\": 30,\n        \"position\": 2\n      }\n    ],\n    \"sessions\": [\n      {\n        \"id\": 45,\n        \"course_title\": \"ریاضی مهندسی\",\n        \"professor_name\": \"دکتر رفیعی\",\n        \"day_of_week\": \"دوشنبه\",\n        \"start_time\": \"10:00:00\",\n        \"end_time\": \"12:00:00\",\n        \"week_type\": \"every\",\n        \"classroom_title\": \"کلاس ۳۰۱\",\n        \"building_title\": \"دانشکده مهندسی\",\n        \"group_code\": \"A1\",\n        \"note\": \"حضور الزامی\"\n      }\n    ],\n    \"messages\": [\n      {\n        \"content\": \"لطفاً ۱۰ دقیقه زودتر حضور داشته باشید.\",\n        \"priority\": 5\n      }\n    ],\n    \"generated_at\": \"2025-01-05T08:00:00Z\"\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n```\n\n---\n\n## ⚠️ Error Responses\n\n### ❌ 404 Not Found - Screen Missing or Inactive\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4800\",\n  \"message\": \"صفحه نمایش مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n```\n\n### 💥 500 Internal Server Error\n\n``` json\n{\n  \"detail\": \"Internal server error.\"\n}\n\n```\n\n---\n\n## 🧪 Test Scenarios\n\n- ✅ **Active slug** → Returns `2790` with sessions, filters, messages\n- ❌ **Unknown slug** → `4800` (`404`)\n- ❌ **Inactive screen** → `4800` (`404`)\n- 💥 **Unexpected failure** → `500`\n\n---\n\n## 📌 Notes\n\n- Add `?format=html` or send `Accept: text/html` to receive the rendered HTML layout instead of JSON.\n- Responses are cached per slug for `refresh_interval` seconds and automatically invalidated when screens or filters change.\n- No authentication is enforced, so share the slug only with trusted devices.\n\n---\n\n## 🏷️ Tags\n\n`#Displays` `#Public` `#ReadOnly` `#GET`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **View:** `public_display_view`\n- **Service:** `display_service.get_display_screen_by_slug_or_404`\n- **Service:** `display_service.build_public_payload`\n- **Repository:** `display_repository.get_display_screen_by_slug`\n\nEndFragment"
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
