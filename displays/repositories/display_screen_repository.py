@@ -4,7 +4,7 @@ from typing import Iterable
 
 from django.db.models import QuerySet
 
-from displays.models import DisplayScreen, DisplayFilter, DisplayMessage
+from displays.models import DisplayScreen, DisplayMessage
 
 
 # --- Display screen operations -------------------------------------------------
@@ -49,55 +49,6 @@ def update_display_screen_fields(screen: DisplayScreen, fields: dict) -> Display
 
 def soft_delete_display_screen(screen: DisplayScreen) -> None:
     screen.delete()
-
-
-# --- Filter operations ---------------------------------------------------------
-
-def create_display_filter(data: dict) -> DisplayFilter:
-    return DisplayFilter.objects.create(**data)
-
-
-def list_display_filters(screen: DisplayScreen) -> QuerySet[DisplayFilter]:
-    return (
-        screen.filters.filter(is_deleted=False)
-        .select_related(
-            "display_screen",
-            "classroom__building__institution",
-            "professor__institution",
-            "course__institution",
-            "semester__institution",
-        )
-        .order_by("position", "id")
-    )
-
-
-def get_display_filter_by_id(filter_id: int, institution) -> DisplayFilter | None:
-    return (
-        DisplayFilter.objects.filter(
-            id=filter_id,
-            display_screen__institution=institution,
-            is_deleted=False,
-        )
-        .select_related(
-            "display_screen__institution",
-            "classroom__building__institution",
-            "professor__institution",
-            "course__institution",
-            "semester__institution",
-        )
-        .first()
-    )
-
-
-def update_display_filter_fields(filter_obj: DisplayFilter, fields: dict) -> DisplayFilter:
-    for field, value in fields.items():
-        setattr(filter_obj, field, value)
-    filter_obj.save()
-    return filter_obj
-
-
-def soft_delete_display_filter(filter_obj: DisplayFilter) -> None:
-    filter_obj.delete()
 
 
 # --- Messages ------------------------------------------------------------------

@@ -11,11 +11,6 @@ from django.utils.text import slugify
 
 from unischedule.core.base_model import BaseModel
 from institutions.models import Institution
-from locations.models import Classroom
-from professors.models import Professor
-from courses.models import Course
-from semesters.models import Semester
-from schedules.models import ClassSession
 
 # Mapping Python's weekday index to the Persian choices used in ClassSession
 PY_WEEKDAY_TO_PERSIAN: Dict[int, str] = {
@@ -64,6 +59,12 @@ class DisplayScreen(BaseModel):
         verbose_name="قالب نمایش",
     )
     is_active = models.BooleanField(default=True, verbose_name="فعال است؟")
+    filters = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="پیکربندی فیلترها",
+        help_text="تعریف فیلترهای صفحه به‌صورت ساختار یافته.",
+    )
 
     class Meta:
         verbose_name = "صفحه نمایش"
@@ -91,153 +92,6 @@ class DisplayScreen(BaseModel):
             self.access_token = secrets.token_urlsafe(16)
         self.full_clean()
         super().save(*args, **kwargs)
-
-
-class DisplayFilter(BaseModel):
-    """Holds filtering configuration for a display screen playlist item."""
-
-    display_screen = models.ForeignKey(
-        DisplayScreen,
-        on_delete=models.CASCADE,
-        related_name="filters",
-        verbose_name="صفحه نمایش",
-    )
-    title = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name="عنوان اختیاری",
-        help_text="برای تفکیک راحت‌تر فیلترها در مدیریت.",
-    )
-    classroom = models.ForeignKey(
-        Classroom,
-        on_delete=models.SET_NULL,
-        related_name="display_filters",
-        blank=True,
-        null=True,
-        verbose_name="کلاس",
-    )
-    professor = models.ForeignKey(
-        Professor,
-        on_delete=models.SET_NULL,
-        related_name="display_filters",
-        blank=True,
-        null=True,
-        verbose_name="استاد",
-    )
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.SET_NULL,
-        related_name="display_filters",
-        blank=True,
-        null=True,
-        verbose_name="درس",
-    )
-    semester = models.ForeignKey(
-        Semester,
-        on_delete=models.SET_NULL,
-        related_name="display_filters",
-        blank=True,
-        null=True,
-        verbose_name="ترم",
-    )
-    day_of_week = models.CharField(
-        max_length=20,
-        choices=ClassSession.DAY_OF_WEEK_CHOICES,
-        blank=True,
-        null=True,
-        verbose_name="روز هفته",
-    )
-    week_type = models.CharField(
-        max_length=20,
-        choices=ClassSession.WeekTypeChoices.choices,
-        blank=True,
-        null=True,
-        verbose_name="نوع هفته",
-    )
-    date_override = models.DateField(
-        blank=True,
-        null=True,
-        verbose_name="تاریخ دلخواه",
-        help_text="در صورت تعیین، روز و نوع هفته بر اساس این تاریخ محاسبه می‌شود.",
-    )
-    position = models.PositiveIntegerField(
-        default=0,
-        verbose_name="ترتیب نمایش",
-        help_text="ترتیب نمایش در پلن صفحه.",
-    )
-    duration_seconds = models.PositiveIntegerField(
-        default=0,
-        blank=True,
-        verbose_name="مدت نمایش",
-        help_text="در صورت چرخش بین چند فیلتر، مدت نمایش این فیلتر.",
-    )
-    is_active = models.BooleanField(default=True, verbose_name="فعال است؟")
-
-    class Meta:
-        verbose_name = "فیلتر نمایش"
-        verbose_name_plural = "فیلترهای نمایش"
-        ordering = ("position", "id")
-
-    def __str__(self) -> str:  # pragma: no cover - simple string representation
-        return self.title or f"Filter #{self.pk} for {self.display_screen.title}"
-
-    def clean(self):
-        super().clean()
-        selectors = [
-            self.classroom,
-            self.professor,
-            self.course,
-            self.semester,
-            self.day_of_week,
-            self.week_type,
-            self.date_override,
-        ]
-        if not any(selectors):
-            raise ValidationError("حداقل یکی از معیارهای فیلتر باید مشخص شود.")
-
-        if not self.display_screen_id:
-            return
-
-        institution = self.display_screen.institution
-        errors = {}
-        if self.classroom and self.classroom.building.institution != institution:
-            errors["classroom"] = "کلاس انتخاب‌شده متعلق به این مؤسسه نیست."
-        if self.professor and self.professor.institution != institution:
-            errors["professor"] = "استاد انتخاب‌شده متعلق به این مؤسسه نیست."
-        if self.course and self.course.institution != institution:
-            errors["course"] = "درس انتخاب‌شده متعلق به این مؤسسه نیست."
-        if self.semester and self.semester.institution != institution:
-            errors["semester"] = "ترم انتخاب‌شده متعلق به این مؤسسه نیست."
-
-        if errors:
-            raise ValidationError(errors)
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
-
-    @property
-    def computed_day_of_week(self) -> str | None:
-        if self.day_of_week:
-            return self.day_of_week
-        if self.date_override:
-            return PY_WEEKDAY_TO_PERSIAN.get(self.date_override.weekday())
-        return None
-
-    @property
-    def computed_week_type(self) -> str | None:
-        if self.week_type:
-            return self.week_type
-        if self.date_override:
-            week_number = self.date_override.isocalendar()[1]
-            return (
-                ClassSession.WeekTypeChoices.ODD
-                if week_number % 2
-                else ClassSession.WeekTypeChoices.EVEN
-            )
-        return None
-
-
 class DisplayMessage(BaseModel):
     """Optional ticker/alert messages for a display screen."""
 

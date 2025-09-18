@@ -5,26 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
 
-from displays.models import DisplayScreen, DisplayFilter, DisplayMessage
-
-
-class DisplayFilterInline(admin.TabularInline):
-    model = DisplayFilter
-    extra = 0
-    autocomplete_fields = ("classroom", "professor", "course", "semester")
-    fields = (
-        "title",
-        "classroom",
-        "professor",
-        "course",
-        "semester",
-        "day_of_week",
-        "week_type",
-        "date_override",
-        "position",
-        "duration_seconds",
-        "is_active",
-    )
+from displays.models import DisplayScreen, DisplayMessage
 
 
 class DisplayMessageInline(admin.StackedInline):
@@ -49,7 +30,7 @@ class DisplayScreenAdmin(admin.ModelAdmin):
     search_fields = ("title", "slug", "institution__name")
     readonly_fields = ("slug", "access_token", "created_at", "updated_at", "preview_link")
     autocomplete_fields = ("institution",)
-    inlines = [DisplayFilterInline, DisplayMessageInline]
+    inlines = [DisplayMessageInline]
     actions = ["preview_screen"]
     fieldsets = (
         (None, {
@@ -59,6 +40,7 @@ class DisplayScreenAdmin(admin.ModelAdmin):
                 "layout_theme",
                 "refresh_interval",
                 "is_active",
+                "filters",
                 "preview_link",
             )
         }),
@@ -96,26 +78,6 @@ class DisplayScreenAdmin(admin.ModelAdmin):
         screen = queryset.first()
         url = reverse("public-displays:public-display", args=[screen.slug])
         return HttpResponseRedirect(url)
-
-
-@admin.register(DisplayFilter)
-class DisplayFilterAdmin(admin.ModelAdmin):
-    list_display = (
-        "title",
-        "display_screen",
-        "professor",
-        "course",
-        "classroom",
-        "semester",
-        "day_of_week",
-        "week_type",
-        "is_active",
-    )
-    list_filter = ("display_screen", "professor", "course", "classroom", "is_active")
-    search_fields = ("title", "display_screen__title", "professor__last_name", "course__title")
-    autocomplete_fields = ("display_screen", "classroom", "professor", "course", "semester")
-
-
 @admin.register(DisplayMessage)
 class DisplayMessageAdmin(admin.ModelAdmin):
     list_display = ("content", "display_screen", "priority", "is_active", "starts_at", "ends_at")

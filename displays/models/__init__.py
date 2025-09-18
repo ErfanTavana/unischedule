@@ -1,7 +1,6 @@
-from .display_models import DisplayScreen, DisplayFilter, DisplayMessage
+from .display_models import DisplayScreen, DisplayMessage
 
 __all__ = [
     "DisplayScreen",
-    "DisplayFilter",
     "DisplayMessage",
 ]

@@ -6,10 +6,6 @@ from displays.views import (
     retrieve_display_screen_view,
     update_display_screen_view,
     delete_display_screen_view,
-    list_display_filters_view,
-    create_display_filter_view,
-    update_display_filter_view,
-    delete_display_filter_view,
     public_display_view,
 )
 
@@ -21,10 +17,6 @@ api_urlpatterns = [
     path("screens/<int:screen_id>/", retrieve_display_screen_view, name="retrieve-screen"),
     path("screens/<int:screen_id>/update/", update_display_screen_view, name="update-screen"),
     path("screens/<int:screen_id>/delete/", delete_display_screen_view, name="delete-screen"),
-    path("screens/<int:screen_id>/filters/", list_display_filters_view, name="list-filters"),
-    path("screens/<int:screen_id>/filters/create/", create_display_filter_view, name="create-filter"),
-    path("filters/<int:filter_id>/update/", update_display_filter_view, name="update-filter"),
-    path("filters/<int:filter_id>/delete/", delete_display_filter_view, name="delete-filter"),
 ]
 
 public_urlpatterns = [
