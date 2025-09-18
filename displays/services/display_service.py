@@ -219,13 +219,11 @@ def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> di
     sessions = _sort_sessions(sessions)
 
     filters = _active_screen_filters(screen)
-    messages = list(display_repository.list_active_messages(screen))
 
     payload_serializer = DisplayPublicPayloadSerializer({
         "screen": screen,
         "filters": filters,
         "sessions": sessions,
-        "messages": messages,
         "generated_at": timezone.now(),
     })
     payload = payload_serializer.data

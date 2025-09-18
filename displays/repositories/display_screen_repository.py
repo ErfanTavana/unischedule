@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 from django.db.models import QuerySet
 
-from displays.models import DisplayScreen, DisplayMessage
+from displays.models import DisplayScreen
 
 
 # --- Display screen operations -------------------------------------------------
@@ -51,15 +49,3 @@ def soft_delete_display_screen(screen: DisplayScreen) -> None:
     screen.delete()
 
 
-# --- Messages ------------------------------------------------------------------
-
-def list_active_messages(screen: DisplayScreen) -> Iterable[DisplayMessage]:
-    return [msg for msg in screen.messages.filter(is_deleted=False) if msg.is_visible()]
-
-
-def create_display_message(data: dict) -> DisplayMessage:
-    return DisplayMessage.objects.create(**data)
-
-
-def soft_delete_display_message(message: DisplayMessage) -> None:
-    message.delete()
