@@ -74,6 +74,8 @@ class DisplayScreenAdmin(admin.ModelAdmin):
 
     @admin.display(description="لینک عمومی")
     def preview_link(self, obj: DisplayScreen) -> str:
+        if obj is None or not getattr(obj, "pk", None) or not getattr(obj, "slug", None):
+            return "Save to generate preview"
         url = reverse("public-displays:public-display", args=[obj.slug])
         return format_html('<a href="{}" target="_blank">{}</a>', url, url)
 
