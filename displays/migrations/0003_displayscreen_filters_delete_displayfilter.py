@@ -7,10 +7,12 @@ def migrate_filters_to_json(apps, schema_editor):
     DisplayScreen = apps.get_model("displays", "DisplayScreen")
     DisplayFilter = apps.get_model("displays", "DisplayFilter")
 
-    for screen in DisplayScreen.objects.all():
+    for screen_id in DisplayScreen.objects.values_list("id", flat=True):
         filter_payload = []
         filters = (
-            DisplayFilter.objects.filter(display_screen=screen, is_deleted=False)
+            DisplayFilter.objects.filter(
+                display_screen_id=screen_id, is_deleted=False
+            )
             .order_by("position", "id")
         )
         for filter_obj in filters:
@@ -35,7 +37,7 @@ def migrate_filters_to_json(apps, schema_editor):
                 }
             )
         if filter_payload:
-            DisplayScreen.objects.filter(pk=screen.pk).update(filters=filter_payload)
+            DisplayScreen.objects.filter(pk=screen_id).update(filters=filter_payload)
 
 
 class Migration(migrations.Migration):
