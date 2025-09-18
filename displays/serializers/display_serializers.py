@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from courses.models import Course
-from displays.models import DisplayMessage, DisplayScreen
+from displays.models import DisplayScreen
 from displays.utils import (
     compute_filter_day_of_week,
     compute_filter_week_type,
@@ -20,22 +20,6 @@ from semesters.models import Semester
 
 DAY_CHOICES = {choice for choice, _ in ClassSession.DAY_OF_WEEK_CHOICES}
 WEEK_TYPE_CHOICES = {choice for choice, _ in ClassSession.WeekTypeChoices.choices}
-
-
-class DisplayMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DisplayMessage
-        fields = [
-            "id",
-            "content",
-            "is_active",
-            "priority",
-            "starts_at",
-            "ends_at",
-            "created_at",
-            "updated_at",
-        ]
-        read_only_fields = ("id", "created_at", "updated_at")
 
 
 class DisplayFilterConfigSerializer(serializers.Serializer):
@@ -155,7 +139,6 @@ class DisplayFilterConfigWriteSerializer(serializers.Serializer):
 
 class DisplayScreenSerializer(serializers.ModelSerializer):
     filters = serializers.SerializerMethodField()
-    messages = DisplayMessageSerializer(many=True, read_only=True)
 
     class Meta:
         model = DisplayScreen
@@ -169,7 +152,6 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
             "layout_theme",
             "is_active",
             "filters",
-            "messages",
             "created_at",
             "updated_at",
         ]
@@ -292,12 +274,6 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
         return sort_filters(prepared)
 
 
-class DisplayPublicMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DisplayMessage
-        fields = ["content", "priority"]
-
-
 class DisplayPublicFilterSerializer(serializers.Serializer):
     def to_representation(self, instance: dict[str, Any]) -> dict[str, Any]:  # type: ignore[override]
         return {
@@ -340,7 +316,6 @@ class DisplayPublicPayloadSerializer(serializers.Serializer):
     screen = DisplayScreenSerializer(read_only=True)
     filters = DisplayPublicFilterSerializer(many=True, read_only=True)
     sessions = DisplayPublicSessionSerializer(many=True, read_only=True)
-    messages = DisplayPublicMessageSerializer(many=True, read_only=True)
     generated_at = serializers.DateTimeField(read_only=True)
 
     def to_representation(self, instance):  # type: ignore[override]
@@ -349,6 +324,5 @@ class DisplayPublicPayloadSerializer(serializers.Serializer):
             "screen": DisplayScreenSerializer(instance["screen"]).data,
             "filters": DisplayPublicFilterSerializer(instance["filters"], many=True).data,
             "sessions": DisplayPublicSessionSerializer(instance["sessions"], many=True).data,
-            "messages": DisplayPublicMessageSerializer(instance["messages"], many=True).data,
             "generated_at": generated_at_field.to_representation(instance["generated_at"]),
         }

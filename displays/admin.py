@@ -1,17 +1,10 @@
 from __future__ import annotations
-
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
 
-from displays.models import DisplayScreen, DisplayMessage
-
-
-class DisplayMessageInline(admin.StackedInline):
-    model = DisplayMessage
-    extra = 0
-    fields = ("content", "is_active", "priority", "starts_at", "ends_at")
+from displays.models import DisplayScreen
 
 
 @admin.register(DisplayScreen)
@@ -30,7 +23,6 @@ class DisplayScreenAdmin(admin.ModelAdmin):
     search_fields = ("title", "slug", "institution__name")
     readonly_fields = ("slug", "access_token", "created_at", "updated_at", "preview_link")
     autocomplete_fields = ("institution",)
-    inlines = [DisplayMessageInline]
     actions = ["preview_screen"]
     fieldsets = (
         (None, {
@@ -80,9 +72,3 @@ class DisplayScreenAdmin(admin.ModelAdmin):
         screen = queryset.first()
         url = reverse("public-displays:public-display", args=[screen.slug])
         return HttpResponseRedirect(url)
-@admin.register(DisplayMessage)
-class DisplayMessageAdmin(admin.ModelAdmin):
-    list_display = ("content", "display_screen", "priority", "is_active", "starts_at", "ends_at")
-    list_filter = ("display_screen", "is_active")
-    search_fields = ("content", "display_screen__title")
-    autocomplete_fields = ("display_screen",)

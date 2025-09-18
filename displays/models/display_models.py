@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import secrets
-from datetime import datetime
 from typing import Dict
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import timezone
 from django.utils.text import slugify
 
 from unischedule.core.base_model import BaseModel
@@ -92,33 +90,3 @@ class DisplayScreen(BaseModel):
             self.access_token = secrets.token_urlsafe(16)
         self.full_clean()
         super().save(*args, **kwargs)
-class DisplayMessage(BaseModel):
-    """Optional ticker/alert messages for a display screen."""
-
-    display_screen = models.ForeignKey(
-        DisplayScreen,
-        on_delete=models.CASCADE,
-        related_name="messages",
-        verbose_name="صفحه نمایش",
-    )
-    content = models.TextField(verbose_name="پیام")
-    is_active = models.BooleanField(default=True, verbose_name="فعال است؟")
-    priority = models.IntegerField(default=0, verbose_name="اولویت")
-    starts_at = models.DateTimeField(blank=True, null=True, verbose_name="شروع نمایش")
-    ends_at = models.DateTimeField(blank=True, null=True, verbose_name="پایان نمایش")
-
-    class Meta:
-        verbose_name = "پیام نمایش"
-        verbose_name_plural = "پیام‌های نمایش"
-        ordering = ("-priority", "created_at")
-
-    def __str__(self) -> str:  # pragma: no cover - simple string representation
-        return self.content[:50]
-
-    def is_visible(self, reference: datetime | None = None) -> bool:
-        now = reference or timezone.now()
-        if self.starts_at and now < self.starts_at:
-            return False
-        if self.ends_at and now > self.ends_at:
-            return False
-        return self.is_active
