@@ -80,16 +80,21 @@ class DisplayServiceViewAdminTests(TestCase):
         data.update(overrides)
         return ClassSession.objects.create(**data)
 
+    def _set_screen_filters(self, filters: list[dict]):
+        display_service.update_display_screen(self.screen, {"filters": filters})
+        self.screen.refresh_from_db()
+
     def test_service_generates_payload_with_classroom_filter(self):
         self._create_session()
-        display_service.create_display_filter(
-            self.screen,
-            {
-                "classroom": self.classroom.id,
-                "day_of_week": "شنبه",
-                "position": 1,
-                "is_active": True,
-            },
+        self._set_screen_filters(
+            [
+                {
+                    "classroom": self.classroom.id,
+                    "day_of_week": "شنبه",
+                    "position": 1,
+                    "is_active": True,
+                }
+            ]
         )
 
         payload = display_service.build_public_payload(self.screen, use_cache=False)
@@ -103,12 +108,13 @@ class DisplayServiceViewAdminTests(TestCase):
         every_session = self._create_session(week_type=ClassSession.WeekTypeChoices.EVERY, start_time=time(10, 0))
         self._create_session(week_type=ClassSession.WeekTypeChoices.EVEN, start_time=time(12, 0))
 
-        display_service.create_display_filter(
-            self.screen,
-            {
-                "professor": self.professor.id,
-                "week_type": ClassSession.WeekTypeChoices.ODD,
-            },
+        self._set_screen_filters(
+            [
+                {
+                    "professor": self.professor.id,
+                    "week_type": ClassSession.WeekTypeChoices.ODD,
+                }
+            ]
         )
 
         sessions = display_service.build_public_payload(self.screen, use_cache=False)["sessions"]
@@ -119,12 +125,11 @@ class DisplayServiceViewAdminTests(TestCase):
 
     def test_filter_validation_rejects_foreign_institution(self):
         with self.assertRaises(CustomValidationError):
-            display_service.create_display_filter(
-                self.screen,
+            self._set_screen_filters([
                 {
                     "professor": self.other_professor.id,
-                },
-            )
+                }
+            ])
 
     def test_api_requires_authentication(self):
         unauthenticated = APIClient()
@@ -138,43 +143,89 @@ class DisplayServiceViewAdminTests(TestCase):
                 "title": "Hall",
                 "refresh_interval": 45,
                 "layout_theme": "dark",
+                "filters": [
+                    {
+                        "classroom": self.classroom.id,
+                        "semester": self.semester.id,
+                        "day_of_week": "شنبه",
+                        "position": 2,
+                    }
+                ],
             },
             format="json",
         )
         self.assertEqual(screen_response.status_code, 201)
-        screen_id = screen_response.data["data"]["screen"]["id"]
-
-        filter_response = self.api_client.post(
-            f"/api/displays/screens/{screen_id}/filters/create/",
-            {
-                "classroom": self.classroom.id,
-                "semester": self.semester.id,
-                "day_of_week": "شنبه",
-            },
-            format="json",
-        )
-        self.assertEqual(filter_response.status_code, 201)
-        filter_id = filter_response.data["data"]["filter"]["id"]
+        screen_data = screen_response.data["data"]["screen"]
+        screen_id = screen_data["id"]
+        self.assertEqual(len(screen_data["filters"]), 1)
+        created_filter = screen_data["filters"][0]
+        self.assertEqual(created_filter["display_screen"], screen_id)
+        self.assertEqual(created_filter["classroom"], self.classroom.id)
 
         update_response = self.api_client.put(
-            f"/api/displays/filters/{filter_id}/update/",
-            {"week_type": ClassSession.WeekTypeChoices.EVERY},
+            f"/api/displays/screens/{screen_id}/update/",
+            {
+                "filters": [
+                    {
+                        "id": created_filter["id"],
+                        "classroom": self.classroom.id,
+                        "semester": self.semester.id,
+                        "day_of_week": "شنبه",
+                        "week_type": ClassSession.WeekTypeChoices.EVERY,
+                        "position": 1,
+                    },
+                    {
+                        "title": "Professor filter",
+                        "professor": self.professor.id,
+                        "week_type": ClassSession.WeekTypeChoices.ODD,
+                        "position": 2,
+                    },
+                ]
+            },
             format="json",
         )
         self.assertEqual(update_response.status_code, 200)
+        updated_filters = update_response.data["data"]["screen"]["filters"]
+        self.assertEqual(len(updated_filters), 2)
+        updated_ids = {flt["id"] for flt in updated_filters}
+        self.assertIn(created_filter["id"], updated_ids)
 
-        list_filters = self.api_client.get(f"/api/displays/screens/{screen_id}/filters/")
-        self.assertEqual(list_filters.status_code, 200)
-        self.assertEqual(len(list_filters.data["data"]["filters"]), 1)
+        removal_response = self.api_client.put(
+            f"/api/displays/screens/{screen_id}/update/",
+            {
+                "filters": [
+                    {
+                        "id": created_filter["id"],
+                        "classroom": self.classroom.id,
+                        "semester": self.semester.id,
+                        "day_of_week": "شنبه",
+                        "week_type": ClassSession.WeekTypeChoices.EVERY,
+                        "position": 3,
+                    }
+                ]
+            },
+            format="json",
+        )
+        self.assertEqual(removal_response.status_code, 200)
+        final_filters = removal_response.data["data"]["screen"]["filters"]
+        self.assertEqual(len(final_filters), 1)
+        self.assertEqual(
+            final_filters[0]["computed_week_type"], ClassSession.WeekTypeChoices.EVERY
+        )
+
+        retrieve_response = self.api_client.get(f"/api/displays/screens/{screen_id}/")
+        self.assertEqual(retrieve_response.status_code, 200)
+        self.assertEqual(len(retrieve_response.data["data"]["screen"]["filters"]), 1)
 
     def test_public_view_renders_json_and_html(self):
         self._create_session()
-        display_service.create_display_filter(
-            self.screen,
-            {
-                "classroom": self.classroom.id,
-                "day_of_week": "شنبه",
-            },
+        self._set_screen_filters(
+            [
+                {
+                    "classroom": self.classroom.id,
+                    "day_of_week": "شنبه",
+                }
+            ]
         )
 
         json_response = self.client.get(f"/displays/{self.screen.slug}/")

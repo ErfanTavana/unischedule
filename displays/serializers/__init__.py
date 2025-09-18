@@ -1,8 +1,6 @@
 from .display_serializers import (
     DisplayScreenSerializer,
     DisplayScreenWriteSerializer,
-    DisplayFilterSerializer,
-    DisplayFilterWriteSerializer,
     DisplayMessageSerializer,
     DisplayPublicPayloadSerializer,
 )
@@ -10,8 +8,6 @@ from .display_serializers import (
 __all__ = [
     "DisplayScreenSerializer",
     "DisplayScreenWriteSerializer",
-    "DisplayFilterSerializer",
-    "DisplayFilterWriteSerializer",
     "DisplayMessageSerializer",
     "DisplayPublicPayloadSerializer",
 ]
