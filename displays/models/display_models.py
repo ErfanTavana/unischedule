@@ -141,14 +141,14 @@ class DisplayFilter(BaseModel):
         verbose_name="ترم",
     )
     day_of_week = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=ClassSession.DAY_OF_WEEK_CHOICES,
         blank=True,
         null=True,
         verbose_name="روز هفته",
     )
     week_type = models.CharField(
-        max_length=5,
+        max_length=20,
         choices=ClassSession.WeekTypeChoices.choices,
         blank=True,
         null=True,

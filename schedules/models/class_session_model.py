@@ -11,9 +11,9 @@ class ClassSession(BaseModel):
     """Represents a single scheduled class session."""
 
     class WeekTypeChoices(models.TextChoices):
-        EVERY = "every", "هرهفته"
-        ODD = "odd", "فرد"
-        EVEN = "even", "زوج"
+        EVERY = "هرهفته", "هرهفته"
+        ODD = "فرد", "فرد"
+        EVEN = "زوج", "زوج"
 
     DAY_OF_WEEK_CHOICES = [
         ("شنبه", "شنبه"),
@@ -61,7 +61,7 @@ class ClassSession(BaseModel):
     end_time = models.TimeField(verbose_name="زمان پایان")
 
     week_type = models.CharField(
-        max_length=5,
+        max_length=15,
         choices=WeekTypeChoices.choices,
         default=WeekTypeChoices.EVERY,
         verbose_name="نوع هفته",
