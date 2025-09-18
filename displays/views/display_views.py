@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.views.decorators.http import require_GET
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -166,45 +165,20 @@ def delete_display_screen_view(request, screen_id: int):
 
 @require_GET
 def public_display_view(request, slug: str):
-    wants_html = request.GET.get("format") == "html" or "text/html" in request.META.get("HTTP_ACCEPT", "")
     try:
         screen = display_service.get_display_screen_by_slug_or_404(slug)
         payload = display_service.build_public_payload(screen)
     except CustomValidationError as exc:
-        if wants_html:
-            return render(
-                request,
-                "displays/public.html",
-                {
-                    "error": exc.detail["message"],
-                    "screen": None,
-                    "sessions": [],
-                    "filters": [],
-                    "messages": [],
-                    "generated_at": None,
-                    "refresh_interval": 60,
-                },
-                status=exc.status_code,
-            )
-        return BaseResponse.error(
-            message=exc.detail["message"],
-            code=exc.detail["code"],
-            status_code=exc.status_code,
-            errors=exc.detail["errors"],
-            data=exc.detail.get("data"),
+        return JsonResponse(
+            {
+                "success": False,
+                "code": exc.detail["code"],
+                "message": exc.detail["message"],
+                "data": exc.detail.get("data", {}),
+                "errors": exc.detail.get("errors", []),
+            },
+            status=exc.status_code,
         )
-
-    if wants_html:
-        screen_data = payload["screen"]
-        context = {
-            "screen": screen_data,
-            "sessions": payload["sessions"],
-            "filters": payload["filters"],
-            "messages": payload["messages"],
-            "generated_at": payload["generated_at"],
-            "refresh_interval": screen_data.get("refresh_interval", 60),
-        }
-        return render(request, "displays/public.html", context)
 
     return JsonResponse(
         {

@@ -217,7 +217,7 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertEqual(retrieve_response.status_code, 200)
         self.assertEqual(len(retrieve_response.data["data"]["screen"]["filters"]), 1)
 
-    def test_public_view_renders_json_and_html(self):
+    def test_public_view_returns_json_payload(self):
         self._create_session()
         self._set_screen_filters(
             [
@@ -231,11 +231,7 @@ class DisplayServiceViewAdminTests(TestCase):
         json_response = self.client.get(f"/displays/{self.screen.slug}/")
         self.assertEqual(json_response.status_code, 200)
         self.assertTrue(json_response.json()["success"])
-
-        html_response = self.client.get(f"/displays/{self.screen.slug}/?format=html")
-        self.assertEqual(html_response.status_code, 200)
-        self.assertIn(b"<html", html_response.content.lower())
-        self.assertIn(self.screen.title.encode(), html_response.content)
+        self.assertEqual(json_response["Content-Type"], "application/json")
 
     def test_admin_preview_action_returns_redirect(self):
         factory = RequestFactory()
@@ -252,7 +248,9 @@ class DisplayServiceViewAdminTests(TestCase):
         found_screen = display_service.get_display_screen_by_slug_or_404(self.screen.slug)
         self.assertEqual(found_screen.id, self.screen.id)
 
-    def test_html_view_handles_missing_screen(self):
-        response = self.client.get("/displays/unknown/?format=html")
+    def test_public_view_missing_screen_returns_json_error(self):
+        response = self.client.get("/displays/unknown/")
         self.assertEqual(response.status_code, 404)
-        self.assertIn(b"error", response.content.lower())
+        data = response.json()
+        self.assertFalse(data["success"])
+        self.assertEqual(response["Content-Type"], "application/json")
