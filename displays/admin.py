@@ -54,19 +54,21 @@ class DisplayScreenAdmin(admin.ModelAdmin):
         }),
     )
 
-    @admin.display(description="لینک عمومی")
+    @admin.display(description="لینک JSON عمومی")
     def preview_link(self, obj: DisplayScreen) -> str:
         if obj is None or not getattr(obj, "pk", None) or not getattr(obj, "slug", None):
-            return "Save to generate preview"
+            return "Save to generate JSON URL"
         url = reverse("public-displays:public-display", args=[obj.slug])
-        return format_html('<a href="{}" target="_blank">{}</a>', url, url)
+        return format_html('<a href="{0}" target="_blank">{0}</a>', url)
 
-    @admin.display(description="پیش‌نمایش")
+    @admin.display(description="آدرس JSON عمومی")
     def public_preview(self, obj: DisplayScreen) -> str:
+        if obj is None or not getattr(obj, "slug", None):
+            return "—"
         url = reverse("public-displays:public-display", args=[obj.slug])
-        return format_html('<a href="{}" target="_blank">نمایش</a>', url)
+        return format_html('<a href="{0}" target="_blank">{0}</a>', url)
 
-    @admin.action(description="پیش‌نمایش صفحه عمومی")
+    @admin.action(description="باز کردن JSON عمومی")
     def preview_screen(self, request, queryset):
         if queryset.count() != 1:
             self.message_user(

@@ -43,7 +43,7 @@ python manage.py runserver
 | `PUT` | `/api/displays/filters/<id>/update/` | ویرایش فیلتر |
 | `DELETE` | `/api/displays/filters/<id>/delete/` | حذف فیلتر |
 
-نمایش عمومی هر نمایشگر از مسیر `/displays/<slug>/` قابل دسترس است. در صورت ارسال پارامتر `?format=html`، قالب HTML همراه با به‌روزرسانی خودکار و پیام‌های نوار اطلاع‌رسانی ارائه می‌شود؛ در حالت پیش‌فرض خروجی JSON با ساختار استاندارد `BaseResponse` بازگردانده خواهد شد.
+نمایش عمومی هر نمایشگر از مسیر `/displays/<slug>/` قابل دسترس است و همیشه خروجی JSON با ساختار استاندارد `BaseResponse` را بازمی‌گرداند؛ این خروجی شامل اطلاعات صفحه، فیلترها، جلسات و پیام‌های مرتبط با نمایشگر است که می‌توان آن را در سرویس‌های بیرونی مصرف کرد.
 
 ## مستندات بیشتر
 برای آشنایی با API و نمونه درخواست‌ها می‌توانید به فایل [Unischedule API.postman_collection.json](Unischedule%20API.postman_collection.json) مراجعه کنید.
