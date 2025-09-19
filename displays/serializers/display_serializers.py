@@ -69,35 +69,50 @@ class DisplayFilterConfigWriteSerializer(serializers.Serializer):
     is_active = serializers.BooleanField(required=False)
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        existing_filters: dict[str, dict[str, Any]] = self.context.get("existing_filters", {})
+        filter_identifier = attrs.get("id")
+        existing_data = None
+        if filter_identifier:
+            existing_data = existing_filters.get(str(filter_identifier))
+
         classroom = attrs.get("classroom")
         professor = attrs.get("professor")
         course = attrs.get("course")
         semester = attrs.get("semester")
 
-        day_of_week = attrs.get("day_of_week")
-        if day_of_week == "":
-            day_of_week = None
-        if day_of_week and day_of_week not in DAY_CHOICES:
-            raise serializers.ValidationError({"day_of_week": "روز هفته انتخاب‌شده معتبر نیست."})
-        attrs["day_of_week"] = day_of_week
+        day_of_week = attrs.get("day_of_week", serializers.empty)
+        if day_of_week is not serializers.empty:
+            if day_of_week == "":
+                day_of_week = None
+            if day_of_week and day_of_week not in DAY_CHOICES:
+                raise serializers.ValidationError({"day_of_week": "روز هفته انتخاب‌شده معتبر نیست."})
+            attrs["day_of_week"] = day_of_week
 
-        week_type = attrs.get("week_type")
-        if week_type == "":
-            week_type = None
-        if week_type and week_type not in WEEK_TYPE_CHOICES:
-            raise serializers.ValidationError({"week_type": "نوع هفته انتخاب‌شده معتبر نیست."})
-        attrs["week_type"] = week_type
+        week_type = attrs.get("week_type", serializers.empty)
+        if week_type is not serializers.empty:
+            if week_type == "":
+                week_type = None
+            if week_type and week_type not in WEEK_TYPE_CHOICES:
+                raise serializers.ValidationError({"week_type": "نوع هفته انتخاب‌شده معتبر نیست."})
+            attrs["week_type"] = week_type
 
         date_override = attrs.get("date_override")
 
+        def _resolve_value(key: str) -> Any:
+            if key in attrs:
+                return attrs.get(key)
+            if existing_data:
+                return existing_data.get(key)
+            return None
+
         selectors = [
-            classroom,
-            professor,
-            course,
-            semester,
-            day_of_week,
-            week_type,
-            date_override,
+            _resolve_value("classroom"),
+            _resolve_value("professor"),
+            _resolve_value("course"),
+            _resolve_value("semester"),
+            _resolve_value("day_of_week"),
+            _resolve_value("week_type"),
+            _resolve_value("date_override"),
         ]
         if not any(selectors):
             raise serializers.ValidationError("حداقل یکی از معیارهای فیلتر باید مشخص شود.")
@@ -117,22 +132,29 @@ class DisplayFilterConfigWriteSerializer(serializers.Serializer):
         if errors:
             raise serializers.ValidationError(errors)
 
-        position = attrs.get("position", 0)
-        if position is None:
-            position = 0
-        if position < 0:
-            raise serializers.ValidationError({"position": "ترتیب نمایش نمی‌تواند منفی باشد."})
-        attrs["position"] = position
+        if "position" in attrs:
+            position = attrs.get("position")
+            if position is None:
+                position = 0
+            if position < 0:
+                raise serializers.ValidationError({"position": "ترتیب نمایش نمی‌تواند منفی باشد."})
+            attrs["position"] = position
+        elif not existing_data:
+            attrs["position"] = 0
 
-        duration = attrs.get("duration_seconds", 0)
-        if duration is None:
-            duration = 0
-        if duration < 0:
-            raise serializers.ValidationError({"duration_seconds": "مدت نمایش نمی‌تواند منفی باشد."})
-        attrs["duration_seconds"] = duration
+        if "duration_seconds" in attrs:
+            duration = attrs.get("duration_seconds")
+            if duration is None:
+                duration = 0
+            if duration < 0:
+                raise serializers.ValidationError({"duration_seconds": "مدت نمایش نمی‌تواند منفی باشد."})
+            attrs["duration_seconds"] = duration
+        elif not existing_data:
+            attrs["duration_seconds"] = 0
 
         if "is_active" not in attrs:
-            attrs["is_active"] = True
+            if existing_data is None:
+                attrs["is_active"] = True
 
         return attrs
 
@@ -192,6 +214,15 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
         filters_field = self.fields.get("filters")
         if filters_field and hasattr(filters_field, "child"):
             filters_field.child.context.update(self.context)
+            existing_filters: dict[str, dict[str, Any]] = {}
+            if getattr(self, "instance", None) and isinstance(getattr(self.instance, "filters", None), list):
+                existing_filters = {
+                    str(item.get("id")): item
+                    for item in self.instance.filters
+                    if item.get("id")
+                }
+            filters_field.child.context["existing_filters"] = existing_filters
+            filters_field.child.context["partial"] = getattr(self, "partial", False)
 
     def validate_refresh_interval(self, value: int) -> int:
         if value <= 0:
@@ -232,40 +263,46 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
         prepared: list[dict[str, Any]] = []
         for raw in filters_data:
             filter_id = raw.get("id") or str(uuid4())
-            source = existing.get(filter_id)
-            classroom = raw.get("classroom")
-            if classroom is not None and hasattr(classroom, "pk"):
-                classroom = classroom.pk
-            professor = raw.get("professor")
-            if professor is not None and hasattr(professor, "pk"):
-                professor = professor.pk
-            course = raw.get("course")
-            if course is not None and hasattr(course, "pk"):
-                course = course.pk
-            semester = raw.get("semester")
-            if semester is not None and hasattr(semester, "pk"):
-                semester = semester.pk
+            source = existing.get(str(filter_id))
 
-            date_override = raw.get("date_override")
-            if date_override:
+            def _resolve_relation(key: str) -> Any:
+                if key in raw:
+                    value = raw.get(key)
+                elif source:
+                    value = source.get(key)
+                else:
+                    value = None
+                if value is not None and hasattr(value, "pk"):
+                    return value.pk
+                return value
+
+            def _resolve_value(key: str, default: Any = None) -> Any:
+                if key in raw:
+                    return raw.get(key)
+                if source and key in source:
+                    return source.get(key)
+                return default
+
+            date_override = _resolve_value("date_override")
+            if hasattr(date_override, "isoformat"):
                 date_override_value = date_override.isoformat()
             else:
-                date_override_value = None
+                date_override_value = date_override
 
             prepared.append(
                 {
                     "id": str(filter_id),
-                    "title": (raw.get("title") or ""),
-                    "classroom": classroom,
-                    "professor": professor,
-                    "course": course,
-                    "semester": semester,
-                    "day_of_week": raw.get("day_of_week"),
-                    "week_type": raw.get("week_type"),
+                    "title": (_resolve_value("title") or ""),
+                    "classroom": _resolve_relation("classroom"),
+                    "professor": _resolve_relation("professor"),
+                    "course": _resolve_relation("course"),
+                    "semester": _resolve_relation("semester"),
+                    "day_of_week": _resolve_value("day_of_week"),
+                    "week_type": _resolve_value("week_type"),
                     "date_override": date_override_value,
-                    "position": raw.get("position", 0),
-                    "duration_seconds": raw.get("duration_seconds", 0),
-                    "is_active": raw.get("is_active", True),
+                    "position": _resolve_value("position", 0),
+                    "duration_seconds": _resolve_value("duration_seconds", 0),
+                    "is_active": _resolve_value("is_active", True),
                     "created_at": source.get("created_at") if source else now_iso,
                     "updated_at": now_iso,
                 }
