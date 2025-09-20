@@ -9,6 +9,11 @@ from django.utils.text import slugify
 
 from unischedule.core.base_model import BaseModel
 from institutions.models import Institution
+from locations.models import Classroom
+from courses.models import Course
+from professors.models import Professor
+from semesters.models import Semester
+from schedules.models import ClassSession
 
 # Mapping Python's weekday index to the Persian choices used in ClassSession
 PY_WEEKDAY_TO_PERSIAN: Dict[int, str] = {
@@ -57,11 +62,71 @@ class DisplayScreen(BaseModel):
         verbose_name="قالب نمایش",
     )
     is_active = models.BooleanField(default=True, verbose_name="فعال است؟")
-    filters = models.JSONField(
-        default=list,
+    filter_title = models.CharField(
+        max_length=255,
         blank=True,
-        verbose_name="پیکربندی فیلترها",
-        help_text="تعریف فیلترهای صفحه به‌صورت ساختار یافته.",
+        default="",
+        verbose_name="عنوان فیلتر",
+        help_text="عنوان نمایشی برای فیلتر انتخابی.",
+    )
+    filter_classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="display_screens",
+        verbose_name="کلاس",
+    )
+    filter_course = models.ForeignKey(
+        Course,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="display_screens",
+        verbose_name="درس",
+    )
+    filter_professor = models.ForeignKey(
+        Professor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="display_screens",
+        verbose_name="استاد",
+    )
+    filter_semester = models.ForeignKey(
+        Semester,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="display_screens",
+        verbose_name="ترم",
+    )
+    filter_day_of_week = models.CharField(
+        max_length=16,
+        choices=ClassSession.DAY_OF_WEEK_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name="روز هفته",
+    )
+    filter_week_type = models.CharField(
+        max_length=16,
+        choices=ClassSession.WeekTypeChoices.choices,
+        null=True,
+        blank=True,
+        verbose_name="نوع هفته",
+    )
+    filter_date_override = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="تاریخ جایگزین",
+    )
+    filter_duration_seconds = models.PositiveIntegerField(
+        default=0,
+        verbose_name="مدت نمایش (ثانیه)",
+    )
+    filter_is_active = models.BooleanField(
+        default=True,
+        verbose_name="فیلتر فعال است؟",
     )
 
     class Meta:

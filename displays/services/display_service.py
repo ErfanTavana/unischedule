@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Iterable, List
+from typing import Iterable, List
 
 from django.core.cache import cache
 from django.db.models import Q
@@ -20,7 +20,6 @@ from displays.utils import (
     compute_filter_day_of_week,
     compute_filter_week_type,
     parse_date,
-    sort_filters,
 )
 from schedules.models import ClassSession
 
@@ -131,52 +130,6 @@ def _base_session_queryset(screen: DisplayScreen):
     )
 
 
-def _screen_filters(screen: DisplayScreen) -> list[dict[str, Any]]:
-    if isinstance(screen.filters, list):
-        return sort_filters(screen.filters)
-    return []
-
-
-def _active_screen_filters(screen: DisplayScreen) -> list[dict[str, Any]]:
-    return [f for f in _screen_filters(screen) if f.get("is_active", True)]
-
-
-def _query_sessions_for_filter(screen: DisplayScreen, filter_data: dict[str, Any]):
-    qs = _base_session_queryset(screen)
-
-    semester = filter_data.get("semester")
-    if semester:
-        qs = qs.filter(semester_id=semester)
-
-    course = filter_data.get("course")
-    if course:
-        qs = qs.filter(course_id=course)
-
-    professor = filter_data.get("professor")
-    if professor:
-        qs = qs.filter(professor_id=professor)
-
-    classroom = filter_data.get("classroom")
-    if classroom:
-        qs = qs.filter(classroom_id=classroom)
-
-    computed_day = compute_filter_day_of_week(filter_data)
-    if computed_day:
-        qs = qs.filter(day_of_week=computed_day)
-
-    computed_week_type = compute_filter_week_type(filter_data)
-    qs = _apply_week_type_filter(qs, computed_week_type)
-
-    date_override = parse_date(filter_data.get("date_override"))
-    if date_override:
-        qs = qs.filter(
-            semester__start_date__lte=date_override,
-            semester__end_date__gte=date_override,
-        )
-
-    return qs.order_by("day_of_week", "start_time", "course__title")
-
-
 def _sort_sessions(sessions: Iterable[ClassSession]) -> List[ClassSession]:
     return sorted(
         sessions,
@@ -188,24 +141,54 @@ def _sort_sessions(sessions: Iterable[ClassSession]) -> List[ClassSession]:
     )
 
 
-def _unique_sessions(sessions: Iterable[ClassSession]) -> List[ClassSession]:
-    unique: dict[int, ClassSession] = {}
-    for session in sessions:
-        unique[session.id] = session
-    return list(unique.values())
-
-
 def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
-    filters = _active_screen_filters(screen)
-    if not filters:
-        return list(
-            _base_session_queryset(screen).order_by("day_of_week", "start_time", "course__title")
+    qs = _base_session_queryset(screen)
+
+    if not screen.filter_is_active:
+        return list(qs.order_by("day_of_week", "start_time", "course__title"))
+
+    has_selector = any(
+        [
+            screen.filter_classroom_id,
+            screen.filter_professor_id,
+            screen.filter_course_id,
+            screen.filter_semester_id,
+            screen.filter_day_of_week,
+            screen.filter_week_type,
+            screen.filter_date_override,
+        ]
+    )
+
+    if not has_selector:
+        return list(qs.order_by("day_of_week", "start_time", "course__title"))
+
+    if screen.filter_semester_id:
+        qs = qs.filter(semester_id=screen.filter_semester_id)
+
+    if screen.filter_course_id:
+        qs = qs.filter(course_id=screen.filter_course_id)
+
+    if screen.filter_professor_id:
+        qs = qs.filter(professor_id=screen.filter_professor_id)
+
+    if screen.filter_classroom_id:
+        qs = qs.filter(classroom_id=screen.filter_classroom_id)
+
+    computed_day = compute_filter_day_of_week(screen)
+    if computed_day:
+        qs = qs.filter(day_of_week=computed_day)
+
+    computed_week_type = compute_filter_week_type(screen)
+    qs = _apply_week_type_filter(qs, computed_week_type)
+
+    date_override = parse_date(screen.filter_date_override)
+    if date_override:
+        qs = qs.filter(
+            semester__start_date__lte=date_override,
+            semester__end_date__gte=date_override,
         )
 
-    collected: list[ClassSession] = []
-    for filter_config in filters:
-        collected.extend(list(_query_sessions_for_filter(screen, filter_config)))
-    return _unique_sessions(collected)
+    return list(qs.order_by("day_of_week", "start_time", "course__title"))
 
 
 def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> dict:
@@ -218,11 +201,9 @@ def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> di
     sessions = _collect_sessions_for_screen(screen)
     sessions = _sort_sessions(sessions)
 
-    filters = _active_screen_filters(screen)
-
     payload_serializer = DisplayPublicPayloadSerializer({
         "screen": screen,
-        "filters": filters,
+        "filter": screen,
         "sessions": sessions,
         "generated_at": timezone.now(),
     })

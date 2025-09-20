@@ -38,12 +38,9 @@ python manage.py runserver
 | `GET` | `/api/displays/screens/<id>/` | دریافت جزئیات نمایشگر خاص |
 | `PUT` | `/api/displays/screens/<id>/update/` | ویرایش نمایشگر |
 | `DELETE` | `/api/displays/screens/<id>/delete/` | حذف (نرم) نمایشگر |
-| `GET` | `/api/displays/screens/<id>/filters/` | فهرست فیلترهای یک نمایشگر |
-| `POST` | `/api/displays/screens/<id>/filters/create/` | ایجاد فیلتر جدید برای نمایشگر |
-| `PUT` | `/api/displays/filters/<id>/update/` | ویرایش فیلتر |
-| `DELETE` | `/api/displays/filters/<id>/delete/` | حذف فیلتر |
+| `GET` | `/displays/<slug>/` | مشاهده خروجی عمومی نمایشگر (بدون احراز هویت) |
 
-نمایش عمومی هر نمایشگر از مسیر `/displays/<slug>/` قابل دسترس است و همیشه خروجی JSON با ساختار استاندارد `BaseResponse` را بازمی‌گرداند؛ این خروجی شامل اطلاعات صفحه، فیلترها، جلسات و پیام‌های مرتبط با نمایشگر است که می‌توان آن را در سرویس‌های بیرونی مصرف کرد.
+نمایش عمومی هر نمایشگر از مسیر `/displays/<slug>/` قابل دسترس است و همیشه خروجی JSON با ساختار استاندارد `BaseResponse` را بازمی‌گرداند؛ این خروجی شامل اطلاعات صفحه، فیلتر تک‌مرحله‌ای و جلسات هم‌خوان با معیارهای تعریف‌شده است که می‌توان آن را در سرویس‌های بیرونی مصرف کرد.
 
 ## مستندات بیشتر
 برای آشنایی با API و نمونه درخواست‌ها می‌توانید به فایل [Unischedule API.postman_collection.json](Unischedule%20API.postman_collection.json) مراجعه کنید.
