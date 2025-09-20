@@ -147,20 +147,35 @@ def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
     if not screen.filter_is_active:
         return list(qs.order_by("day_of_week", "start_time", "course__title"))
 
-    has_selector = any(
-        [
-            screen.filter_classroom_id,
-            screen.filter_professor_id,
-            screen.filter_course_id,
-            screen.filter_semester_id,
-            screen.filter_day_of_week,
-            screen.filter_week_type,
-            screen.filter_date_override,
-        ]
-    )
+    def _has_value(value) -> bool:
+        if value is None:
+            return False
+        if isinstance(value, str):
+            return value.strip() != ""
+        return True
+
+    selectors = [
+        screen.filter_classroom_id,
+        screen.filter_building_id,
+        screen.filter_professor_id,
+        screen.filter_course_id,
+        screen.filter_semester_id,
+        screen.filter_day_of_week,
+        screen.filter_week_type,
+        screen.filter_date_override,
+        screen.filter_group_code,
+        screen.filter_start_time,
+        screen.filter_end_time,
+        screen.filter_capacity,
+    ]
+
+    has_selector = any(_has_value(value) for value in selectors)
 
     if not has_selector:
         return list(qs.order_by("day_of_week", "start_time", "course__title"))
+
+    if screen.filter_building_id:
+        qs = qs.filter(classroom__building_id=screen.filter_building_id)
 
     if screen.filter_semester_id:
         qs = qs.filter(semester_id=screen.filter_semester_id)
@@ -173,6 +188,18 @@ def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
 
     if screen.filter_classroom_id:
         qs = qs.filter(classroom_id=screen.filter_classroom_id)
+
+    if screen.filter_group_code:
+        qs = qs.filter(group_code=screen.filter_group_code)
+
+    if screen.filter_start_time:
+        qs = qs.filter(start_time__gte=screen.filter_start_time)
+
+    if screen.filter_end_time:
+        qs = qs.filter(end_time__lte=screen.filter_end_time)
+
+    if screen.filter_capacity is not None:
+        qs = qs.filter(capacity__gte=screen.filter_capacity)
 
     computed_day = compute_filter_day_of_week(screen)
     if computed_day:

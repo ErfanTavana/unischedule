@@ -62,6 +62,9 @@ class DisplayServiceViewAdminTests(TestCase):
         )
         self.building = Building.objects.create(title="Main", institution=self.institution)
         self.classroom = Classroom.objects.create(title="101", building=self.building)
+        self.second_building = Building.objects.create(title="Annex", institution=self.institution)
+        self.second_classroom = Classroom.objects.create(title="102", building=self.second_building)
+        self.other_building = Building.objects.create(title="Remote", institution=self.other_institution)
 
         self.screen = DisplayScreen.objects.create(institution=self.institution, title="Lobby")
 
@@ -76,6 +79,8 @@ class DisplayServiceViewAdminTests(TestCase):
             start_time=time(8, 0),
             end_time=time(10, 0),
             week_type=ClassSession.WeekTypeChoices.EVERY,
+            group_code="A",
+            capacity=20,
         )
         data.update(overrides)
         return ClassSession.objects.create(**data)
@@ -86,9 +91,18 @@ class DisplayServiceViewAdminTests(TestCase):
 
     def test_service_generates_payload_with_classroom_filter(self):
         self._create_session()
+        self._create_session(
+            classroom=self.second_classroom,
+            group_code="B",
+            start_time=time(12, 0),
+            end_time=time(14, 0),
+            capacity=10,
+        )
         self._update_screen_filter(
             filter_classroom=self.classroom.id,
+            filter_building=self.building.id,
             filter_day_of_week="شنبه",
+            filter_capacity=15,
             filter_is_active=True,
         )
 
@@ -98,6 +112,8 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertEqual(len(payload["sessions"]), 1)
         self.assertEqual(payload["sessions"][0]["classroom_title"], self.classroom.title)
         self.assertEqual(payload["filter"]["computed_day_of_week"], "شنبه")
+        self.assertEqual(payload["filter"]["building"]["id"], self.building.id)
+        self.assertEqual(payload["filter"]["capacity"], 15)
 
     def test_service_filters_by_professor_and_week_type(self):
         odd_session = self._create_session(week_type=ClassSession.WeekTypeChoices.ODD)
@@ -115,12 +131,57 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertIn(every_session.id, session_ids)
         self.assertEqual(len(session_ids), 2)
 
+    def test_service_filters_by_building_group_and_time_range(self):
+        included_session = self._create_session(group_code="Z", capacity=40)
+        self._create_session(
+            classroom=self.second_classroom,
+            group_code="Z",
+            start_time=time(9, 0),
+            end_time=time(11, 0),
+            capacity=50,
+        )
+        self._create_session(group_code="Z", capacity=35, start_time=time(7, 0), end_time=time(9, 0))
+
+        self._update_screen_filter(
+            filter_building=self.building.id,
+            filter_group_code="Z",
+            filter_start_time=time(8, 0),
+            filter_end_time=time(10, 0),
+            filter_capacity=30,
+        )
+
+        payload = display_service.build_public_payload(self.screen, use_cache=False)
+        self.assertEqual(len(payload["sessions"]), 1)
+        self.assertEqual(payload["sessions"][0]["id"], included_session.id)
+        self.assertEqual(payload["filter"]["group_code"], "Z")
+        self.assertEqual(payload["filter"]["start_time"], "08:00:00")
+        self.assertEqual(payload["filter"]["end_time"], "10:00:00")
+
     def test_filter_validation_rejects_foreign_institution(self):
         with self.assertRaises(CustomValidationError):
             display_service.update_display_screen(
                 self.screen,
                 {
                     "filter_professor": self.other_professor.id,
+                },
+            )
+
+    def test_filter_validation_rejects_foreign_building(self):
+        with self.assertRaises(CustomValidationError):
+            display_service.update_display_screen(
+                self.screen,
+                {
+                    "filter_building": self.other_building.id,
+                },
+            )
+
+    def test_filter_validation_rejects_mismatched_building_and_classroom(self):
+        with self.assertRaises(CustomValidationError):
+            display_service.update_display_screen(
+                self.screen,
+                {
+                    "filter_classroom": self.classroom.id,
+                    "filter_building": self.second_building.id,
                 },
             )
 
@@ -138,6 +199,7 @@ class DisplayServiceViewAdminTests(TestCase):
                 "layout_theme": "dark",
                 "filter_title": "Classroom filter",
                 "filter_classroom": self.classroom.id,
+                "filter_building": self.building.id,
                 "filter_semester": self.semester.id,
                 "filter_day_of_week": "شنبه",
             },
@@ -147,6 +209,7 @@ class DisplayServiceViewAdminTests(TestCase):
         screen_data = screen_response.data["data"]["screen"]
         screen_id = screen_data["id"]
         self.assertEqual(screen_data["filter_classroom"], self.classroom.id)
+        self.assertEqual(screen_data["filter_building"], self.building.id)
         self.assertEqual(screen_data["filter_semester"], self.semester.id)
         self.assertEqual(screen_data["filter_day_of_week"], "شنبه")
         self.assertTrue(screen_data["filter_is_active"])
@@ -158,6 +221,7 @@ class DisplayServiceViewAdminTests(TestCase):
                 "filter_professor": self.professor.id,
                 "filter_week_type": ClassSession.WeekTypeChoices.ODD,
                 "filter_classroom": None,
+                "filter_building": None,
                 "filter_semester": None,
             },
             format="json",
