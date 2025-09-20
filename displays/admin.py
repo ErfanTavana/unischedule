@@ -32,10 +32,26 @@ class DisplayScreenAdmin(admin.ModelAdmin):
                 "layout_theme",
                 "refresh_interval",
                 "is_active",
-                "filters",
                 "preview_link",
             )
         }),
+        (
+            "پیکربندی فیلتر",
+            {
+                "fields": (
+                    "filter_title",
+                    "filter_is_active",
+                    "filter_classroom",
+                    "filter_course",
+                    "filter_professor",
+                    "filter_semester",
+                    "filter_day_of_week",
+                    "filter_week_type",
+                    "filter_date_override",
+                    "filter_duration_seconds",
+                )
+            },
+        ),
         ("شناسه‌ها", {
             "fields": ("slug", "access_token"),
             "classes": ("collapse",),
