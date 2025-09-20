@@ -7,7 +7,7 @@ from rest_framework import serializers
 from courses.models import Course
 from displays.models import DisplayScreen
 from displays.utils import compute_filter_day_of_week, compute_filter_week_type
-from locations.models import Classroom
+from locations.models import Building, Classroom
 from professors.models import Professor
 from schedules.models import ClassSession
 from semesters.models import Semester
@@ -33,12 +33,17 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
             "is_active",
             "filter_title",
             "filter_classroom",
+            "filter_building",
             "filter_course",
             "filter_professor",
             "filter_semester",
             "filter_day_of_week",
             "filter_week_type",
             "filter_date_override",
+            "filter_start_time",
+            "filter_end_time",
+            "filter_group_code",
+            "filter_capacity",
             "filter_duration_seconds",
             "filter_is_active",
             "filter_computed_day_of_week",
@@ -68,6 +73,9 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
     filter_classroom = serializers.PrimaryKeyRelatedField(
         queryset=Classroom.objects.all(), required=False, allow_null=True
     )
+    filter_building = serializers.PrimaryKeyRelatedField(
+        queryset=Building.objects.all(), required=False, allow_null=True
+    )
     filter_course = serializers.PrimaryKeyRelatedField(
         queryset=Course.objects.all(), required=False, allow_null=True
     )
@@ -80,6 +88,10 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
     filter_day_of_week = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     filter_week_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     filter_date_override = serializers.DateField(required=False, allow_null=True)
+    filter_start_time = serializers.TimeField(required=False, allow_null=True)
+    filter_end_time = serializers.TimeField(required=False, allow_null=True)
+    filter_group_code = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    filter_capacity = serializers.IntegerField(required=False, allow_null=True, min_value=0)
     filter_duration_seconds = serializers.IntegerField(required=False, min_value=0)
     filter_is_active = serializers.BooleanField(required=False)
 
@@ -92,12 +104,17 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
             "is_active",
             "filter_title",
             "filter_classroom",
+            "filter_building",
             "filter_course",
             "filter_professor",
             "filter_semester",
             "filter_day_of_week",
             "filter_week_type",
             "filter_date_override",
+            "filter_start_time",
+            "filter_end_time",
+            "filter_group_code",
+            "filter_capacity",
             "filter_duration_seconds",
             "filter_is_active",
         ]
@@ -133,6 +150,25 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
                     {"filter_week_type": "نوع هفته انتخاب‌شده معتبر نیست."}
                 )
 
+        group_code = attrs.get("filter_group_code", serializers.empty)
+        if group_code is not serializers.empty:
+            if not group_code:
+                attrs["filter_group_code"] = None
+            else:
+                attrs["filter_group_code"] = str(group_code).strip()
+                if not attrs["filter_group_code"]:
+                    attrs["filter_group_code"] = None
+
+        start_time = attrs.get("filter_start_time", serializers.empty)
+        end_time = attrs.get("filter_end_time", serializers.empty)
+        if start_time is not serializers.empty and end_time is not serializers.empty:
+            if start_time and end_time and start_time > end_time:
+                raise serializers.ValidationError(
+                    {
+                        "filter_end_time": "زمان پایان نمی‌تواند قبل از زمان شروع باشد.",
+                    }
+                )
+
         duration = attrs.get("filter_duration_seconds", serializers.empty)
         if duration is serializers.empty and instance is None:
             attrs.setdefault("filter_duration_seconds", 0)
@@ -154,17 +190,29 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
                 return getattr(instance, field)
             return None
 
-        selectors = [
-            _resolve("filter_classroom"),
-            _resolve("filter_professor"),
-            _resolve("filter_course"),
-            _resolve("filter_semester"),
-            _resolve("filter_day_of_week"),
-            _resolve("filter_week_type"),
-            _resolve("filter_date_override"),
-        ]
+        selectors = {
+            "filter_classroom": _resolve("filter_classroom"),
+            "filter_building": _resolve("filter_building"),
+            "filter_professor": _resolve("filter_professor"),
+            "filter_course": _resolve("filter_course"),
+            "filter_semester": _resolve("filter_semester"),
+            "filter_day_of_week": _resolve("filter_day_of_week"),
+            "filter_week_type": _resolve("filter_week_type"),
+            "filter_date_override": _resolve("filter_date_override"),
+            "filter_group_code": _resolve("filter_group_code"),
+            "filter_start_time": _resolve("filter_start_time"),
+            "filter_end_time": _resolve("filter_end_time"),
+            "filter_capacity": _resolve("filter_capacity"),
+        }
 
-        if bool(filter_is_active) and not any(selectors):
+        def _has_value(value: Any) -> bool:
+            if value is None:
+                return False
+            if isinstance(value, str):
+                return value.strip() != ""
+            return True
+
+        if bool(filter_is_active) and not any(_has_value(value) for value in selectors.values()):
             raise serializers.ValidationError("حداقل یکی از معیارهای فیلتر باید مشخص شود.")
 
         institution = self._institution()
@@ -173,6 +221,22 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
             classroom = attrs.get("filter_classroom")
             if classroom and classroom.building.institution_id != institution.id:
                 errors["filter_classroom"] = "کلاس انتخاب‌شده متعلق به این مؤسسه نیست."
+
+            building_provided = "filter_building" in attrs
+            building = attrs.get("filter_building") if building_provided else None
+            if not building_provided and instance is not None:
+                building = instance.filter_building
+
+            if building and building.institution_id != institution.id:
+                errors["filter_building"] = "ساختمان انتخاب‌شده متعلق به این مؤسسه نیست."
+
+            classroom_provided = "filter_classroom" in attrs
+            resolved_classroom = classroom if classroom_provided else None
+            if not classroom_provided and instance is not None:
+                resolved_classroom = instance.filter_classroom
+
+            if resolved_classroom and building and resolved_classroom.building_id != building.id:
+                errors["filter_classroom"] = "کلاس و ساختمان انتخاب‌شده هم‌خوانی ندارند."
 
             professor = attrs.get("filter_professor")
             if professor and professor.institution_id != institution.id:
@@ -194,10 +258,47 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
 
 class DisplayPublicFilterSerializer(serializers.Serializer):
     def to_representation(self, instance: DisplayScreen) -> dict[str, Any]:  # type: ignore[override]
+        def _ref(attr: str, *, display: str | None = None) -> dict[str, Any] | None:
+            value = getattr(instance, attr)
+            if not value:
+                return None
+            label: str
+            if display is not None:
+                label = display
+            elif hasattr(value, "title"):
+                label = getattr(value, "title")
+            else:
+                label = str(value)
+            return {"id": value.id, "label": label}
+
+        professor = instance.filter_professor
+        professor_label = None
+        if professor:
+            computed_name = f"{professor.first_name} {professor.last_name}".strip()
+            professor_label = computed_name or None
+
         return {
             "title": instance.filter_title or "",
+            "classroom": _ref("filter_classroom"),
+            "building": _ref("filter_building"),
+            "course": _ref("filter_course"),
+            "professor": _ref("filter_professor", display=professor_label),
+            "semester": _ref("filter_semester"),
+            "group_code": instance.filter_group_code or None,
+            "start_time": instance.filter_start_time.isoformat()
+            if instance.filter_start_time
+            else None,
+            "end_time": instance.filter_end_time.isoformat()
+            if instance.filter_end_time
+            else None,
+            "capacity": instance.filter_capacity,
             "computed_day_of_week": compute_filter_day_of_week(instance),
             "computed_week_type": compute_filter_week_type(instance),
+            "day_of_week": instance.filter_day_of_week,
+            "week_type": instance.filter_week_type,
+            "date_override": instance.filter_date_override.isoformat()
+            if instance.filter_date_override
+            else None,
             "duration_seconds": instance.filter_duration_seconds,
             "is_active": instance.filter_is_active,
         }

@@ -9,7 +9,7 @@ from django.utils.text import slugify
 
 from unischedule.core.base_model import BaseModel
 from institutions.models import Institution
-from locations.models import Classroom
+from locations.models import Building, Classroom
 from courses.models import Course
 from professors.models import Professor
 from semesters.models import Semester
@@ -77,6 +77,14 @@ class DisplayScreen(BaseModel):
         related_name="display_screens",
         verbose_name="کلاس",
     )
+    filter_building = models.ForeignKey(
+        Building,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="display_screens",
+        verbose_name="ساختمان",
+    )
     filter_course = models.ForeignKey(
         Course,
         on_delete=models.SET_NULL,
@@ -119,6 +127,27 @@ class DisplayScreen(BaseModel):
         null=True,
         blank=True,
         verbose_name="تاریخ جایگزین",
+    )
+    filter_start_time = models.TimeField(
+        null=True,
+        blank=True,
+        verbose_name="زمان شروع",
+    )
+    filter_end_time = models.TimeField(
+        null=True,
+        blank=True,
+        verbose_name="زمان پایان",
+    )
+    filter_group_code = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name="کد گروه",
+    )
+    filter_capacity = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="حداقل ظرفیت",
     )
     filter_duration_seconds = models.PositiveIntegerField(
         default=0,
