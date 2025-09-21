@@ -49,7 +49,12 @@
           "name": "Logout",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/auth/logout/",
               "host": [
@@ -74,7 +79,12 @@
           "name": "List Semesters",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/semesters/",
               "host": [
@@ -93,7 +103,12 @@
           "name": "Create Semester",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -139,7 +154,12 @@
           "name": "Update Semester",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -185,7 +205,12 @@
           "name": "Delete Semester",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/semesters/12/delete/",
               "host": [
@@ -206,7 +231,12 @@
           "name": "Set Active Semester",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": []
@@ -236,7 +266,12 @@
           "name": "List Professors",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/professors/",
               "host": [
@@ -255,7 +290,12 @@
           "name": "Retrieve Professor",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/professors/1/",
               "host": [
@@ -275,7 +315,12 @@
           "name": "Create Professor",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -324,6 +369,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -356,7 +405,12 @@
           "name": "Delete Professor",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/professors/1/delete/",
               "host": [
@@ -382,7 +436,12 @@
           "name": "List Courses",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/courses/",
               "host": [
@@ -401,7 +460,12 @@
           "name": "Retrieve Course",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/courses/1/",
               "host": [
@@ -421,7 +485,12 @@
           "name": "Create Course",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -475,7 +544,12 @@
           "name": "Update Course",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -522,7 +596,12 @@
           "name": "Delete Course",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/courses/2/delete/",
               "host": [
@@ -552,7 +631,12 @@
               "name": "List Buildings",
               "request": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/api/locations/buildings/",
                   "host": [
@@ -573,7 +657,12 @@
               "name": "Retrieve Building",
               "request": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/api/locations/buildings/9/",
                   "host": [
@@ -595,7 +684,12 @@
               "name": "Create Building",
               "request": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "body": {
                   "mode": "formdata",
                   "formdata": [
@@ -627,7 +721,12 @@
               "name": "Update Building",
               "request": {
                 "method": "PUT",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "body": {
                   "mode": "formdata",
                   "formdata": [
@@ -660,7 +759,12 @@
               "name": "Delete Building",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/api/locations/buildings/12/delete/",
                   "host": [
@@ -688,7 +792,12 @@
               "name": "List All Classrooms",
               "request": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/api/locations/classrooms/all/",
                   "host": [
@@ -710,7 +819,12 @@
               "name": "List Classrooms by Building",
               "request": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/api/locations/buildings/9/classrooms/",
                   "host": [
@@ -733,7 +847,12 @@
               "name": "Retrieve Classroom",
               "request": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/api/locations/classrooms/1/",
                   "host": [
@@ -755,7 +874,12 @@
               "name": "Create Classroom",
               "request": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "body": {
                   "mode": "formdata",
                   "formdata": [
@@ -789,7 +913,12 @@
               "name": "Update Classroom",
               "request": {
                 "method": "PUT",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "body": {
                   "mode": "formdata",
                   "formdata": [
@@ -822,7 +951,12 @@
               "name": "Delete Classroom",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/api/locations/classrooms/2/delete/",
                   "host": [
@@ -855,7 +989,12 @@
           },
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": []
@@ -897,7 +1036,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -976,7 +1120,12 @@
           "name": "Retrieve Schedule",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}api/schedules/2/",
               "host": [
@@ -996,7 +1145,12 @@
           "name": "Update Schedule",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -1076,7 +1230,12 @@
           "name": "Delete Schedule",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/schedules/3/delete/",
               "host": [
@@ -1103,7 +1262,12 @@
           "name": "List Display Screens",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/displays/screens/",
               "host": [
@@ -1228,7 +1392,12 @@
           "name": "Create Display Screen",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -1864,7 +2033,12 @@
           "name": "Retrieve Display Screen",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/displays/screens/{{screen_id}}/",
               "host": [
@@ -2021,7 +2195,12 @@
           "name": "Update Display Screen",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -2696,7 +2875,12 @@
           "name": "Delete Display Screen",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/displays/screens/{{screen_id}}/delete/",
               "host": [
