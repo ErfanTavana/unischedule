@@ -319,41 +319,32 @@
         {
           "name": "Update Professor",
           "request": {
-            "method": "POST",
-            "header": [],
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "first_name",
-                  "value": "عرفان",
-                  "type": "text"
-                },
-                {
-                  "key": "last_name",
-                  "value": "رضایی2",
-                  "type": "text"
-                },
-                {
-                  "key": "national_code",
-                  "value": "0912345610",
-                  "type": "text"
-                },
-                {
-                  "key": "phone_number",
-                  "value": "09033483116",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Ali\",\n  \"last_name\": \"Ahmadi\",\n  \"phone_number\": \"09123456789\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
-              "raw": "{{base_url}}api/professors/create/",
+              "raw": "{{base_url}}/api/professors/{{professor_id}}/update/",
               "host": [
-                "{{base_url}}api"
+                "{{base_url}}"
               ],
               "path": [
+                "api",
                 "professors",
-                "create",
+                "{{professor_id}}",
+                "update",
                 ""
               ]
             },
