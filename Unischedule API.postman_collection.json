@@ -236,10 +236,6 @@
                 "value": "Token {{token}}"
               }
             ],
-            "body": {
-              "mode": "formdata",
-              "formdata": []
-            },
             "url": {
               "raw": "{{base_url}}/api/semesters/11/activate/",
               "host": [
@@ -980,10 +976,6 @@
                 "value": "Token {{token}}"
               }
             ],
-            "body": {
-              "mode": "formdata",
-              "formdata": []
-            },
             "url": {
               "raw": "{{base_url}}/api/schedules/",
               "host": [
