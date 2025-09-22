@@ -206,7 +206,8 @@ def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
         qs = qs.filter(day_of_week=computed_day)
 
     computed_week_type = compute_filter_week_type(screen)
-    qs = _apply_week_type_filter(qs, computed_week_type)
+    if computed_week_type:
+        qs = _apply_week_type_filter(qs, computed_week_type)
 
     date_override = parse_date(screen.filter_date_override)
     if date_override:

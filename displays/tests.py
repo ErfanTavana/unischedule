@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, time
+from unittest import mock
 
 from django.contrib.admin.sites import AdminSite
 from django.http import HttpResponseRedirect
@@ -130,6 +131,67 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertIn(odd_session.id, session_ids)
         self.assertIn(every_session.id, session_ids)
         self.assertEqual(len(session_ids), 2)
+
+    def test_computed_week_type_uses_semester_calendar(self):
+        custom_semester = Semester.objects.create(
+            institution=self.institution,
+            title="Special",
+            start_date=date(2024, 9, 3),
+            end_date=date(2024, 12, 31),
+        )
+
+        odd_session = self._create_session(
+            semester=custom_semester,
+            week_type=ClassSession.WeekTypeChoices.ODD,
+            start_time=time(8, 0),
+        )
+        even_session = self._create_session(
+            semester=custom_semester,
+            week_type=ClassSession.WeekTypeChoices.EVEN,
+            start_time=time(10, 0),
+        )
+        every_session = self._create_session(
+            semester=custom_semester,
+            week_type=ClassSession.WeekTypeChoices.EVERY,
+            start_time=time(12, 0),
+        )
+
+        self._update_screen_filter(
+            filter_semester=custom_semester.id,
+            filter_day_of_week="شنبه",
+            filter_date_override=date(2024, 9, 5),
+        )
+
+        payload = display_service.build_public_payload(self.screen, use_cache=False)
+        self.assertEqual(
+            payload["filter"]["computed_week_type"],
+            ClassSession.WeekTypeChoices.ODD,
+        )
+        session_ids = {session["id"] for session in payload["sessions"]}
+        self.assertIn(odd_session.id, session_ids)
+        self.assertIn(every_session.id, session_ids)
+        self.assertNotIn(even_session.id, session_ids)
+
+        self._update_screen_filter(filter_date_override=date(2024, 9, 10))
+        payload = display_service.build_public_payload(self.screen, use_cache=False)
+        self.assertEqual(
+            payload["filter"]["computed_week_type"],
+            ClassSession.WeekTypeChoices.EVEN,
+        )
+        session_ids = {session["id"] for session in payload["sessions"]}
+        self.assertIn(even_session.id, session_ids)
+        self.assertIn(every_session.id, session_ids)
+        self.assertNotIn(odd_session.id, session_ids)
+
+        self._update_screen_filter(filter_date_override=None)
+        with mock.patch("displays.utils.timezone.localdate", return_value=date(2025, 2, 1)):
+            payload = display_service.build_public_payload(self.screen, use_cache=False)
+
+        self.assertIsNone(payload["filter"]["computed_week_type"])
+        session_ids = {session["id"] for session in payload["sessions"]}
+        self.assertIn(odd_session.id, session_ids)
+        self.assertIn(even_session.id, session_ids)
+        self.assertIn(every_session.id, session_ids)
 
     def test_service_filters_by_building_group_and_time_range(self):
         included_session = self._create_session(group_code="Z", capacity=40)
