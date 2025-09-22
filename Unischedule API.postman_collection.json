@@ -14,21 +14,20 @@
           "name": "Login",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "username",
-                  "value": "erfan",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "7634",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"erfan\",\n  \"password\": \"7634\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/auth/login/",
@@ -107,32 +106,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "title",
-                  "value": "تابستان 4032",
-                  "type": "text"
-                },
-                {
-                  "key": "start_date",
-                  "value": "2025-07-26",
-                  "type": "text"
-                },
-                {
-                  "key": "end_date",
-                  "value": "2025-09-26",
-                  "type": "text"
-                },
-                {
-                  "key": "is_active",
-                  "value": "False",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"تابستان 4032\",\n  \"start_date\": \"2025-07-26\",\n  \"end_date\": \"2025-09-26\",\n  \"is_active\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/semesters/create/",
@@ -157,32 +144,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "title",
-                  "value": "تست",
-                  "type": "text"
-                },
-                {
-                  "key": "start_date",
-                  "value": "2025-07-26",
-                  "type": "text"
-                },
-                {
-                  "key": "end_date",
-                  "value": "2025-07-29",
-                  "type": "text"
-                },
-                {
-                  "key": "is_active",
-                  "value": "True",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"تست\",\n  \"start_date\": \"2025-07-26\",\n  \"end_date\": \"2025-07-29\",\n  \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/semesters/4/update/",
@@ -314,32 +289,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "first_name",
-                  "value": "عرفان",
-                  "type": "text"
-                },
-                {
-                  "key": "last_name",
-                  "value": "رضایی2",
-                  "type": "text"
-                },
-                {
-                  "key": "national_code",
-                  "value": "0912345677",
-                  "type": "text"
-                },
-                {
-                  "key": "phone_number",
-                  "value": "09033483116",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"عرفان\",\n  \"last_name\": \"رضایی2\",\n  \"national_code\": \"0912345677\",\n  \"phone_number\": \"09033483116\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/professors/create/",
@@ -483,42 +446,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "title",
-                  "value": "زبان",
-                  "type": "text"
-                },
-                {
-                  "key": "code",
-                  "value": "1010",
-                  "type": "text"
-                },
-                {
-                  "key": "offer_code",
-                  "value": "1012",
-                  "type": "text"
-                },
-                {
-                  "key": "unit_count",
-                  "value": "3",
-                  "type": "text"
-                },
-                {
-                  "key": "is_active",
-                  "value": "True",
-                  "type": "text"
-                },
-                {
-                  "key": "professor",
-                  "value": "2",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"زبان\",\n  \"code\": \"1010\",\n  \"offer_code\": \"1012\",\n  \"unit_count\": 3,\n  \"is_active\": true,\n  \"professor\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/courses/create/",
@@ -542,32 +483,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "title",
-                  "value": "انگلیسی",
-                  "type": "text"
-                },
-                {
-                  "key": "unit_count",
-                  "value": "",
-                  "type": "text"
-                },
-                {
-                  "key": "is_active",
-                  "value": "",
-                  "type": "text"
-                },
-                {
-                  "key": "professor",
-                  "value": "",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"انگلیسی پیشرفته\",\n  \"unit_count\": 2,\n  \"is_active\": true,\n  \"professor\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/courses/2/update/",
@@ -678,17 +607,20 @@
                   {
                     "key": "Authorization",
                     "value": "Token {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
                   }
                 ],
                 "body": {
-                  "mode": "formdata",
-                  "formdata": [
-                    {
-                      "key": "title",
-                      "value": "ساختمان اموزش2",
-                      "type": "text"
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"ساختمان اموزش2\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
                     }
-                  ]
+                  }
                 },
                 "url": {
                   "raw": "{{base_url}}/api/locations/buildings/create/",
@@ -714,17 +646,20 @@
                   {
                     "key": "Authorization",
                     "value": "Token {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
                   }
                 ],
                 "body": {
-                  "mode": "formdata",
-                  "formdata": [
-                    {
-                      "key": "title",
-                      "value": "ساختمان جدید علوم پایه",
-                      "type": "text"
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"ساختمان جدید علوم پایه\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
                     }
-                  ]
+                  }
                 },
                 "url": {
                   "raw": "{{base_url}}/api/locations/buildings/9/update/",
@@ -862,17 +797,20 @@
                   {
                     "key": "Authorization",
                     "value": "Token {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
                   }
                 ],
                 "body": {
-                  "mode": "formdata",
-                  "formdata": [
-                    {
-                      "key": "title",
-                      "value": "آزمایشگاه شبکه",
-                      "type": "text"
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"آزمایشگاه شبکه\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
                     }
-                  ]
+                  }
                 },
                 "url": {
                   "raw": "{{base_url}}/api/locations/buildings/9/classrooms/create/",
@@ -900,17 +838,20 @@
                   {
                     "key": "Authorization",
                     "value": "Token {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
                   }
                 ],
                 "body": {
-                  "mode": "formdata",
-                  "formdata": [
-                    {
-                      "key": "title",
-                      "value": "کلاس جدید",
-                      "type": "text"
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"کلاس جدید\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
                     }
-                  ]
+                  }
                 },
                 "url": {
                   "raw": "{{base_url}}/api/locations/classrooms/2/update/",
@@ -1024,67 +965,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "course",
-                  "value": "1",
-                  "type": "text"
-                },
-                {
-                  "key": "professor",
-                  "value": "1",
-                  "type": "text"
-                },
-                {
-                  "key": "classroom",
-                  "value": "1",
-                  "type": "text"
-                },
-                {
-                  "key": "semester",
-                  "value": "1",
-                  "type": "text"
-                },
-                {
-                  "key": "day_of_week",
-                  "value": "شنبه",
-                  "type": "text"
-                },
-                {
-                  "key": "start_time",
-                  "value": "09:00",
-                  "type": "text"
-                },
-                {
-                  "key": "end_time",
-                  "value": "11:00",
-                  "type": "text"
-                },
-                {
-                  "key": "week_type",
-                  "value": "زوج",
-                  "type": "text"
-                },
-                {
-                  "key": "group_code",
-                  "value": "A1",
-                  "type": "text"
-                },
-                {
-                  "key": "capacity",
-                  "value": "30",
-                  "type": "text"
-                },
-                {
-                  "key": "note",
-                  "value": "جلسه اول",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"زوج\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/schedules/create/",
@@ -1133,67 +1027,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "course",
-                  "value": "1",
-                  "type": "text"
-                },
-                {
-                  "key": "professor",
-                  "value": "1",
-                  "type": "text"
-                },
-                {
-                  "key": "classroom",
-                  "value": "1",
-                  "type": "text"
-                },
-                {
-                  "key": "semester",
-                  "value": "1",
-                  "type": "text"
-                },
-                {
-                  "key": "day_of_week",
-                  "value": "شنبه",
-                  "type": "text"
-                },
-                {
-                  "key": "start_time",
-                  "value": "09:00",
-                  "type": "text"
-                },
-                {
-                  "key": "end_time",
-                  "value": "11:00",
-                  "type": "text"
-                },
-                {
-                  "key": "week_type",
-                  "value": "فرد",
-                  "type": "text"
-                },
-                {
-                  "key": "group_code",
-                  "value": "A1",
-                  "type": "text"
-                },
-                {
-                  "key": "capacity",
-                  "value": "30",
-                  "type": "text"
-                },
-                {
-                  "key": "note",
-                  "value": "جلسه اول",
-                  "type": "text"
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"professor\": 1,\n  \"classroom\": 1,\n  \"semester\": 1,\n  \"day_of_week\": \"شنبه\",\n  \"start_time\": \"09:00\",\n  \"end_time\": \"11:00\",\n  \"week_type\": \"فرد\",\n  \"group_code\": \"A1\",\n  \"capacity\": 30,\n  \"note\": \"جلسه اول\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/schedules/2/update/",
@@ -1379,82 +1226,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "title",
-                  "type": "text",
-                  "value": "تابلو دانشکده مهندسی"
-                },
-                {
-                  "key": "refresh_interval",
-                  "type": "text",
-                  "value": "60"
-                },
-                {
-                  "key": "layout_theme",
-                  "type": "text",
-                  "value": "dark"
-                },
-                {
-                  "key": "is_active",
-                  "type": "text",
-                  "value": "true"
-                },
-                {
-                  "key": "filter_title",
-                  "type": "text",
-                  "value": "جلسات گروه هوش مصنوعی"
-                },
-                {
-                  "key": "filter_classroom",
-                  "type": "text",
-                  "value": "12"
-                },
-                {
-                  "key": "filter_course",
-                  "type": "text",
-                  "value": "18"
-                },
-                {
-                  "key": "filter_professor",
-                  "type": "text",
-                  "value": "7"
-                },
-                {
-                  "key": "filter_semester",
-                  "type": "text",
-                  "value": "5"
-                },
-                {
-                  "key": "filter_day_of_week",
-                  "type": "text",
-                  "value": "شنبه"
-                },
-                {
-                  "key": "filter_week_type",
-                  "type": "text",
-                  "value": "زوج"
-                },
-                {
-                  "key": "filter_duration_seconds",
-                  "type": "text",
-                  "value": "45"
-                },
-                {
-                  "key": "filter_date_override",
-                  "type": "text",
-                  "value": "2025-02-08"
-                },
-                {
-                  "key": "filter_is_active",
-                  "type": "text",
-                  "value": "true"
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"تابلو دانشکده مهندسی\",\n  \"refresh_interval\": 60,\n  \"layout_theme\": \"dark\",\n  \"is_active\": true,\n  \"filter_title\": \"جلسات گروه هوش مصنوعی\",\n  \"filter_classroom\": 12,\n  \"filter_course\": 18,\n  \"filter_professor\": 7,\n  \"filter_semester\": 5,\n  \"filter_day_of_week\": \"شنبه\",\n  \"filter_week_type\": \"زوج\",\n  \"filter_duration_seconds\": 45,\n  \"filter_date_override\": \"2025-02-08\",\n  \"filter_is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/displays/screens/create/",
@@ -2182,72 +1967,20 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "title",
-                  "type": "text",
-                  "value": "تابلو لابی شمالی"
-                },
-                {
-                  "key": "refresh_interval",
-                  "type": "text",
-                  "value": "120"
-                },
-                {
-                  "key": "layout_theme",
-                  "type": "text",
-                  "value": "dark"
-                },
-                {
-                  "key": "is_active",
-                  "type": "text",
-                  "value": "true"
-                },
-                {
-                  "key": "filter_title",
-                  "type": "text",
-                  "value": "جلسات تمام‌وقت لابی شمالی"
-                },
-                {
-                  "key": "filter_course",
-                  "type": "text",
-                  "value": "18"
-                },
-                {
-                  "key": "filter_professor",
-                  "type": "text",
-                  "value": "7"
-                },
-                {
-                  "key": "filter_semester",
-                  "type": "text",
-                  "value": "5"
-                },
-                {
-                  "key": "filter_day_of_week",
-                  "type": "text",
-                  "value": "شنبه"
-                },
-                {
-                  "key": "filter_week_type",
-                  "type": "text",
-                  "value": "every"
-                },
-                {
-                  "key": "filter_duration_seconds",
-                  "type": "text",
-                  "value": "60"
-                },
-                {
-                  "key": "filter_is_active",
-                  "type": "text",
-                  "value": "true"
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"تابلو لابی شمالی\",\n  \"refresh_interval\": 120,\n  \"layout_theme\": \"dark\",\n  \"is_active\": true,\n  \"filter_title\": \"جلسات تمام‌وقت لابی شمالی\",\n  \"filter_course\": 18,\n  \"filter_professor\": 7,\n  \"filter_semester\": 5,\n  \"filter_day_of_week\": \"شنبه\",\n  \"filter_week_type\": \"every\",\n  \"filter_duration_seconds\": 60,\n  \"filter_is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-              ]
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/displays/screens/{{screen_id}}/update/",
