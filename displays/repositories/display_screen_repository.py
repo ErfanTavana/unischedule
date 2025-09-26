@@ -49,3 +49,15 @@ def soft_delete_display_screen(screen: DisplayScreen) -> None:
     screen.delete()
 
 
+def list_active_display_screens_by_institution(institution) -> QuerySet[DisplayScreen]:
+    return (
+        DisplayScreen.objects.filter(
+            institution=institution,
+            is_deleted=False,
+            is_active=True,
+        )
+        .select_related("institution", "filter_classroom__building")
+        .order_by("title")
+    )
+
+
