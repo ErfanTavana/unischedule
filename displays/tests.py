@@ -131,6 +131,28 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertIn(every_session.id, session_ids)
         self.assertEqual(len(session_ids), 2)
 
+    def test_service_does_not_infer_week_type_from_date_override(self):
+        odd_session = self._create_session(week_type=ClassSession.WeekTypeChoices.ODD)
+        even_session = self._create_session(
+            week_type=ClassSession.WeekTypeChoices.EVEN,
+            start_time=time(10, 0),
+        )
+        every_session = self._create_session(
+            week_type=ClassSession.WeekTypeChoices.EVERY,
+            start_time=time(12, 0),
+        )
+
+        self._update_screen_filter(
+            filter_is_active=True,
+            filter_date_override=date(2024, 9, 7),
+        )
+
+        payload = display_service.build_public_payload(self.screen, use_cache=False)
+        session_ids = {session["id"] for session in payload["sessions"]}
+
+        self.assertSetEqual(session_ids, {odd_session.id, even_session.id, every_session.id})
+        self.assertIsNone(payload["filter"]["computed_week_type"])
+
     def test_service_filters_by_building_group_and_time_range(self):
         included_session = self._create_session(group_code="Z", capacity=40)
         self._create_session(
