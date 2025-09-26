@@ -7,6 +7,7 @@ from schedules.serializers import (
 )
 from schedules import repositories as class_session_repository
 from schedules.models import ClassSession
+from schedules.services.display_invalidation import invalidate_related_displays
 
 
 def _ensure_institution(institution) -> None:
@@ -54,6 +55,7 @@ def create_class_session(data: dict, institution) -> dict:
     validated_data["institution"] = institution
     _check_conflict(validated_data, institution)
     session = class_session_repository.create_class_session(validated_data)
+    invalidate_related_displays(session)
     return ClassSessionSerializer(session).data
 
 
@@ -67,11 +69,14 @@ def update_class_session(session: ClassSession, data: dict) -> dict:
             status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
             errors=serializer.errors,
         )
+    original_session = ClassSession.objects.get(pk=session.pk)
     validated_data = serializer.validated_data
     validated_data["id"] = session.id
     validated_data.setdefault("institution", session.institution)
     _check_conflict(validated_data, session.institution)
     updated_instance = serializer.save()
+    invalidate_related_displays(updated_instance)
+    invalidate_related_displays(original_session)
     return ClassSessionSerializer(updated_instance).data
 
 
@@ -96,6 +101,7 @@ def get_class_session_by_id_or_404(session_id: int, institution) -> dict:
 def delete_class_session(session: ClassSession) -> None:
     _ensure_institution(session.institution)
     class_session_repository.soft_delete_class_session(session)
+    invalidate_related_displays(session)
 
 
 def list_class_sessions(institution) -> list[dict]:

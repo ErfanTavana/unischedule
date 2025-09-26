@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date, time
 
 from django.contrib.admin.sites import AdminSite
+from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.test import RequestFactory, TestCase
 from rest_framework.test import APIClient
@@ -16,6 +17,7 @@ from institutions.models import Institution
 from locations.models import Building, Classroom
 from professors.models import Professor
 from schedules.models import ClassSession
+from schedules.services import class_session_service
 from semesters.models import Semester
 from unischedule.core.exceptions import CustomValidationError
 
@@ -305,3 +307,85 @@ class DisplayServiceViewAdminTests(TestCase):
         data = response.json()
         self.assertFalse(data["success"])
         self.assertEqual(response["Content-Type"], "application/json")
+
+
+class DisplayCacheInvalidationTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.institution = Institution.objects.create(name="Inst", slug="inst-cache")
+        self.other_institution = Institution.objects.create(name="Other", slug="other-cache")
+
+        self.professor = Professor.objects.create(
+            institution=self.institution,
+            first_name="Ali",
+            last_name="Ahmadi",
+            national_code="1111111111",
+        )
+        self.course = Course.objects.create(
+            institution=self.institution,
+            code="C2",
+            title="Data Structures",
+            professor=self.professor,
+            offer_code="DS-1",
+            unit_count=3,
+        )
+        self.semester = Semester.objects.create(
+            institution=self.institution,
+            title="Spring",
+            start_date=date(2024, 2, 1),
+            end_date=date(2024, 6, 30),
+        )
+        self.building = Building.objects.create(title="Main", institution=self.institution)
+        self.classroom = Classroom.objects.create(title="201", building=self.building)
+
+        self.screen = DisplayScreen.objects.create(
+            institution=self.institution,
+            title="Lobby Cache",
+            filter_classroom=self.classroom,
+            filter_is_active=True,
+        )
+        self.other_screen = DisplayScreen.objects.create(
+            institution=self.other_institution,
+            title="Remote Cache",
+        )
+
+    def _session_payload(self, **overrides) -> dict:
+        payload = {
+            "course": self.course.id,
+            "professor": self.professor.id,
+            "classroom": self.classroom.id,
+            "semester": self.semester.id,
+            "day_of_week": "شنبه",
+            "start_time": "08:00:00",
+            "end_time": "10:00:00",
+            "week_type": ClassSession.WeekTypeChoices.EVERY,
+            "group_code": "A",
+            "capacity": 25,
+        }
+        payload.update(overrides)
+        return payload
+
+    def test_public_payload_cache_invalidated_after_session_create(self):
+        first_response = self.client.get(f"/displays/{self.screen.slug}/")
+        self.assertEqual(first_response.status_code, 200)
+        first_sessions = first_response.json()["data"]["sessions"]
+        self.assertEqual(first_sessions, [])
+        self.assertIsNotNone(cache.get(f"display:{self.screen.slug}"))
+
+        other_response = self.client.get(f"/displays/{self.other_screen.slug}/")
+        self.assertEqual(other_response.status_code, 200)
+        self.assertIsNotNone(cache.get(f"display:{self.other_screen.slug}"))
+
+        class_session_service.create_class_session(
+            self._session_payload(),
+            self.institution,
+        )
+
+        self.assertIsNone(cache.get(f"display:{self.screen.slug}"))
+        self.assertIsNotNone(cache.get(f"display:{self.other_screen.slug}"))
+
+        refreshed_response = self.client.get(f"/displays/{self.screen.slug}/")
+        self.assertEqual(refreshed_response.status_code, 200)
+        refreshed_sessions = refreshed_response.json()["data"]["sessions"]
+        self.assertEqual(len(refreshed_sessions), 1)
+        self.assertEqual(refreshed_sessions[0]["course_title"], self.course.title)
