@@ -44,15 +44,4 @@ def compute_filter_week_type(filter_data: Any) -> str | None:
     )
     if week_type:
         return week_type
-    override = parse_date(
-        _get_value(filter_data, "date_override")
-        or _get_value(filter_data, "filter_date_override")
-    )
-    if override:
-        week_number = override.isocalendar()[1]
-        return (
-            ClassSession.WeekTypeChoices.ODD
-            if week_number % 2
-            else ClassSession.WeekTypeChoices.EVEN
-        )
     return None
