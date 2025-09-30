@@ -278,3 +278,17 @@ class ErrorCodes:
         "errors": [],
         "data": {},
     }
+    PASSWORD_INCORRECT = {
+        "code": "4704",
+        "message": "رمز عبور فعلی نادرست است.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "errors": ["The current password provided is incorrect."],
+        "data": {},
+    }
+    PASSWORD_CHANGE_FAILED = {
+        "code": "4705",
+        "message": "تغییر رمز عبور با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }

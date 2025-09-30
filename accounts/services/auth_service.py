@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from accounts.repositories import get_token_by_user, delete_token
-from accounts.serializers import LoginSerializer
+from accounts.serializers import LoginSerializer, ChangePasswordSerializer
 from rest_framework.authtoken.models import Token
 from unischedule.core.exceptions import CustomValidationError
 from unischedule.core.error_codes import ErrorCodes
@@ -65,3 +65,30 @@ def logout_user(user) -> None:
         )
 
     delete_token(token)
+
+
+def change_user_password(user, data: dict) -> None:
+    """Validate and change the authenticated user's password."""
+    serializer = ChangePasswordSerializer(data=data, context={"user": user})
+    if not serializer.is_valid():
+        raise CustomValidationError(
+            message=ErrorCodes.VALIDATION_FAILED["message"],
+            code=ErrorCodes.VALIDATION_FAILED["code"],
+            status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
+            errors=serializer.errors,
+        )
+
+    validated_data = serializer.validated_data
+    old_password = validated_data.get("old_password")
+    new_password = validated_data.get("new_password")
+
+    if not user.check_password(old_password):
+        raise CustomValidationError(
+            message=ErrorCodes.PASSWORD_INCORRECT["message"],
+            code=ErrorCodes.PASSWORD_INCORRECT["code"],
+            status_code=ErrorCodes.PASSWORD_INCORRECT["status_code"],
+            errors=ErrorCodes.PASSWORD_INCORRECT["errors"],
+        )
+
+    user.set_password(new_password)
+    user.save(update_fields=["password"])

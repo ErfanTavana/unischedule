@@ -203,3 +203,8 @@ class SuccessCodes:
         "code": 2201,
         "message": "خروج از حساب با موفقیت انجام شد."
     }
+    PASSWORD_CHANGE_SUCCESS = {
+        "code": 2002,
+        "message": "رمز عبور با موفقیت تغییر کرد.",
+        "data": {},
+    }
