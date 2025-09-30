@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 
-from accounts.services import login_user, logout_user
+from accounts.services import login_user, logout_user, change_user_password
 
 from unischedule.core.base_response import BaseResponse
 from unischedule.core.success_codes import SuccessCodes
@@ -69,4 +69,33 @@ def logout_view(request):
             code=ErrorCodes.LOGOUT_FAILED["code"],
             status_code=ErrorCodes.LOGOUT_FAILED["status_code"],
             errors=ErrorCodes.LOGOUT_FAILED["errors"]
+        )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def change_password_view(request):
+    """POST - Change the authenticated user's password."""
+    try:
+        change_user_password(request.user, request.data)
+        return BaseResponse.success(
+            message=SuccessCodes.PASSWORD_CHANGE_SUCCESS["message"],
+            code=SuccessCodes.PASSWORD_CHANGE_SUCCESS["code"],
+            data=SuccessCodes.PASSWORD_CHANGE_SUCCESS.get("data", {}),
+            status_code=status.HTTP_200_OK
+        )
+    except CustomValidationError as e:
+        return BaseResponse.error(
+            message=e.detail["message"],
+            code=e.detail["code"],
+            status_code=e.status_code,
+            errors=e.detail["errors"],
+            data=e.detail["data"]
+        )
+    except Exception:
+        return BaseResponse.error(
+            message=ErrorCodes.PASSWORD_CHANGE_FAILED["message"],
+            code=ErrorCodes.PASSWORD_CHANGE_FAILED["code"],
+            status_code=ErrorCodes.PASSWORD_CHANGE_FAILED["status_code"],
+            errors=ErrorCodes.PASSWORD_CHANGE_FAILED["errors"]
         )
