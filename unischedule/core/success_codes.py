@@ -1,4 +1,31 @@
 class SuccessCodes:
+    # Institutions
+    INSTITUTION_LISTED = {
+        "code": "2800",
+        "message": "لیست مؤسسات با موفقیت دریافت شد.",
+        "data": {},
+    }
+    INSTITUTION_RETRIEVED = {
+        "code": "2801",
+        "message": "اطلاعات مؤسسه با موفقیت دریافت شد.",
+        "data": {},
+    }
+    INSTITUTION_CREATED = {
+        "code": "2802",
+        "message": "مؤسسه جدید با موفقیت ایجاد شد.",
+        "data": {},
+    }
+    INSTITUTION_UPDATED = {
+        "code": "2803",
+        "message": "اطلاعات مؤسسه با موفقیت به‌روزرسانی شد.",
+        "data": {},
+    }
+    INSTITUTION_DELETED = {
+        "code": "2804",
+        "message": "مؤسسه با موفقیت حذف شد.",
+        "data": {},
+    }
+
     # Semesters
     SEMESTER_CREATED = {
         "code": "2100",
