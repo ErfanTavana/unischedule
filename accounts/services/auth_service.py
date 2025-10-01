@@ -7,8 +7,19 @@ from unischedule.core.error_codes import ErrorCodes
 
 
 def login_user(data: dict) -> dict:
-    """
-    Authenticate user and return token if successful.
+    """Authenticate a user and return an API token payload.
+
+    Args:
+        data: Raw credential payload expected to contain ``username`` and
+            ``password`` fields provided by the request body.
+
+    Returns:
+        dict: A dictionary containing the issued token and a subset of the
+            user's profile information that should be returned to the client.
+
+    Raises:
+        CustomValidationError: Raised when serializer validation fails or when
+            the provided credentials do not match any active user.
     """
     # Validate input using LoginSerializer
     serializer = LoginSerializer(data=data)
@@ -52,8 +63,14 @@ def login_user(data: dict) -> dict:
 
 
 def logout_user(user) -> None:
-    """
-    Delete the user's auth token (logout).
+    """Invalidate an authenticated user's session token.
+
+    Args:
+        user: The authenticated ``User`` instance whose token must be removed.
+
+    Raises:
+        CustomValidationError: Raised when the user does not currently possess
+            a token, indicating that the logout request is invalid.
     """
     token = get_token_by_user(user)
     if not token:
@@ -68,7 +85,18 @@ def logout_user(user) -> None:
 
 
 def change_user_password(user, data: dict) -> None:
-    """Validate and change the authenticated user's password."""
+    """Validate and update the authenticated user's password.
+
+    Args:
+        user: The authenticated ``User`` instance requesting the change.
+        data: Request payload containing the current password and the desired
+            new password information.
+
+    Raises:
+        CustomValidationError: Raised when any validation step fails, including
+            serializer validation, incorrect current password, or policy
+            violations enforced by Django's password validators.
+    """
     serializer = ChangePasswordSerializer(data=data, context={"user": user})
     if not serializer.is_valid():
         raise CustomValidationError(

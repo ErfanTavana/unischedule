@@ -8,7 +8,10 @@ from unischedule.core.success_codes import SuccessCodes
 
 
 class ChangePasswordAPITestCase(TestCase):
+    """End-to-end tests for the change-password API endpoint."""
+
     def setUp(self):
+        # Create and authenticate a baseline user for each test scenario.
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             username="testuser",
@@ -19,6 +22,7 @@ class ChangePasswordAPITestCase(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_change_password_success(self):
+        """Passwords should update when the payload is valid."""
         payload = {
             "old_password": "OldPassword123",
             "new_password": "NewPassword123!",
@@ -36,6 +40,7 @@ class ChangePasswordAPITestCase(TestCase):
         self.assertTrue(self.user.check_password(payload["new_password"]))
 
     def test_change_password_incorrect_current_password(self):
+        """Reject requests when the provided current password is incorrect."""
         payload = {
             "old_password": "WrongPassword",
             "new_password": "AnotherPassword123",
@@ -50,6 +55,7 @@ class ChangePasswordAPITestCase(TestCase):
         self.assertEqual(response.data["message"], ErrorCodes.PASSWORD_INCORRECT["message"])
 
     def test_change_password_mismatch(self):
+        """Ensure validation catches mismatched new password confirmation."""
         payload = {
             "old_password": "OldPassword123",
             "new_password": "NewPassword123",
@@ -64,6 +70,7 @@ class ChangePasswordAPITestCase(TestCase):
         self.assertIn("confirm_new_password", response.data["errors"])
 
     def test_change_password_same_as_old(self):
+        """Block requests that attempt to reuse the existing password."""
         payload = {
             "old_password": "OldPassword123",
             "new_password": "OldPassword123",
@@ -77,6 +84,7 @@ class ChangePasswordAPITestCase(TestCase):
         self.assertIn("new_password", response.data["errors"])
 
     def test_change_password_does_not_meet_policy(self):
+        """Validate that Django's password policy errors bubble up to the response."""
         payload = {
             "old_password": "OldPassword123",
             "new_password": "short",
