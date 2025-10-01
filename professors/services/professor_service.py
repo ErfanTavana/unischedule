@@ -13,9 +13,7 @@ from professors.models import Professor
 
 
 def create_professor(data: dict, institution) -> dict:
-    """
-    Create a new professor for the given institution.
-    """
+    """Create a new professor belonging to the given institution."""
     serializer = CreateProfessorSerializer(data=data, context={"institution": institution})
 
     try:
@@ -31,6 +29,9 @@ def create_professor(data: dict, institution) -> dict:
     validated_data = serializer.validated_data
     validated_data["institution"] = institution
 
+    # We still guard against race conditions at the database level to prevent
+    # creating professors with duplicate national codes inside the same
+    # institution even if the serializer validation passes.
     try:
         professor = professor_repository.create_professor(validated_data)
     except IntegrityError:
@@ -45,6 +46,7 @@ def create_professor(data: dict, institution) -> dict:
 
 
 def get_professor_instance_or_404(professor_id: int, institution) -> Professor:
+    """Return a professor instance or raise a not found error."""
     professor = professor_repository.get_professor_by_id_and_institution(
         professor_id=professor_id,
         institution=institution
@@ -62,14 +64,13 @@ def get_professor_instance_or_404(professor_id: int, institution) -> Professor:
 
 
 def get_professor_by_id_or_404(professor_id: int, institution) -> dict:
+    """Return serialized professor data for the given identifier."""
     professor = get_professor_instance_or_404(professor_id, institution)
     return ProfessorSerializer(professor).data
 
 
 def update_professor(professor, data: dict) -> dict:
-    """
-    Update an existing professor and return serialized data.
-    """
+    """Update an existing professor instance and return serialized data."""
     serializer = UpdateProfessorSerializer(instance=professor, data=data, partial=True)
     if not serializer.is_valid():
         raise CustomValidationError(
@@ -84,15 +85,11 @@ def update_professor(professor, data: dict) -> dict:
 
 
 def delete_professor(professor) -> None:
-    """
-    Soft delete a professor.
-    """
+    """Soft delete the provided professor instance."""
     professor_repository.soft_delete_professor(professor)
 
 
 def list_professors(institution) -> list[dict]:
-    """
-    List all professors for an institution.
-    """
+    """Return serialized data for all professors of the institution."""
     queryset = professor_repository.list_professors_by_institution(institution)
     return ProfessorSerializer(queryset, many=True).data

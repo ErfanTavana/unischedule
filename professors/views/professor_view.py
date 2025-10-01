@@ -22,6 +22,8 @@ def list_professors_view(request):
     institution = request.user.institution
     professors = professor_service.list_professors(institution)
 
+    # BaseResponse.success ensures every success response shares the same
+    # envelope (message, code, data) used across the project.
     return BaseResponse.success(
         message=SuccessCodes.PROFESSOR_LISTED["message"],
         code=SuccessCodes.PROFESSOR_LISTED["code"],
@@ -35,6 +37,8 @@ def retrieve_professor_view(request, professor_id):
     institution = request.user.institution
     serialized_professor = professor_service.get_professor_by_id_or_404(professor_id, institution)
 
+    # Successful retrievals are wrapped in the common response format so
+    # clients can parse status metadata consistently.
     return BaseResponse.success(
         message=SuccessCodes.PROFESSOR_RETRIEVED["message"],
         code=SuccessCodes.PROFESSOR_RETRIEVED["code"],
@@ -61,6 +65,8 @@ def create_professor_view(request):
         )
 
     except CustomValidationError as e:
+        # Validation errors also leverage BaseResponse.error so error payloads
+        # remain predictable for API consumers.
         return BaseResponse.error(
             message=e.detail["message"],
             code=e.detail["code"],
@@ -71,6 +77,8 @@ def create_professor_view(request):
 
 
     except Exception:
+        # Unexpected errors fall back to a predefined error code while still
+        # returning the structured error response.
         return BaseResponse.error(
             message=ErrorCodes.PROFESSOR_CREATION_FAILED["message"],
             code=ErrorCodes.PROFESSOR_CREATION_FAILED["code"],
@@ -97,6 +105,8 @@ def update_professor_view(request, professor_id):
         )
 
     except CustomValidationError as e:
+        # Translate domain-specific validation issues to the standard error
+        # schema to keep client handling consistent.
         return BaseResponse.error(
             message=e.detail["message"],
             code=e.detail["code"],
@@ -106,6 +116,7 @@ def update_professor_view(request, professor_id):
         )
 
     except ValidationError as e:
+        # DRF validation exceptions are also normalized via BaseResponse.
         return BaseResponse.error(
             message=ErrorCodes.VALIDATION_FAILED["message"],
             code=ErrorCodes.VALIDATION_FAILED["code"],
@@ -115,6 +126,7 @@ def update_professor_view(request, professor_id):
 
     except Exception:
         logger.exception("Unhandled exception while updating professor")
+        # Even unexpected errors are wrapped in the same response contract.
         return BaseResponse.error(
             message=ErrorCodes.PROFESSOR_UPDATE_FAILED["message"],
             code=ErrorCodes.PROFESSOR_UPDATE_FAILED["code"],
@@ -140,6 +152,8 @@ def delete_professor_view(request, professor_id):
         )
     except Exception:
         logger.exception("Unhandled exception while deleting professor")
+        # Soft-delete failures are still presented through the BaseResponse
+        # abstraction for a uniform API.
         return BaseResponse.error(
             message=ErrorCodes.PROFESSOR_DELETION_FAILED["message"],
             code=ErrorCodes.PROFESSOR_DELETION_FAILED["code"],
