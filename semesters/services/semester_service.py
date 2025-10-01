@@ -17,8 +17,12 @@ def list_semesters(institution):
 
 
 def create_semester(data, institution):
-    """
-    Create a new semester for an institution.
+    """Create a semester for an institution and optionally activate it.
+
+    When ``is_active`` is set in the payload the service first deactivates all
+    other semesters that belong to the same institution so the new record is
+    the sole active semester. This mirrors the business rule that an
+    institution can only have a single active semester at any point in time.
     """
     serializer = CreateSemesterSerializer(data=data)
     serializer.is_valid(raise_exception=True)
@@ -34,8 +38,12 @@ def create_semester(data, institution):
 
 
 def update_semester(semester, data):
-    """
-    Update an existing semester.
+    """Update a semester and propagate activation changes.
+
+    The method applies the incoming data through ``UpdateSemesterSerializer``.
+    If the update marks the semester as active, the function deactivates every
+    other semester of the institution before persisting the change so the
+    activation flag remains unique across the institution.
     """
     serializer = UpdateSemesterSerializer(instance=semester, data=data, partial=True)
     serializer.is_valid(raise_exception=True)
@@ -75,8 +83,11 @@ def get_semester_by_id_or_404(semester_id, institution):
 
 
 def set_active_semester(semester):
-    """
-    Set a semester as active and deactivate others.
+    """Mark the provided semester as the active one for its institution.
+
+    This helper is used by the dedicated API endpoint. It ensures all other
+    semesters tied to the institution are deactivated before toggling the
+    provided instance, keeping the single-active-semester invariant.
     """
     semester_repository.deactivate_all_semesters(semester.institution)
     semester.is_active = True
