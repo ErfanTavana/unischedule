@@ -14,8 +14,13 @@ from semesters.services import semester_service
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_semesters_view(request):
-    """
-    GET - List all semesters for the authenticated user's institution.
+    """Handle ``GET`` requests by delegating to the service layer.
+
+    The view resolves the current user's institution, fetches all related
+    semesters through ``semester_service.list_semesters`` and wraps the result
+    in the unified ``BaseResponse`` envelope. No exceptional branches are
+    expected here because the service simply returns an empty list when the
+    institution has no semesters.
     """
     institution = request.user.institution
     semesters = semester_service.list_semesters(institution)
@@ -30,8 +35,14 @@ def list_semesters_view(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_semester_view(request):
-    """
-    POST - Create a new semester for the authenticated user's institution.
+    """Create a new semester for the authenticated user's institution.
+
+    The view pulls the request payload and forwards it to the service layer.
+    Domain errors raised as ``CustomValidationError`` (e.g. duplicates) and
+    serializer ``ValidationError`` are mapped to the standard error response
+    payloads, while any unforeseen exception is converted into a generic
+    ``SEMESTER_CREATION_FAILED`` message. Successful requests return the
+    serialized semester with a ``201`` status code.
     """
     institution = request.user.institution
     data = request.data
@@ -71,8 +82,13 @@ def create_semester_view(request):
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_semester_view(request, semester_id):
-    """
-    PUT - Update an existing semester.
+    """Update an existing semester after ensuring it belongs to the user.
+
+    The view first resolves the semester via ``get_semester_by_id_or_404`` to
+    guarantee ownership. Afterwards it attempts the update and responds with a
+    success payload. The three ``except`` blocks translate domain errors,
+    serializer validation issues and unexpected exceptions into consistent API
+    responses so clients always receive a structured message.
     """
     institution = request.user.institution
     semester = semester_service.get_semester_by_id_or_404(semester_id, institution)
@@ -113,8 +129,12 @@ def update_semester_view(request, semester_id):
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def delete_semester_view(request, semester_id):
-    """
-    DELETE - Soft delete a semester.
+    """Soft delete a semester that belongs to the authenticated institution.
+
+    After resolving the semester via the shared helper the view calls the
+    service layer to perform the soft delete, then returns a standard success
+    message. No additional exception handling is required because the helper
+    already raises the structured not-found error if needed.
     """
     institution = request.user.institution
     semester = semester_service.get_semester_by_id_or_404(semester_id, institution)
@@ -129,8 +149,12 @@ def delete_semester_view(request, semester_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def set_active_semester_view(request, semester_id):
-    """
-    POST - Set a semester as active and deactivate all others for the same institution.
+    """Mark the target semester as active for the institution.
+
+    The view shares the lookup helper used by other actions, then delegates to
+    ``semester_service.set_active_semester`` which handles deactivating any
+    previously active record. The updated semester is returned in a standard
+    success envelope.
     """
     institution = request.user.institution
     semester = semester_service.get_semester_by_id_or_404(semester_id, institution)
