@@ -18,9 +18,12 @@ def list_all_classrooms_view(request):
     """
     GET - List all classrooms for the authenticated user's institution (across all buildings).
     """
+    # Prepare data: obtain the institution context from the authenticated user
     institution = request.user.institution
+    # Service call: gather serialized classrooms for all institution buildings
     classrooms = classroom_service.list_classrooms_for_institution(institution)
 
+    # Response: return the aggregated list inside the success wrapper
     return BaseResponse.success(
         message=SuccessCodes.CLASSROOM_LISTED["message"],
         code=SuccessCodes.CLASSROOM_LISTED["code"],
@@ -31,12 +34,14 @@ def list_all_classrooms_view(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_classrooms_view(request, building_id):
+    # Prepare data: resolve institution and load the target building
     institution = request.user.institution
-
     building = get_building_instance_or_404(building_id, institution)
 
+    # Service call: fetch classrooms tied to the building
     classrooms = classroom_service.list_classrooms(building)
 
+    # Response: send serialized classrooms back to the client
     return BaseResponse.success(
         message=SuccessCodes.CLASSROOM_LISTED["message"],
         code=SuccessCodes.CLASSROOM_LISTED["code"],
@@ -50,9 +55,12 @@ def retrieve_classroom_view(request, classroom_id):
     """
     GET - Retrieve a classroom by its ID if it belongs to the user's institution.
     """
+    # Prepare data: determine institution and requested classroom id
     institution = request.user.institution
+    # Service call: validate ownership and serialize the classroom
     classroom = classroom_service.get_classroom_by_id_and_institution_or_404(classroom_id, institution)
 
+    # Response: deliver the serialized classroom inside the standard envelope
     return BaseResponse.success(
         message=SuccessCodes.CLASSROOM_RETRIEVED["message"],
         code=SuccessCodes.CLASSROOM_RETRIEVED["code"],
@@ -66,12 +74,15 @@ def create_classroom_view(request, building_id):
     """
     POST - Create a new classroom under a specific building.
     """
+    # Prepare data: capture institution context, resolve building, and payload
     institution = request.user.institution
     building = building_service.get_building_instance_or_404(building_id, institution)
     data = request.data
 
     try:
+        # Service call: validate input and create the classroom
         classroom = classroom_service.create_classroom(data, building)
+        # Response: return the created classroom with 201 status
         return BaseResponse.success(
             message=SuccessCodes.CLASSROOM_CREATED["message"],
             code=SuccessCodes.CLASSROOM_CREATED["code"],
@@ -101,6 +112,7 @@ def update_classroom_view(request, classroom_id):
     """
     PUT - Update an existing classroom by its ID (only if it belongs to the user's institution).
     """
+    # Prepare data: ensure the classroom belongs to the requesting institution
     institution = request.user.institution
 
     try:
@@ -110,8 +122,10 @@ def update_classroom_view(request, classroom_id):
             institution=institution
         )
 
+        # Service call: validate and apply updates to the classroom
         updated_classroom = classroom_service.update_classroom(classroom, request.data)
 
+        # Response: send back the updated classroom details
         return BaseResponse.success(
             message=SuccessCodes.CLASSROOM_UPDATED["message"],
             code=SuccessCodes.CLASSROOM_UPDATED["code"],
@@ -148,6 +162,7 @@ def delete_classroom_view(request, classroom_id):
     """
     DELETE - Soft delete a classroom if it belongs to the authenticated user's institution.
     """
+    # Prepare data: confirm classroom is part of the user's institution
     institution = request.user.institution
 
     try:
@@ -157,8 +172,10 @@ def delete_classroom_view(request, classroom_id):
             institution=institution
         )
 
+        # Service call: mark the classroom as soft deleted
         classroom_service.delete_classroom(classroom)
 
+        # Response: acknowledge the deletion
         return BaseResponse.success(
             message=SuccessCodes.CLASSROOM_DELETED["message"],
             code=SuccessCodes.CLASSROOM_DELETED["code"]
