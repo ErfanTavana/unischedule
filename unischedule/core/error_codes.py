@@ -18,6 +18,43 @@ class ErrorCodes:
         "data": {},
     }
 
+    # Institution
+    INSTITUTION_NOT_FOUND = {
+        "code": "4900",
+        "message": "مؤسسه مورد نظر یافت نشد.",
+        "status_code": status.HTTP_404_NOT_FOUND,
+        "errors": [],
+        "data": {},
+    }
+    INSTITUTION_DUPLICATE_SLUG = {
+        "code": "4901",
+        "message": "نامک وارد شده قبلاً استفاده شده است.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "errors": [],
+        "data": {},
+    }
+    INSTITUTION_CREATION_FAILED = {
+        "code": "4902",
+        "message": "ایجاد مؤسسه با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    INSTITUTION_UPDATE_FAILED = {
+        "code": "4903",
+        "message": "به‌روزرسانی اطلاعات مؤسسه با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    INSTITUTION_DELETION_FAILED = {
+        "code": "4904",
+        "message": "حذف مؤسسه با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+
     # Semester
     SEMESTER_NOT_FOUND = {
         "code": "4100",
