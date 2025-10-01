@@ -111,6 +111,13 @@ def get_display_screen_by_slug_or_404(slug: str) -> DisplayScreen:
 
 
 def _apply_week_type_filter(qs, week_type: str | None):
+    """Apply the appropriate week-type filter for the current selector set.
+
+    Screens can pin a specific week type (odd/even) but should also include
+    sessions that are marked to occur every week.  This helper encapsulates
+    that behaviour so it can be reused by both cached and uncached payload
+    builders.
+    """
     if not week_type:
         return qs
     if week_type == ClassSession.WeekTypeChoices.EVERY:
@@ -142,6 +149,13 @@ def _sort_sessions(sessions: Iterable[ClassSession]) -> List[ClassSession]:
 
 
 def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
+    """Return all sessions that match the screen filter configuration.
+
+    The function centralises the filtering logic so it can be reused when the
+    payload is fetched from cache and when it is rebuilt.  It honours the
+    activation flag, the user-provided selectors, and computed fallbacks such
+    as day-of-week and week-type rules.
+    """
     qs = _base_session_queryset(screen)
 
     if not screen.filter_is_active:
@@ -219,6 +233,13 @@ def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
 
 
 def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> dict:
+    """Serialize the public payload for a display screen.
+
+    When ``use_cache`` is True a cached copy is returned if available, otherwise
+    the session list is calculated, sorted and serialised together with the
+    computed filter metadata.  Newly generated payloads are stored in the cache
+    for the screen ``refresh_interval``.
+    """
     cache_key = f"display:{screen.slug}"
     if use_cache:
         cached = cache.get(cache_key)
@@ -242,4 +263,5 @@ def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> di
 
 
 def invalidate_screen_cache(screen: DisplayScreen) -> None:
+    """Remove the cached payload for the provided screen."""
     cache.delete(f"display:{screen.slug}")

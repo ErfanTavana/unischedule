@@ -15,6 +15,7 @@ from unischedule.core.success_codes import SuccessCodes
 from displays.services import display_service
 
 
+# Private API endpoints require authenticated institution staff.
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_display_screens_view(request):
@@ -39,6 +40,7 @@ def list_display_screens_view(request):
         )
 
 
+# ایجاد و مدیریت صفحه‌های نمایش فقط برای پنل مدیریتی فعال است.
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_display_screen_view(request):
@@ -78,6 +80,7 @@ def create_display_screen_view(request):
         )
 
 
+# جزئیات هر صفحه نیز صرفاً با توکن دسترسی داخلی برگردانده می‌شود.
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def retrieve_display_screen_view(request, screen_id: int):
@@ -99,6 +102,7 @@ def retrieve_display_screen_view(request, screen_id: int):
         )
 
 
+# به‌روزرسانی فیلترها و تنظیمات در اندپوینت خصوصی انجام می‌شود.
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_display_screen_view(request, screen_id: int):
@@ -135,6 +139,7 @@ def update_display_screen_view(request, screen_id: int):
         )
 
 
+# حذف صفحات نمایش نیز بخشی از بخش مدیریت خصوصی است.
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def delete_display_screen_view(request, screen_id: int):
@@ -163,6 +168,7 @@ def delete_display_screen_view(request, screen_id: int):
         )
 
 
+# Public endpoint renders payload for unauthenticated kiosks/TVs.
 @require_GET
 def public_display_view(request, slug: str):
     try:
