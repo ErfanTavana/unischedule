@@ -3,8 +3,11 @@ from courses.models import Course
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    """
-    Serializer for returning course data in API responses.
+    """Read-only serializer exposing the persisted attributes of a course.
+
+    No computed or derived fields are defined; each attribute maps directly to
+    a column on :class:`courses.models.Course` so the consumer receives the
+    exact database values.
     """
 
     class Meta:
@@ -22,8 +25,11 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class CreateCourseSerializer(serializers.ModelSerializer):
-    """
-    Serializer for creating a new course.
+    """Input serializer for course creation requests.
+
+    All fields correspond to model attributes and are validated in place. The
+    serializer does not inject computed data; instead, the service layer assigns
+    the owning institution before persisting the model.
     """
 
     class Meta:
@@ -49,8 +55,11 @@ class CreateCourseSerializer(serializers.ModelSerializer):
 
 
 class UpdateCourseSerializer(serializers.ModelSerializer):
-    """
-    Serializer for updating an existing course.
+    """Serializer for partial updates on existing course records.
+
+    Every exposed field maps directly to the model; no computed values are
+    produced. ``extra_kwargs`` relaxes required flags so callers can send only
+    the fields they intend to modify.
     """
 
     class Meta:
