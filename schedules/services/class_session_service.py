@@ -22,6 +22,7 @@ def _ensure_institution(institution) -> None:
 
 
 def _check_conflict(data, institution):
+    """بررسی می‌کند که زمان‌بندی کلاس با سایر جلسات در همان موسسه تداخل نداشته باشد."""
     if class_session_repository.has_time_conflict(
         institution=institution,
         semester=data["semester"],
@@ -42,6 +43,7 @@ def _check_conflict(data, institution):
 
 
 def create_class_session(data: dict, institution) -> dict:
+    """یک جلسهٔ جدید ایجاد می‌کند و قبل از ذخیره از نبود تداخل زمانی اطمینان می‌یابد."""
     _ensure_institution(institution)
     serializer = CreateClassSessionSerializer(data=data)
     if not serializer.is_valid():
@@ -52,6 +54,7 @@ def create_class_session(data: dict, institution) -> dict:
             errors=serializer.errors,
         )
     validated_data = serializer.validated_data
+    # موسسه از درخواست استخراج و به داده‌های معتبر شده افزوده می‌شود
     validated_data["institution"] = institution
     _check_conflict(validated_data, institution)
     session = class_session_repository.create_class_session(validated_data)
@@ -60,6 +63,7 @@ def create_class_session(data: dict, institution) -> dict:
 
 
 def update_class_session(session: ClassSession, data: dict) -> dict:
+    """یک جلسهٔ موجود را با داده‌های جدید به‌روزرسانی کرده و هرگونه تداخل احتمالی را بررسی می‌کند."""
     _ensure_institution(session.institution)
     serializer = UpdateClassSessionSerializer(instance=session, data=data, partial=True)
     if not serializer.is_valid():
@@ -69,6 +73,7 @@ def update_class_session(session: ClassSession, data: dict) -> dict:
             status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
             errors=serializer.errors,
         )
+    # نسخهٔ اصلی برای ثبت وضعیت پیش از تغییر نگه‌داری می‌شود تا کش نمایش‌ها نیز به‌روزرسانی گردد
     original_session = ClassSession.objects.get(pk=session.pk)
     validated_data = serializer.validated_data
     validated_data["id"] = session.id
