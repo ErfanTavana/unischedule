@@ -240,6 +240,8 @@ def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> di
     computed filter metadata.  Newly generated payloads are stored in the cache
     for the screen ``refresh_interval``.
     """
+    # Cache keys are namespaced with the ``display:`` prefix so they do not
+    # collide with other app caches; the slug uniquely identifies each screen.
     cache_key = f"display:{screen.slug}"
     if use_cache:
         cached = cache.get(cache_key)
@@ -264,4 +266,6 @@ def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> di
 
 def invalidate_screen_cache(screen: DisplayScreen) -> None:
     """Remove the cached payload for the provided screen."""
+    # Mirrors the naming strategy in ``build_public_payload`` to target only the
+    # affected screen without disturbing other cached responses.
     cache.delete(f"display:{screen.slug}")
