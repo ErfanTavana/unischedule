@@ -19,6 +19,9 @@ api_urlpatterns = [
     path("screens/<int:screen_id>/delete/", delete_display_screen_view, name="delete-screen"),
 ]
 
+# Public preview endpoints are intentionally unauthenticated; they are consumed
+# by kiosk/TV clients that only know the screen slug.  Access should be limited
+# to opaque slugs shared with trusted devices.
 public_urlpatterns = [
     path("<slug:slug>/", public_display_view, name="public-display"),
 ]

@@ -9,6 +9,8 @@ from displays.models import DisplayScreen
 
 @admin.register(DisplayScreen)
 class DisplayScreenAdmin(admin.ModelAdmin):
+    # Display columns emphasise ownership, publication state, and quick access
+    # to the public preview URL so operators can verify the feed at a glance.
     list_display = (
         "title",
         "institution",
@@ -23,6 +25,8 @@ class DisplayScreenAdmin(admin.ModelAdmin):
     search_fields = ("title", "slug", "institution__name")
     readonly_fields = ("slug", "access_token", "created_at", "updated_at", "preview_link")
     autocomplete_fields = ("institution",)
+    # Provide a one-click action that opens the unauthenticated JSON preview
+    # used by kiosk devices.  Limited to single selection to avoid ambiguity.
     actions = ["preview_screen"]
     fieldsets = (
         (None, {
@@ -78,6 +82,8 @@ class DisplayScreenAdmin(admin.ModelAdmin):
 
     @admin.action(description="باز کردن JSON عمومی")
     def preview_screen(self, request, queryset):
+        # Ensure that staff explicitly choose a single screen before
+        # redirecting them to the external preview endpoint.
         if queryset.count() != 1:
             self.message_user(
                 request,
