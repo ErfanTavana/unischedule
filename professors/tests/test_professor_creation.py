@@ -26,5 +26,7 @@ class ProfessorCreationTests(TestCase):
         first_response = self.client.post(self.url, self.professor_data, format="json")
         self.assertEqual(first_response.status_code, status.HTTP_201_CREATED)
 
+        # Attempting to create the same professor again verifies the API's
+        # protection against duplicate national codes.
         second_response = self.client.post(self.url, self.professor_data, format="json")
         self.assertEqual(second_response.status_code, status.HTTP_400_BAD_REQUEST)
