@@ -17,6 +17,14 @@ WEEK_TYPE_CHOICES = {choice for choice, _ in ClassSession.WeekTypeChoices.choice
 
 
 class DisplayScreenSerializer(serializers.ModelSerializer):
+    """Expose screen configuration alongside computed filter metadata.
+
+    ``filter_computed_day_of_week`` و ``filter_computed_week_type`` فیلدهای
+    محاسباتی هستند که مقدار نهایی فیلتر را پس از اعمال منطق کمکی
+    ``displays.utils`` باز می‌گردانند تا کلاینت از وضعیت واقعی فیلتر مطلع
+    شود.
+    """
+
     filter_computed_day_of_week = serializers.SerializerMethodField()
     filter_computed_week_type = serializers.SerializerMethodField()
 
@@ -70,6 +78,15 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
 
 
 class DisplayScreenWriteSerializer(serializers.ModelSerializer):
+    """Allow administrators to configure selector-based filters for a screen.
+
+    این سریالایزر فیلدهای کلیدخارجی (کلاس، ساختمان، درس و ...) را در قالب
+    شناسه دریافت می‌کند و همچنین فیلدهای زمانی، بازهٔ ظرفیت و پارامترهای
+    کنترلی نظیر ``filter_is_active`` را اعتبارسنجی می‌کند.  ساختار فیلتر به
+    صورت مجموعه‌ای از selectorها است که فعال بودنشان از طریق فلگ
+    ``filter_is_active`` تعیین می‌شود.
+    """
+
     filter_classroom = serializers.PrimaryKeyRelatedField(
         queryset=Classroom.objects.all(), required=False, allow_null=True
     )
@@ -257,6 +274,13 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
 
 
 class DisplayPublicFilterSerializer(serializers.Serializer):
+    """Provide the public representation of the configured filters.
+
+    خروجی شامل شناسه و برچسب برای selectorهای فعال است و علاوه بر مقادیر
+    خام، فیلدهای محاسباتی ``computed_day_of_week`` و ``computed_week_type`` را
+    نیز ارائه می‌دهد تا نحوهٔ اعمال فیلتر برای بیننده شفاف باشد.
+    """
+
     def to_representation(self, instance: DisplayScreen) -> dict[str, Any]:  # type: ignore[override]
         def _ref(attr: str, *, display: str | None = None) -> dict[str, Any] | None:
             value = getattr(instance, attr)
@@ -305,6 +329,8 @@ class DisplayPublicFilterSerializer(serializers.Serializer):
 
 
 class DisplayPublicSessionSerializer(serializers.ModelSerializer):
+    """Serialize session data enriched with display-friendly labels."""
+
     course_title = serializers.CharField(source="course.title", read_only=True)
     professor_name = serializers.SerializerMethodField()
     classroom_title = serializers.CharField(source="classroom.title", read_only=True)
@@ -332,6 +358,13 @@ class DisplayPublicSessionSerializer(serializers.ModelSerializer):
 
 
 class DisplayPublicPayloadSerializer(serializers.Serializer):
+    """Wrap the screen, filter summary and session list for public displays.
+
+    ساختار نهایی شامل اطلاعات صفحه، توضیح فیلتر به کمک
+    ``DisplayPublicFilterSerializer`` و آرایه‌ای از جلسات است که هر کدام با
+    فیلدهای محاسباتی از جمله عناوین درس و ساختمان ارائه می‌شوند.
+    """
+
     screen = DisplayScreenSerializer(read_only=True)
     filter = serializers.SerializerMethodField()
     sessions = DisplayPublicSessionSerializer(many=True, read_only=True)

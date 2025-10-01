@@ -92,6 +92,7 @@ class DisplayServiceViewAdminTests(TestCase):
         self.screen.refresh_from_db()
 
     def test_service_generates_payload_with_classroom_filter(self):
+        """Payload must honour classroom, building and capacity selectors."""
         self._create_session()
         self._create_session(
             classroom=self.second_classroom,
@@ -118,6 +119,7 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertEqual(payload["filter"]["capacity"], 15)
 
     def test_service_filters_by_professor_and_week_type(self):
+        """Odd-week filter still includes sessions that run every week."""
         odd_session = self._create_session(week_type=ClassSession.WeekTypeChoices.ODD)
         every_session = self._create_session(week_type=ClassSession.WeekTypeChoices.EVERY, start_time=time(10, 0))
         self._create_session(week_type=ClassSession.WeekTypeChoices.EVEN, start_time=time(12, 0))
@@ -134,6 +136,7 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertEqual(len(session_ids), 2)
 
     def test_service_does_not_infer_week_type_from_date_override(self):
+        """Date overrides should not infer implicit week-type constraints."""
         odd_session = self._create_session(week_type=ClassSession.WeekTypeChoices.ODD)
         even_session = self._create_session(
             week_type=ClassSession.WeekTypeChoices.EVEN,
@@ -156,6 +159,7 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertIsNone(payload["filter"]["computed_week_type"])
 
     def test_service_filters_by_building_group_and_time_range(self):
+        """Combined building, group and time filters narrow sessions correctly."""
         included_session = self._create_session(group_code="Z", capacity=40)
         self._create_session(
             classroom=self.second_classroom,
@@ -275,6 +279,7 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertFalse(retrieved_screen["filter_is_active"])
 
     def test_public_view_returns_json_payload(self):
+        """Public endpoint returns cached-friendly JSON payloads."""
         self._create_session()
         self._update_screen_filter(
             filter_classroom=self.classroom.id,
@@ -302,6 +307,7 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertEqual(found_screen.id, self.screen.id)
 
     def test_public_view_missing_screen_returns_json_error(self):
+        """Unknown slug should yield a JSON error response for kiosks."""
         response = self.client.get("/displays/unknown/")
         self.assertEqual(response.status_code, 404)
         data = response.json()
@@ -366,6 +372,7 @@ class DisplayCacheInvalidationTests(TestCase):
         return payload
 
     def test_public_payload_cache_invalidated_after_session_create(self):
+        """Creating a session invalidates only the affected screen cache key."""
         first_response = self.client.get(f"/displays/{self.screen.slug}/")
         self.assertEqual(first_response.status_code, 200)
         first_sessions = first_response.json()["data"]["sessions"]
