@@ -21,9 +21,12 @@ def list_buildings_view(request):
     """
     GET - List all buildings for the authenticated user's institution.
     """
+    # Prepare data: resolve the caller's institution from the authenticated user
     institution = request.user.institution
+    # Service call: fetch serialized buildings scoped to the institution
     buildings = building_service.list_buildings(institution)
 
+    # Response: wrap the payload in the unified success envelope
     return BaseResponse.success(
         message=SuccessCodes.BUILDING_LISTED["message"],
         code=SuccessCodes.BUILDING_LISTED["code"],
@@ -37,9 +40,12 @@ def retrieve_building_view(request, building_id):
     """
     GET - Retrieve a building by ID.
     """
+    # Prepare data: resolve institution and requested building id
     institution = request.user.institution
+    # Service call: validate ownership and serialize the building
     building = building_service.get_building_by_id_or_404(building_id, institution)
 
+    # Response: send the serialized building to the client
     return BaseResponse.success(
         message=SuccessCodes.BUILDING_RETRIEVED["message"],
         code=SuccessCodes.BUILDING_RETRIEVED["code"],
@@ -53,11 +59,14 @@ def create_building_view(request):
     """
     POST - Create a new building for the authenticated user's institution.
     """
+    # Prepare data: extract institution context and request payload
     institution = request.user.institution
     data = request.data
 
     try:
+        # Service call: validate input and persist the new building
         building = building_service.create_building(data, institution)
+        # Response: return the created building with 201 status
         return BaseResponse.success(
             message=SuccessCodes.BUILDING_CREATED["message"],
             code=SuccessCodes.BUILDING_CREATED["code"],
@@ -89,11 +98,14 @@ def update_building_view(request, building_id):
     """
     PUT - Update an existing building.
     """
+    # Prepare data: ensure the building belongs to the user's institution
     institution = request.user.institution
     building = building_service.get_building_instance_or_404(building_id, institution)
 
     try:
+        # Service call: validate updates and persist changes
         updated_building = building_service.update_building(building, request.data)
+        # Response: return the updated building payload
         return BaseResponse.success(
             message=SuccessCodes.BUILDING_UPDATED["message"],
             code=SuccessCodes.BUILDING_UPDATED["code"],
@@ -129,11 +141,14 @@ def delete_building_view(request, building_id):
     """
     DELETE - Soft delete a building.
     """
+    # Prepare data: load the building within the user's institution scope
     institution = request.user.institution
     building = building_service.get_building_instance_or_404(building_id, institution)
 
     try:
+        # Service call: perform the soft delete mutation
         building_service.delete_building(building)
+        # Response: acknowledge deletion via the success envelope
         return BaseResponse.success(
             message=SuccessCodes.BUILDING_DELETED["message"],
             code=SuccessCodes.BUILDING_DELETED["code"]

@@ -16,5 +16,7 @@ class BuildingSerializerTests(TestCase):
             context={"institution": self.institution},
         )
 
+        # This check ensures we prevent duplicate building names inside the same
+        # institution, which keeps campus navigation and scheduling unambiguous.
         self.assertFalse(serializer.is_valid())
         self.assertIn("title", serializer.errors)
