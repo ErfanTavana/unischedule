@@ -14,9 +14,11 @@ from schedules.services import class_session_service
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_class_sessions_view(request):
+    """لیست جلسات کلاس را با استفاده از BaseResponse و مدیریت خطا بازمی‌گرداند."""
     institution = request.user.institution
     try:
         sessions = class_session_service.list_class_sessions(institution)
+        # BaseResponse.success خروجی استاندارد شدهٔ موفقیت را آماده می‌کند
         return BaseResponse.success(
             message=SuccessCodes.CLASS_SESSION_LISTED["message"],
             code=SuccessCodes.CLASS_SESSION_LISTED["code"],
@@ -35,6 +37,7 @@ def list_class_sessions_view(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def retrieve_class_session_view(request, session_id):
+    """جزئیات جلسه را بر اساس شناسه بازمی‌گرداند و خطاها را به قالب عمومی تبدیل می‌کند."""
     institution = request.user.institution
     try:
         session = class_session_service.get_class_session_by_id_or_404(session_id, institution)
@@ -56,6 +59,7 @@ def retrieve_class_session_view(request, session_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_class_session_view(request):
+    """جلسهٔ جدید را ایجاد کرده و انواع استثناها را به پاسخ استاندارد تبدیل می‌کند."""
     institution = request.user.institution
     try:
         session = class_session_service.create_class_session(request.data, institution)
@@ -74,6 +78,7 @@ def create_class_session_view(request):
             data=e.detail["data"],
         )
     except ValidationError as e:
+        # ValidationError داخلی DRF به خطای عمومی Validation ترجمه می‌شود تا پیام یکسان بماند
         return BaseResponse.error(
             message=ErrorCodes.VALIDATION_FAILED["message"],
             code=ErrorCodes.VALIDATION_FAILED["code"],
@@ -81,6 +86,7 @@ def create_class_session_view(request):
             errors=e.detail,
         )
     except Exception:
+        # برای خطاهای پیش‌بینی‌نشده، پیام کلی شکست ایجاد کلاس بازگردانده می‌شود
         return BaseResponse.error(
             message=ErrorCodes.CLASS_SESSION_CREATION_FAILED["message"],
             code=ErrorCodes.CLASS_SESSION_CREATION_FAILED["code"],
@@ -92,6 +98,7 @@ def create_class_session_view(request):
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_class_session_view(request, session_id):
+    """جلسهٔ موجود را به‌روزرسانی کرده و پیام‌های خطا را در قالب BaseResponse بازمی‌گرداند."""
     institution = request.user.institution
     try:
         session = class_session_service.get_class_session_instance_or_404(session_id, institution)
@@ -110,6 +117,7 @@ def update_class_session_view(request, session_id):
             data=e.detail["data"],
         )
     except ValidationError as e:
+        # خطای اعتبارسنجی DRF با پیام عمومی خطای اعتبارسنجی بازگردانده می‌شود
         return BaseResponse.error(
             message=ErrorCodes.VALIDATION_FAILED["message"],
             code=ErrorCodes.VALIDATION_FAILED["code"],
@@ -117,6 +125,7 @@ def update_class_session_view(request, session_id):
             errors=e.detail,
         )
     except Exception:
+        # سایر خطاهای غیرمنتظره با پیام شکست به‌روزرسانی پاسخ داده می‌شوند
         return BaseResponse.error(
             message=ErrorCodes.CLASS_SESSION_UPDATE_FAILED["message"],
             code=ErrorCodes.CLASS_SESSION_UPDATE_FAILED["code"],
@@ -128,6 +137,7 @@ def update_class_session_view(request, session_id):
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def delete_class_session_view(request, session_id):
+    """جلسهٔ مشخص شده را حذف نرم می‌کند و از BaseResponse برای پاسخ موفق یا خطا بهره می‌گیرد."""
     institution = request.user.institution
     try:
         session = class_session_service.get_class_session_instance_or_404(session_id, institution)
@@ -145,6 +155,7 @@ def delete_class_session_view(request, session_id):
             data=e.detail["data"],
         )
     except Exception:
+        # آخرین سد دفاعی برای خطاهای حذف که خارج از سناریوهای انتظار هستند
         return BaseResponse.error(
             message=ErrorCodes.CLASS_SESSION_DELETION_FAILED["message"],
             code=ErrorCodes.CLASS_SESSION_DELETION_FAILED["code"],

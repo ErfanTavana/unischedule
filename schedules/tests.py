@@ -64,6 +64,7 @@ class ClassSessionModelServiceViewTests(TestCase):
         self.assertTrue(ClassSession.objects_with_deleted.filter(id=session.id, is_deleted=True).exists())
 
     def test_service_create_and_retrieve(self):
+        # موفق: ایجاد و بازیابی جلسه بدون هیچ تداخل زمانی
         data = self._session_payload()
         created = class_session_service.create_class_session(data, self.institution)
         self.assertEqual(ClassSession.objects.count(), 1)
@@ -71,16 +72,19 @@ class ClassSessionModelServiceViewTests(TestCase):
         self.assertEqual(retrieved["id"], created["id"])
 
     def test_service_prevents_conflict(self):
+        # تداخل استاد: تلاش برای ایجاد جلسهٔ جدید با همان استاد و بازهٔ زمانی متداخل
         class_session_service.create_class_session(self._session_payload(), self.institution)
         with self.assertRaises(CustomValidationError):
             class_session_service.create_class_session(self._session_payload(start_time="09:00"), self.institution)
 
     def test_view_create_retrieve_delete(self):
+        # موفق: جریان کامل ایجاد، دریافت و حذف جلسه از طریق API
         response = self.client.post("/api/schedules/create/", self._session_payload(), format="json")
         self.assertEqual(response.status_code, 201)
         session_id = response.data["data"]["class_session"]["id"]
         res_get = self.client.get(f"/api/schedules/{session_id}/")
         self.assertEqual(res_get.status_code, 200)
+        # تداخل کلاس: تلاش برای رزرو کلاس در بازهٔ زمانی متداخل برای همان کلاس
         res_conflict = self.client.post("/api/schedules/create/", self._session_payload(start_time="09:00"), format="json")
         self.assertEqual(res_conflict.status_code, 400)
         del_res = self.client.delete(f"/api/schedules/{session_id}/delete/")
@@ -88,6 +92,7 @@ class ClassSessionModelServiceViewTests(TestCase):
         self.assertTrue(ClassSession.objects_with_deleted.get(id=session_id).is_deleted)
 
     def test_views_require_institution_for_authenticated_user(self):
+        # تداخل کلاس/موسسه: کاربر بدون موسسه نمی‌تواند با سرویس تعامل کند و خطای مرتبط دریافت می‌کند
         user_without_institution = User.objects.create_user(username="noinst", password="pass")
         other_client = APIClient()
         other_client.force_authenticate(user=user_without_institution)
