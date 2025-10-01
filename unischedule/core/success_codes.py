@@ -1,5 +1,21 @@
+"""Shared application success codes grouped by domain.
+
+The codes follow a ``2XYZ`` convention where the second digit indicates the
+domain (e.g. ``8`` for institutions, ``1`` for semesters). Grouping the codes
+here helps product and client teams maintain a single source of truth when
+mapping server responses to UI messages.
+
+Example:
+    ``BaseResponse.success(**SuccessCodes.INSTITUTION_CREATED)`` turns the
+    constant into the standard response format without duplicating the message
+    at the call site.
+"""
+
+
 class SuccessCodes:
-    # Institutions
+    """Namespace containing grouped dictionaries used by ``BaseResponse``."""
+
+    # Institutions: all institution management scenarios share the 28xx range.
     INSTITUTION_LISTED = {
         "code": "2800",
         "message": "لیست مؤسسات با موفقیت دریافت شد.",
@@ -26,7 +42,7 @@ class SuccessCodes:
         "data": {},
     }
 
-    # Semesters
+    # Semesters: the 21xx series communicates academic term lifecycle events.
     SEMESTER_CREATED = {
         "code": "2100",
         "message": "ترم با موفقیت ایجاد شد.",
@@ -56,7 +72,8 @@ class SuccessCodes:
         "message": "ترم فعال با موفقیت تنظیم شد.",
         "data": {}
     }
-    # Professors
+
+    # Professors: 22xx codes mirror CRUD operations on faculty profiles.
     PROFESSOR_LISTED = {
         "code": "2201",
         "message": "لیست اساتید با موفقیت دریافت شد.",
@@ -87,7 +104,7 @@ class SuccessCodes:
         "data": {}
     }
 
-    # === COURSE ===
+    # Courses: 23xx indicates catalog level changes and queries.
     COURSE_CREATED = {
         "code": "2301",
         "message": "درس جدید با موفقیت ایجاد شد.",
@@ -118,7 +135,7 @@ class SuccessCodes:
         "data": {}
     }
 
-    # Buildings
+    # Buildings: facility management uses 24xx aligned with location entities.
     BUILDING_CREATED = {
         "code": "2401",
         "message": "ساختمان با موفقیت ایجاد شد."
@@ -139,7 +156,8 @@ class SuccessCodes:
         "code": "2405",
         "message": "لیست ساختمان‌ها با موفقیت دریافت شد."
     }
-    # --------- Classroom Success Codes ---------
+
+    # Classrooms: 25xx signals updates to physical classroom resources.
     CLASSROOM_LISTED = {
         "code": "2501",
         "message": "لیست کلاس‌ها با موفقیت دریافت شد."
@@ -164,7 +182,8 @@ class SuccessCodes:
         "code": "2505",
         "message": "کلاس با موفقیت حذف شد."
     }
-    # Class Sessions
+
+    # Class Sessions: 26xx maps to scheduling occurrences inside semesters.
     CLASS_SESSION_CREATED = {
         "code": "2601",
         "message": "جلسه کلاس با موفقیت ایجاد شد.",
@@ -190,7 +209,8 @@ class SuccessCodes:
         "message": "جلسه کلاس با موفقیت حذف شد.",
         "data": {},
     }
-    # Display screens
+
+    # Display screens: 27xx is dedicated to digital signage endpoints.
     DISPLAY_SCREEN_CREATED = {
         "code": "2701",
         "message": "صفحه نمایش با موفقیت ایجاد شد.",
@@ -221,7 +241,8 @@ class SuccessCodes:
         "message": "اطلاعات صفحه نمایش با موفقیت بارگذاری شد.",
         "data": {},
     }
-    # ✅ Auth
+
+    # ✅ Auth: success codes used by authentication flows.
     LOGIN_SUCCESS = {
         "code": 2001,
         "message": "ورود با موفقیت انجام شد.",

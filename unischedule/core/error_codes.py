@@ -1,8 +1,23 @@
+"""Central repository of error codes referenced by API responses.
+
+Error codes use the ``4XYZ`` family so they are easy to distinguish from
+success codes. The second digit hints at the domain: ``9`` for institutions,
+``1`` for semesters, etc. This convention keeps HTTP codes, logical codes and
+user-facing messages together, which simplifies raising errors through
+``BaseResponse.error`` or :class:`~unischedule.core.exceptions.CustomValidationError`.
+
+Example:
+    ``BaseResponse.error(**ErrorCodes.SEMESTER_NOT_FOUND)`` immediately returns
+    an HTTP 404 without redefining the message or application code.
+"""
+
 from rest_framework import status
 
 
 class ErrorCodes:
-    # Generic
+    """Domain grouped error payloads shared across serializers and services."""
+
+    # Generic: 40xx codes cover validation and permission scenarios.
     VALIDATION_FAILED = {
         "code": "4000",
         "message": "اطلاعات وارد شده نامعتبر است.",
@@ -18,7 +33,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Institution
+    # Institution: 49xx codes represent issues when managing institutions.
     INSTITUTION_NOT_FOUND = {
         "code": "4900",
         "message": "مؤسسه مورد نظر یافت نشد.",
@@ -55,7 +70,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Semester
+    # Semester: 41xx warnings communicate failures on academic terms.
     SEMESTER_NOT_FOUND = {
         "code": "4100",
         "message": "ترم مورد نظر یافت نشد.",
@@ -92,7 +107,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Professor
+    # Professor: 42xx handles CRUD exceptions around faculty members.
     PROFESSOR_NOT_FOUND = {
         "code": "4200",
         "message": "استاد مورد نظر یافت نشد.",
@@ -122,7 +137,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Course
+    # Course: 43xx focuses on catalog validation and persistence issues.
     COURSE_CREATION_FAILED = {
         "code": "4301",
         "message": "ایجاد درس با خطا مواجه شد.",
@@ -159,7 +174,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Building
+    # Building: 44xx is reserved for facility management failures.
     BUILDING_NOT_FOUND = {
         "code": "4400",
         "message": "ساختمان مورد نظر یافت نشد.",
@@ -189,7 +204,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Classroom
+    # Classroom: 45xx highlights classroom lifecycle problems.
     CLASSROOM_NOT_FOUND = {
         "code": "4500",
         "message": "کلاس مورد نظر یافت نشد.",
@@ -219,7 +234,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Class Session
+    # Class Session: 46xx represents scheduling conflicts or errors.
     CLASS_SESSION_NOT_FOUND = {
         "code": "4600",
         "message": "جلسه کلاس مورد نظر یافت نشد.",
@@ -256,7 +271,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Display screens
+    # Display screens: 48xx is dedicated to signage endpoints.
     DISPLAY_SCREEN_NOT_FOUND = {
         "code": "4800",
         "message": "صفحه نمایش مورد نظر یافت نشد.",
@@ -286,7 +301,7 @@ class ErrorCodes:
         "data": {},
     }
 
-    # Auth
+    # Auth: 47xx concentrates on authentication and security workflows.
     INVALID_CREDENTIALS = {
         "code": "4700",
         "message": "نام کاربری یا رمز عبور اشتباه است.",

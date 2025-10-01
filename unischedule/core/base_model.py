@@ -1,10 +1,22 @@
+"""Core abstract models and managers shared across the project.
+
+This module introduces :class:`ActiveManager` and :class:`BaseModel` which are
+used by most database models in the project. They encapsulate conventions such
+as soft deletion and audit timestamps so that every domain model can inherit a
+consistent behaviour without re-implementing it.
+"""
+
 from django.db import models
 from django.utils import timezone
 
 
 class ActiveManager(models.Manager):
-    """
-    Custom manager that returns only non-deleted records by default.
+    """Return only non-deleted rows when accessing ``Model.objects``.
+
+    ``ActiveManager`` keeps application queries focused on active records by
+    filtering ``is_deleted=False`` at the ORM level. Developers can access the
+    full dataset through ``objects_with_deleted`` when they explicitly need
+    archived rows.
     """
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=False)
@@ -12,8 +24,14 @@ class ActiveManager(models.Manager):
 
 class BaseModel(models.Model):
     """
-    Abstract base model with common fields and soft delete functionality.
-    Includes timestamp fields and cascade soft delete logic.
+    Abstract base model that centralises audit fields and soft delete logic.
+
+    Every persistent model inherits the ``created_at``/``updated_at`` timestamp
+    pair, a ``is_deleted`` flag that drives soft deletion, and two managers
+    (``objects`` and ``objects_with_deleted``). The :meth:`delete` override makes
+    sure deletions mark records as archived while the optional
+    :meth:`_cascade_soft_delete` hook allows propagating the behaviour to
+    related objects (e.g. child schedules) when required.
     """
 
     created_at = models.DateTimeField(default=timezone.now, verbose_name="ایجاد شده در")
@@ -28,9 +46,7 @@ class BaseModel(models.Model):
         abstract = True
 
     def delete(self, using=None, keep_parents=False):
-        """
-        Perform a soft delete by setting is_deleted=True instead of removing from database.
-        """
+        """Soft delete the record instead of removing it from the database."""
         self.is_deleted = True
         self.save(update_fields=["is_deleted", "updated_at"])
 
@@ -38,7 +54,5 @@ class BaseModel(models.Model):
         self._cascade_soft_delete()
 
     def _cascade_soft_delete(self):
-        """
-        Override this method in child models to apply soft delete to related objects.
-        """
+        """Hook for subclasses to soft delete related records when necessary."""
         pass

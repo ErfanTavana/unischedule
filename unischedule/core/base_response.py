@@ -1,3 +1,11 @@
+"""Utility helpers that standardise API responses across the project.
+
+``BaseResponse`` wraps common success/error envelopes and paging logic so that
+viewsets only need to supply their payloads. Keeping response structure in one
+place guarantees a uniform contract for the front-end and simplifies
+documentation.
+"""
+
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
@@ -5,9 +13,10 @@ from django.utils import timezone
 
 
 class DefaultPageNumberPagination(PageNumberPagination):
-    """
-    کلاس صفحه‌بندی پیش‌فرض برای پروژه.
-    پارامتر page_size به‌صورت پویا از querystring قابل دریافت است.
+    """Project-wide pagination defaults used by :func:`BaseResponse.paginate_queryset`.
+
+    The class exposes ``page_size`` through a query parameter so clients can
+    request small or large pages without having to override pagination per view.
     """
     page_size = 10
     page_size_query_param = 'page_size'
@@ -15,8 +24,11 @@ class DefaultPageNumberPagination(PageNumberPagination):
 
 
 class BaseResponse:
-    """
-    کلاس کمکی برای ساختن پاسخ‌های استاندارد API.
+    """Helper for building consistent DRF ``Response`` objects.
+
+    Developers can call :meth:`success`, :meth:`error`, or
+    :meth:`paginate_queryset` from viewsets or services to avoid repeating the
+    envelope shape each time an API endpoint returns data.
     """
 
     @staticmethod
@@ -28,19 +40,19 @@ class BaseResponse:
         warnings=None,
         meta=None
     ):
-        """
-        پاسخ موفق با ساختار استاندارد.
+        """Return a successful API response using the shared payload contract.
 
         Args:
-            message (str): پیام موفقیت
-            data (dict): داده خروجی
-            status_code (int): کد HTTP
-            code (int): کد منطقی اپلیکیشن
-            warnings (list): هشدارهای غیر بحرانی
-            meta (dict): متادیتای اضافی
+            message (str): Human-friendly success message shown to clients.
+            data (dict): Main payload returned to the caller.
+            status_code (int): HTTP status code to attach to the response.
+            code (int): Internal logical code that front-end apps can branch on.
+            warnings (list): Non-blocking warnings worth surfacing to the user.
+            meta (dict): Optional metadata (e.g. paging info) bundled alongside
+                the main payload.
 
         Returns:
-            Response: پاسخ DRF استاندارد
+            Response: A DRF ``Response`` instance following the "success" schema.
         """
         return Response({
             "success": True,
@@ -59,18 +71,17 @@ class BaseResponse:
         code=2000,
         data=None
     ):
-        """
-        پاسخ خطا با ساختار استاندارد.
+        """Return an error response with a predictable envelope for clients.
 
         Args:
-            message (str): پیام خطا
-            errors (list): لیست خطاهای ولیدیشن یا منطقی
-            status_code (int): کد HTTP
-            code (int): کد منطقی اپلیکیشن
-            data (dict): داده اضافی قابل نمایش
+            message (str): Primary error message for the user interface.
+            errors (list): Detailed validation or domain errors.
+            status_code (int): HTTP status code representing the failure.
+            code (int): Application-level error code referenced in documentation.
+            data (dict): Optional contextual data explaining the failure state.
 
         Returns:
-            Response: پاسخ DRF با ساختار استاندارد خطا
+            Response: A DRF ``Response`` containing the standard error payload.
         """
         return Response({
             "success": False,
@@ -92,22 +103,21 @@ class BaseResponse:
         extra_data=None,
         data_key='items'
     ):
-        """
-        پاسخ صفحه‌بندی‌شده برای لیست‌ها.
+        """Serialize and wrap a queryset in the standard paginated response.
 
         Args:
-            queryset (QuerySet): مجموعه داده‌ها
-            request (Request): درخواست DRF
-            serializer_class (Serializer): کلاس سریالایزر
-            message (str): پیام موفقیت
-            status_code (int): کد HTTP
-            code (int): کد اپلیکیشن
-            warnings (list): هشدارها
-            extra_data (dict): اطلاعات اضافی
-            data_key (str): کلید خروجی لیست
+            queryset (QuerySet): Data collection that should be paginated.
+            request (Request): DRF request used to resolve paging parameters.
+            serializer_class (Serializer): Serializer used to render each item.
+            message (str): Success message to display to clients.
+            status_code (int): HTTP status code for the response.
+            code (int): Logical success code that complements HTTP status codes.
+            warnings (list): Optional warnings that should accompany the result.
+            extra_data (dict): Extra payload that should travel with the list.
+            data_key (str): Dict key under which the serialized list is stored.
 
         Returns:
-            Response: پاسخ با داده‌های صفحه‌بندی شده
+            Response: DRF response compatible with :class:`DefaultPageNumberPagination`.
         """
         paginator = DefaultPageNumberPagination()
         paginated_queryset = paginator.paginate_queryset(queryset, request) or []
