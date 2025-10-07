@@ -278,6 +278,92 @@ class DisplayServiceViewAdminTests(TestCase):
         retrieved_screen = retrieve_response.data["data"]["screen"]
         self.assertFalse(retrieved_screen["filter_is_active"])
 
+    def test_api_allows_creating_screen_without_selectors(self):
+        response = self.api_client.post(
+            "/api/displays/screens/create/",
+            {
+                "title": "Unfiltered",
+                "refresh_interval": 30,
+                "layout_theme": "default",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        screen_data = response.data["data"]["screen"]
+        self.assertFalse(screen_data["filter_is_active"])
+
+        screen = DisplayScreen.objects.get(pk=screen_data["id"])
+        self.assertFalse(screen.filter_is_active)
+        self.assertIsNone(screen.filter_classroom)
+        self.assertIsNone(screen.filter_building)
+        self.assertIsNone(screen.filter_professor)
+        self.assertIsNone(screen.filter_course)
+        self.assertIsNone(screen.filter_semester)
+        self.assertIsNone(screen.filter_day_of_week)
+        self.assertIsNone(screen.filter_week_type)
+        self.assertIsNone(screen.filter_date_override)
+        self.assertIsNone(screen.filter_group_code)
+        self.assertIsNone(screen.filter_start_time)
+        self.assertIsNone(screen.filter_end_time)
+        self.assertIsNone(screen.filter_capacity)
+
+    def test_api_can_clear_all_selectors_and_disable_filter(self):
+        create_response = self.api_client.post(
+            "/api/displays/screens/create/",
+            {
+                "title": "Filtered",
+                "refresh_interval": 45,
+                "layout_theme": "dark",
+                "filter_classroom": self.classroom.id,
+                "filter_building": self.building.id,
+                "filter_professor": self.professor.id,
+                "filter_day_of_week": "شنبه",
+                "filter_week_type": ClassSession.WeekTypeChoices.EVERY,
+            },
+            format="json",
+        )
+        self.assertEqual(create_response.status_code, 201)
+        screen_id = create_response.data["data"]["screen"]["id"]
+
+        update_response = self.api_client.put(
+            f"/api/displays/screens/{screen_id}/update/",
+            {
+                "filter_classroom": None,
+                "filter_building": None,
+                "filter_professor": None,
+                "filter_course": None,
+                "filter_semester": None,
+                "filter_day_of_week": "",
+                "filter_week_type": "",
+                "filter_date_override": None,
+                "filter_group_code": "",
+                "filter_start_time": None,
+                "filter_end_time": None,
+                "filter_capacity": None,
+            },
+            format="json",
+        )
+
+        self.assertEqual(update_response.status_code, 200)
+        updated_screen = update_response.data["data"]["screen"]
+        self.assertFalse(updated_screen["filter_is_active"])
+
+        screen = DisplayScreen.objects.get(pk=screen_id)
+        self.assertFalse(screen.filter_is_active)
+        self.assertIsNone(screen.filter_classroom)
+        self.assertIsNone(screen.filter_building)
+        self.assertIsNone(screen.filter_professor)
+        self.assertIsNone(screen.filter_course)
+        self.assertIsNone(screen.filter_semester)
+        self.assertIsNone(screen.filter_day_of_week)
+        self.assertIsNone(screen.filter_week_type)
+        self.assertIsNone(screen.filter_date_override)
+        self.assertIsNone(screen.filter_group_code)
+        self.assertIsNone(screen.filter_start_time)
+        self.assertIsNone(screen.filter_end_time)
+        self.assertIsNone(screen.filter_capacity)
+
     def test_public_view_returns_json_payload(self):
         """Public endpoint returns cached-friendly JSON payloads."""
         self._create_session()

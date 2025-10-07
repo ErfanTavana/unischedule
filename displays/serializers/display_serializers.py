@@ -229,7 +229,16 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
                 return value.strip() != ""
             return True
 
-        if bool(filter_is_active) and not any(_has_value(value) for value in selectors.values()):
+        has_selector = any(_has_value(value) for value in selectors.values())
+
+        if not has_selector:
+            if filter_is_active:
+                attrs["filter_is_active"] = False
+                filter_is_active = False
+            else:
+                attrs.setdefault("filter_is_active", False)
+
+        if bool(filter_is_active) and not has_selector:
             raise serializers.ValidationError("حداقل یکی از معیارهای فیلتر باید مشخص شود.")
 
         institution = self._institution()
