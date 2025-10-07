@@ -190,7 +190,8 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
         if duration is serializers.empty and instance is None:
             attrs.setdefault("filter_duration_seconds", 0)
 
-        if "filter_is_active" in attrs:
+        filter_is_active_provided = "filter_is_active" in attrs
+        if filter_is_active_provided:
             provided_is_active = attrs.get("filter_is_active")
             attrs["filter_is_active"] = bool(provided_is_active)
             filter_is_active = bool(provided_is_active)
@@ -233,6 +234,10 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
 
         if not has_selector:
             if filter_is_active:
+                if filter_is_active_provided:
+                    raise serializers.ValidationError(
+                        "حداقل یکی از معیارهای فیلتر باید مشخص شود."
+                    )
                 attrs["filter_is_active"] = False
                 filter_is_active = False
             else:

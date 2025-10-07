@@ -364,6 +364,71 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertIsNone(screen.filter_end_time)
         self.assertIsNone(screen.filter_capacity)
 
+    def test_api_reenables_filters_with_selectors(self):
+        create_response = self.api_client.post(
+            "/api/displays/screens/create/",
+            {
+                "title": "Reenable",
+                "refresh_interval": 60,
+                "layout_theme": "default",
+                "filter_classroom": self.classroom.id,
+                "filter_day_of_week": "شنبه",
+            },
+            format="json",
+        )
+        self.assertEqual(create_response.status_code, 201)
+        screen_id = create_response.data["data"]["screen"]["id"]
+
+        disable_response = self.api_client.put(
+            f"/api/displays/screens/{screen_id}/update/",
+            {"filter_is_active": False},
+            format="json",
+        )
+        self.assertEqual(disable_response.status_code, 200)
+        self.assertFalse(disable_response.data["data"]["screen"]["filter_is_active"])
+
+        reenable_response = self.api_client.put(
+            f"/api/displays/screens/{screen_id}/update/",
+            {
+                "filter_is_active": True,
+                "filter_classroom": self.classroom.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(reenable_response.status_code, 200)
+        updated_screen = reenable_response.data["data"]["screen"]
+        self.assertTrue(updated_screen["filter_is_active"])
+        self.assertEqual(updated_screen["filter_classroom"], self.classroom.id)
+
+        screen = DisplayScreen.objects.get(pk=screen_id)
+        self.assertTrue(screen.filter_is_active)
+        self.assertEqual(screen.filter_classroom_id, self.classroom.id)
+
+    def test_api_rejects_enabling_filter_without_selectors(self):
+        create_response = self.api_client.post(
+            "/api/displays/screens/create/",
+            {
+                "title": "No selectors",
+                "refresh_interval": 30,
+                "layout_theme": "default",
+            },
+            format="json",
+        )
+        self.assertEqual(create_response.status_code, 201)
+        screen_id = create_response.data["data"]["screen"]["id"]
+
+        enable_response = self.api_client.put(
+            f"/api/displays/screens/{screen_id}/update/",
+            {"filter_is_active": True},
+            format="json",
+        )
+
+        self.assertEqual(enable_response.status_code, 400)
+        errors = enable_response.data["errors"]
+        non_field_errors = [str(error) for error in errors.get("non_field_errors", [])]
+        self.assertIn("حداقل یکی از معیارهای فیلتر باید مشخص شود.", non_field_errors)
+
     def test_public_view_returns_json_payload(self):
         """Public endpoint returns cached-friendly JSON payloads."""
         self._create_session()
