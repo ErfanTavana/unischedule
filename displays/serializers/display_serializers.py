@@ -46,7 +46,9 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
             "filter_professor",
             "filter_semester",
             "filter_day_of_week",
+            "filter_use_current_day_of_week",
             "filter_week_type",
+            "filter_use_current_week_type",
             "filter_date_override",
             "filter_start_time",
             "filter_end_time",
@@ -104,6 +106,8 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
     )
     filter_day_of_week = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     filter_week_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    filter_use_current_day_of_week = serializers.BooleanField(required=False)
+    filter_use_current_week_type = serializers.BooleanField(required=False)
     filter_date_override = serializers.DateField(required=False, allow_null=True)
     filter_start_time = serializers.TimeField(required=False, allow_null=True)
     filter_end_time = serializers.TimeField(required=False, allow_null=True)
@@ -126,7 +130,9 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
             "filter_professor",
             "filter_semester",
             "filter_day_of_week",
+            "filter_use_current_day_of_week",
             "filter_week_type",
+            "filter_use_current_week_type",
             "filter_date_override",
             "filter_start_time",
             "filter_end_time",
@@ -166,6 +172,14 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {"filter_week_type": "نوع هفته انتخاب‌شده معتبر نیست."}
                 )
+
+        use_current_day = attrs.get("filter_use_current_day_of_week", serializers.empty)
+        if use_current_day is not serializers.empty:
+            attrs["filter_use_current_day_of_week"] = bool(use_current_day)
+
+        use_current_week_type = attrs.get("filter_use_current_week_type", serializers.empty)
+        if use_current_week_type is not serializers.empty:
+            attrs["filter_use_current_week_type"] = bool(use_current_week_type)
 
         group_code = attrs.get("filter_group_code", serializers.empty)
         if group_code is not serializers.empty:
@@ -216,6 +230,8 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
             "filter_semester": _resolve("filter_semester"),
             "filter_day_of_week": _resolve("filter_day_of_week"),
             "filter_week_type": _resolve("filter_week_type"),
+            "filter_use_current_day_of_week": _resolve("filter_use_current_day_of_week"),
+            "filter_use_current_week_type": _resolve("filter_use_current_week_type"),
             "filter_date_override": _resolve("filter_date_override"),
             "filter_group_code": _resolve("filter_group_code"),
             "filter_start_time": _resolve("filter_start_time"),
@@ -228,6 +244,8 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
                 return False
             if isinstance(value, str):
                 return value.strip() != ""
+            if isinstance(value, bool):
+                return value
             return True
 
         has_selector = any(_has_value(value) for value in selectors.values())
@@ -334,6 +352,8 @@ class DisplayPublicFilterSerializer(serializers.Serializer):
             "computed_week_type": compute_filter_week_type(instance),
             "day_of_week": instance.filter_day_of_week,
             "week_type": instance.filter_week_type,
+            "use_current_day_of_week": instance.filter_use_current_day_of_week,
+            "use_current_week_type": instance.filter_use_current_week_type,
             "date_override": instance.filter_date_override.isoformat()
             if instance.filter_date_override
             else None,

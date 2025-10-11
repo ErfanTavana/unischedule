@@ -166,6 +166,8 @@ def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
             return False
         if isinstance(value, str):
             return value.strip() != ""
+        if isinstance(value, bool):
+            return value
         return True
 
     selectors = [
@@ -176,6 +178,8 @@ def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
         screen.filter_semester_id,
         screen.filter_day_of_week,
         screen.filter_week_type,
+        screen.filter_use_current_day_of_week,
+        screen.filter_use_current_week_type,
         screen.filter_date_override,
         screen.filter_group_code,
         screen.filter_start_time,

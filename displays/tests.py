@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, time
+from unittest.mock import patch
 
 from django.contrib.admin.sites import AdminSite
 from django.core.cache import cache
@@ -118,6 +119,24 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertEqual(payload["filter"]["building"]["id"], self.building.id)
         self.assertEqual(payload["filter"]["capacity"], 15)
 
+    def test_auto_day_filter_uses_current_date(self):
+        """Enabling auto-day should match sessions for the detected weekday."""
+        self._create_session(day_of_week="دوشنبه")
+        self._create_session(day_of_week="سه‌شنبه", start_time=time(10, 0))
+
+        with patch("django.utils.timezone.localdate", return_value=date(2024, 9, 2)):
+            self._update_screen_filter(
+                filter_use_current_day_of_week=True,
+                filter_is_active=True,
+            )
+            payload = display_service.build_public_payload(self.screen, use_cache=False)
+
+        sessions = payload["sessions"]
+        self.assertEqual(len(sessions), 1)
+        self.assertEqual(sessions[0]["day_of_week"], "دوشنبه")
+        self.assertEqual(payload["filter"]["computed_day_of_week"], "دوشنبه")
+        self.assertTrue(payload["filter"]["use_current_day_of_week"])
+
     def test_service_filters_by_professor_and_week_type(self):
         """Odd-week filter still includes sessions that run every week."""
         odd_session = self._create_session(week_type=ClassSession.WeekTypeChoices.ODD)
@@ -134,6 +153,35 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertIn(odd_session.id, session_ids)
         self.assertIn(every_session.id, session_ids)
         self.assertEqual(len(session_ids), 2)
+
+    def test_auto_week_type_uses_semester_reference(self):
+        """Auto week-type should be derived from the active or selected semester."""
+        odd_session = self._create_session(week_type=ClassSession.WeekTypeChoices.ODD)
+        even_session = self._create_session(
+            week_type=ClassSession.WeekTypeChoices.EVEN,
+            start_time=time(10, 0),
+        )
+        every_session = self._create_session(
+            week_type=ClassSession.WeekTypeChoices.EVERY,
+            start_time=time(12, 0),
+        )
+
+        with patch("django.utils.timezone.localdate", return_value=date(2024, 9, 8)):
+            self._update_screen_filter(
+                filter_semester=self.semester.id,
+                filter_use_current_week_type=True,
+                filter_is_active=True,
+            )
+            payload = display_service.build_public_payload(self.screen, use_cache=False)
+
+        computed_week_type = payload["filter"]["computed_week_type"]
+        self.assertEqual(computed_week_type, ClassSession.WeekTypeChoices.EVEN)
+
+        session_ids = {session["id"] for session in payload["sessions"]}
+        self.assertIn(even_session.id, session_ids)
+        self.assertIn(every_session.id, session_ids)
+        self.assertNotIn(odd_session.id, session_ids)
+        self.assertTrue(payload["filter"]["use_current_week_type"])
 
     def test_service_does_not_infer_week_type_from_date_override(self):
         """Date overrides should not infer implicit week-type constraints."""
@@ -240,6 +288,8 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertEqual(screen_data["filter_building"], self.building.id)
         self.assertEqual(screen_data["filter_semester"], self.semester.id)
         self.assertEqual(screen_data["filter_day_of_week"], "شنبه")
+        self.assertFalse(screen_data["filter_use_current_day_of_week"])
+        self.assertFalse(screen_data["filter_use_current_week_type"])
         self.assertTrue(screen_data["filter_is_active"])
 
         update_response = self.api_client.put(
@@ -302,6 +352,8 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertIsNone(screen.filter_semester)
         self.assertIsNone(screen.filter_day_of_week)
         self.assertIsNone(screen.filter_week_type)
+        self.assertFalse(screen.filter_use_current_day_of_week)
+        self.assertFalse(screen.filter_use_current_week_type)
         self.assertIsNone(screen.filter_date_override)
         self.assertIsNone(screen.filter_group_code)
         self.assertIsNone(screen.filter_start_time)
@@ -358,6 +410,8 @@ class DisplayServiceViewAdminTests(TestCase):
         self.assertIsNone(screen.filter_semester)
         self.assertIsNone(screen.filter_day_of_week)
         self.assertIsNone(screen.filter_week_type)
+        self.assertFalse(screen.filter_use_current_day_of_week)
+        self.assertFalse(screen.filter_use_current_week_type)
         self.assertIsNone(screen.filter_date_override)
         self.assertIsNone(screen.filter_group_code)
         self.assertIsNone(screen.filter_start_time)
