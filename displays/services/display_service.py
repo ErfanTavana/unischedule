@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Iterable, List
 
+from django.db.models import QuerySet
 from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
@@ -47,10 +48,16 @@ def _validate_serializer(serializer) -> None:
         )
 
 
-def list_display_screens(institution) -> list[dict]:
+def list_display_screens(institution) -> QuerySet[DisplayScreen]:
+    """Return the screen queryset for the requesting institution.
+
+    Pagination is applied at the view layer via :func:`BaseResponse.paginate_queryset`
+    to leverage the shared response envelope while keeping the repository focused on
+    queryset construction.
+    """
+
     _ensure_institution(institution)
-    queryset = display_repository.list_display_screens(institution)
-    return DisplayScreenSerializer(queryset, many=True).data
+    return display_repository.list_display_screens(institution)
 
 
 def create_display_screen(data: dict, institution) -> dict:

@@ -12,6 +12,7 @@ from unischedule.core.error_codes import ErrorCodes
 from unischedule.core.exceptions import CustomValidationError
 from unischedule.core.success_codes import SuccessCodes
 
+from displays.serializers import DisplayScreenSerializer
 from displays.services import display_service
 
 
@@ -21,11 +22,14 @@ from displays.services import display_service
 def list_display_screens_view(request):
     institution = request.user.institution
     try:
-        screens = display_service.list_display_screens(institution)
-        return BaseResponse.success(
+        queryset = display_service.list_display_screens(institution)
+        return BaseResponse.paginate_queryset(
+            queryset=queryset,
+            request=request,
+            serializer_class=DisplayScreenSerializer,
             message=SuccessCodes.DISPLAY_SCREEN_LISTED["message"],
             code=SuccessCodes.DISPLAY_SCREEN_LISTED["code"],
-            data={"screens": screens},
+            data_key="screens",
         )
     except CustomValidationError as exc:
         return JsonResponse(
