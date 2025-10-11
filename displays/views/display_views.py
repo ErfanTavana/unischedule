@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from unischedule.core.base_response import BaseResponse
 from unischedule.core.error_codes import ErrorCodes
@@ -173,30 +172,31 @@ def delete_display_screen_view(request, screen_id: int):
 
 
 # Public endpoint renders payload for unauthenticated kiosks/TVs.
-@require_GET
+@api_view(["GET"])
+@permission_classes([AllowAny])
 def public_display_view(request, slug: str):
     try:
         screen = display_service.get_display_screen_by_slug_or_404(slug)
         payload = display_service.build_public_payload(screen)
     except CustomValidationError as exc:
-        return JsonResponse(
-            {
-                "success": False,
-                "code": exc.detail["code"],
-                "message": exc.detail["message"],
-                "data": exc.detail.get("data", {}),
-                "errors": exc.detail.get("errors", []),
-            },
-            status=exc.status_code,
+        return BaseResponse.error(
+            message=exc.detail["message"],
+            code=exc.detail["code"],
+            status_code=exc.status_code,
+            errors=exc.detail.get("errors", []),
+            data=exc.detail.get("data", {}),
         )
 
-    return JsonResponse(
-        {
-            "success": True,
-            "code": SuccessCodes.DISPLAY_SCREEN_RENDERED["code"],
-            "message": SuccessCodes.DISPLAY_SCREEN_RENDERED["message"],
-            "data": payload,
-            "warnings": [],
-            "meta": {},
-        }
+    sessions = payload.get("sessions", [])
+    payload_without_sessions = {key: value for key, value in payload.items() if key != "sessions"}
+
+    return BaseResponse.paginate_queryset(
+        queryset=sessions,
+        request=request,
+        serializer_class=None,
+        message=SuccessCodes.DISPLAY_SCREEN_RENDERED["message"],
+        code=SuccessCodes.DISPLAY_SCREEN_RENDERED["code"],
+        data_key="sessions",
+        extra_data=payload_without_sessions,
+        extra_data_key=None,
     )
