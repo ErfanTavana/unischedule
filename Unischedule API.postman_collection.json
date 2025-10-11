@@ -113,115 +113,127 @@
 						"body": {
 							"mode": "formdata",
 							"formdata": [
-								{
-									"key": "title",
-									"value": "تابلوی اطلاع‌رسانی لابی",
-									"type": "text"
-								},
-								{
-									"key": "refresh_interval",
-									"value": "90",
-									"type": "text"
-								},
-								{
-									"key": "layout_theme",
-									"value": "default",
-									"type": "text"
-								},
-								{
-									"key": "is_active",
-									"value": "true",
-									"type": "text"
-								},
-								{
-									"key": "filter_title",
-									"value": "کلاس‌های امروز ساختمان مرکزی",
-									"type": "text"
-								},
-								{
-									"key": "filter_classroom",
-									"value": "21",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_building",
-									"value": "5",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_course",
-									"value": "8",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_professor",
-									"value": "14",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_semester",
-									"value": "6",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_day_of_week",
-									"value": "شنبه",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_week_type",
-									"value": "odd",
-									"type": "text"
-								},
-								{
-									"key": "filter_date_override",
-									"value": "2025-09-01",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_start_time",
-									"value": "08:00",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_end_time",
-									"value": "12:00",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_group_code",
-									"value": "A1",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_capacity",
-									"value": "25",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_duration_seconds",
-									"value": "120",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "filter_is_active",
-									"value": "true",
-									"type": "text",
-									"disabled": true
-								}
-							]
+	{
+		"key": "title",
+		"value": "تابلوی اطلاع‌رسانی لابی",
+		"type": "text"
+	},
+	{
+		"key": "refresh_interval",
+		"value": "90",
+		"type": "text"
+	},
+	{
+		"key": "layout_theme",
+		"value": "default",
+		"type": "text"
+	},
+	{
+		"key": "is_active",
+		"value": "true",
+		"type": "text"
+	},
+	{
+		"key": "filter_title",
+		"value": "کلاس‌های امروز ساختمان مرکزی",
+		"type": "text"
+	},
+	{
+		"key": "filter_classroom",
+		"value": "21",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_building",
+		"value": "5",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_course",
+		"value": "8",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_professor",
+		"value": "14",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_semester",
+		"value": "6",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_day_of_week",
+		"value": "شنبه",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_use_current_day_of_week",
+		"value": "true",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_week_type",
+		"value": "odd",
+		"type": "text"
+	},
+	{
+		"key": "filter_use_current_week_type",
+		"value": "true",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_date_override",
+		"value": "2025-09-01",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_start_time",
+		"value": "08:00",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_end_time",
+		"value": "12:00",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_group_code",
+		"value": "A1",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_capacity",
+		"value": "25",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_duration_seconds",
+		"value": "120",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_is_active",
+		"value": "true",
+		"type": "text",
+		"disabled": true
+	}
+]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/displays/screens/create/",
@@ -359,57 +371,69 @@
 						"body": {
 							"mode": "formdata",
 							"formdata": [
-								{
-									"key": "title",
-									"value": "تابلوی اطلاع‌رسانی پردیس مرکزی",
-									"type": "text"
-								},
-								{
-									"key": "refresh_interval",
-									"value": "120",
-									"type": "text"
-								},
-								{
-									"key": "layout_theme",
-									"value": "dark",
-									"type": "text"
-								},
-								{
-									"key": "filter_title",
-									"value": "کلاس‌های ویژه",
-									"type": "text"
-								},
-								{
-									"key": "filter_week_type",
-									"value": "every",
-									"type": "text"
-								},
-								{
-									"key": "filter_group_code",
-									"value": "B2",
-									"type": "text"
-								},
-								{
-									"key": "filter_start_time",
-									"value": "09:00",
-									"type": "text"
-								},
-								{
-									"key": "filter_end_time",
-									"value": "13:00",
-									"type": "text"
-								},
-								{
-									"key": "filter_duration_seconds",
-									"value": "180",
-									"type": "text"
-								},
-								{
-									"key": "filter_is_active",
-									"value": "true",
-									"type": "text"
-								}
-							]
+	{
+		"key": "title",
+		"value": "تابلوی اطلاع‌رسانی پردیس مرکزی",
+		"type": "text"
+	},
+	{
+		"key": "refresh_interval",
+		"value": "120",
+		"type": "text"
+	},
+	{
+		"key": "layout_theme",
+		"value": "dark",
+		"type": "text"
+	},
+	{
+		"key": "filter_title",
+		"value": "کلاس‌های ویژه",
+		"type": "text"
+	},
+	{
+		"key": "filter_week_type",
+		"value": "every",
+		"type": "text"
+	},
+	{
+		"key": "filter_use_current_day_of_week",
+		"value": "true",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_use_current_week_type",
+		"value": "true",
+		"type": "text",
+		"disabled": true
+	},
+	{
+		"key": "filter_group_code",
+		"value": "B2",
+		"type": "text"
+	},
+	{
+		"key": "filter_start_time",
+		"value": "09:00",
+		"type": "text"
+	},
+	{
+		"key": "filter_end_time",
+		"value": "13:00",
+		"type": "text"
+	},
+	{
+		"key": "filter_duration_seconds",
+		"value": "180",
+		"type": "text"
+	},
+	{
+		"key": "filter_is_active",
+		"value": "true",
+		"type": "text"
+	}
+]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/displays/screens/{{screen_id}}/update/",
@@ -425,7 +449,7 @@
 								""
 							]
 						},
-						"description": "StartFragment\n\n### ✏️ **PUT - Update Display Screen**\n\n**Folder:** `Displays/`\n\n**Description**\n\nبه‌روزرسانی تنظیمات صفحه نمایش شامل عنوان، بازه تازه‌سازی و فیلترها برای کنترل محتوای نمایش عمومی. می‌توانید فلگ‌های خودکار روز/نوع هفته یا سایر معیارها را فعال/غیرفعال کنید.\n\n---\n\n### 🔗 **Endpoint**\n\n```\nPUT {{base_url}}/api/displays/screens/{{screen_id}}/update/\n```\n\n---\n\n### 🔐 **Authentication**\n\n- نیازمند توکن فعال (`Authorization: Token {{token}}`)\n\n---\n\n### 📥 **Request Body (form-data)**\n\nارسال فقط فیلدهای موردنیاز؛ سایر فیلدها بدون تغییر باقی می‌مانند.\n\n---\n\n### 📤 **Success Response (200 OK)**\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2704\",\n  \"message\": \"صفحه نمایش با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"screen\": {\n      \"id\": 34,\n      \"institution\": 4,\n      \"title\": \"تابلوی اطلاع‌رسانی پردیس مرکزی\",\n      \"slug\": \"lobby-display\",\n      \"access_token\": \"b48e0fa5c9fa4936\",\n      \"refresh_interval\": 120,\n      \"layout_theme\": \"dark\",\n      \"is_active\": true,\n      \"filter_title\": \"کلاس‌های ویژه\",\n      \"filter_classroom\": 21,\n      \"filter_building\": 5,\n      \"filter_course\": 8,\n      \"filter_professor\": 14,\n      \"filter_semester\": 6,\n      \"filter_day_of_week\": null,\n      \"filter_use_current_day_of_week\": true,\n      \"filter_week_type\": \"every\",\n      \"filter_use_current_week_type\": false,\n      \"filter_date_override\": \"2025-09-01\",\n      \"filter_start_time\": \"09:00:00\",\n      \"filter_end_time\": \"13:00:00\",\n      \"filter_group_code\": \"B2\",\n      \"filter_capacity\": 25,\n      \"filter_duration_seconds\": 180,\n      \"filter_is_active\": true,\n      \"filter_computed_day_of_week\": \"دوشنبه\",\n      \"filter_computed_week_type\": \"every\",\n      \"created_at\": \"2025-09-01T05:10:00Z\",\n      \"updated_at\": \"2025-09-01T06:30:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n---\n\n### ⚠️ **Possible Errors**\n\n| HTTP | Code | Message | توضیحات |\n| --- | --- | --- | --- |\n| 400 | 4000 | اطلاعات وارد شده نامعتبر است. | مقدار یکی از فیلدها صحیح نیست (مثلاً زمان پایان قبل از شروع). |\n| 401 | — | Authentication credentials were not provided. | توکن ارسال نشده یا معتبر نیست. |\n| 403 | 4001 | برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد. | صفحه به موسسه دیگری تعلق دارد. |\n| 404 | 4800 | صفحه نمایش مورد نظر یافت نشد. | شناسه صفحه حذف یا اشتباه است. |\n| 500 | 4802 | به‌روزرسانی صفحه نمایش با خطا مواجه شد. | بروز خطای داخلی هنگام ذخیره تغییرات. |\n\n---\n\n### 🧪 **Scenarios**\n\n- ✅ تغییر تم صفحه برای مناسبت‌های خاص.\n- 🔁 فعال/غیرفعال کردن فیلترها و فلگ‌های خودکار جهت کنترل محتوای نمایش.\n- ❌ ارسال بازه زمانی نامعتبر برای آزمایش پیام‌های خطا.\n\nEndFragment\n"
+						"description": "StartFragment\n\n### ✏️ **PUT - Update Display Screen**\n\n**Folder:** `Displays/`\n\n**Description**\n\nبه‌روزرسانی تنظیمات صفحه نمایش شامل عنوان، بازه تازه‌سازی و فیلترها برای کنترل محتوای نمایش عمومی. می‌توانید فلگ‌های خودکار روز/نوع هفته یا سایر معیارها را فعال/غیرفعال کنید.\n\n---\n\n### 🔗 **Endpoint**\n\n```\nPUT {{base_url}}/api/displays/screens/{{screen_id}}/update/\n```\n\n---\n\n### 🔐 **Authentication**\n\n- نیازمند توکن فعال (`Authorization: Token {{token}}`)\n\n---\n\n### 📥 **Request Body (form-data)**\n\nارسال فقط فیلدهای موردنیاز؛ سایر فیلدها بدون تغییر باقی می‌مانند.\n\n- از فیلدهای `filter_use_current_day_of_week` و `filter_use_current_week_type` برای فعال‌سازی محاسبه خودکار روز و نوع هفته استفاده کنید.\n\n---\n\n### 📤 **Success Response (200 OK)**\n\n``` json\n{\n  \"success\": true,\n  \"code\": \"2704\",\n  \"message\": \"صفحه نمایش با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"screen\": {\n      \"id\": 34,\n      \"institution\": 4,\n      \"title\": \"تابلوی اطلاع‌رسانی پردیس مرکزی\",\n      \"slug\": \"lobby-display\",\n      \"access_token\": \"b48e0fa5c9fa4936\",\n      \"refresh_interval\": 120,\n      \"layout_theme\": \"dark\",\n      \"is_active\": true,\n      \"filter_title\": \"کلاس‌های ویژه\",\n      \"filter_classroom\": 21,\n      \"filter_building\": 5,\n      \"filter_course\": 8,\n      \"filter_professor\": 14,\n      \"filter_semester\": 6,\n      \"filter_day_of_week\": null,\n      \"filter_use_current_day_of_week\": true,\n      \"filter_week_type\": \"every\",\n      \"filter_use_current_week_type\": false,\n      \"filter_date_override\": \"2025-09-01\",\n      \"filter_start_time\": \"09:00:00\",\n      \"filter_end_time\": \"13:00:00\",\n      \"filter_group_code\": \"B2\",\n      \"filter_capacity\": 25,\n      \"filter_duration_seconds\": 180,\n      \"filter_is_active\": true,\n      \"filter_computed_day_of_week\": \"دوشنبه\",\n      \"filter_computed_week_type\": \"every\",\n      \"created_at\": \"2025-09-01T05:10:00Z\",\n      \"updated_at\": \"2025-09-01T06:30:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n\n---\n\n### ⚠️ **Possible Errors**\n\n| HTTP | Code | Message | توضیحات |\n| --- | --- | --- | --- |\n| 400 | 4000 | اطلاعات وارد شده نامعتبر است. | مقدار یکی از فیلدها صحیح نیست (مثلاً زمان پایان قبل از شروع). |\n| 401 | — | Authentication credentials were not provided. | توکن ارسال نشده یا معتبر نیست. |\n| 403 | 4001 | برای انجام این عملیات، کاربر باید به یک مؤسسه متصل باشد. | صفحه به موسسه دیگری تعلق دارد. |\n| 404 | 4800 | صفحه نمایش مورد نظر یافت نشد. | شناسه صفحه حذف یا اشتباه است. |\n| 500 | 4802 | به‌روزرسانی صفحه نمایش با خطا مواجه شد. | بروز خطای داخلی هنگام ذخیره تغییرات. |\n\n---\n\n### 🧪 **Scenarios**\n\n- ✅ تغییر تم صفحه برای مناسبت‌های خاص.\n- 🔁 فعال/غیرفعال کردن فیلترها و فلگ‌های خودکار جهت کنترل محتوای نمایش.\n- ❌ ارسال بازه زمانی نامعتبر برای آزمایش پیام‌های خطا.\n\nEndFragment\n"
 					},
 					"response": []
 				},
