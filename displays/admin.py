@@ -50,7 +50,9 @@ class DisplayScreenAdmin(admin.ModelAdmin):
                     "filter_professor",
                     "filter_semester",
                     "filter_day_of_week",
+                    "filter_use_current_day_of_week",
                     "filter_week_type",
+                    "filter_use_current_week_type",
                     "filter_date_override",
                     "filter_duration_seconds",
                 )

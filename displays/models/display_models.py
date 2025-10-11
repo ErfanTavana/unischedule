@@ -123,6 +123,16 @@ class DisplayScreen(BaseModel):
         blank=True,
         verbose_name="نوع هفته",
     )
+    filter_use_current_day_of_week = models.BooleanField(
+        default=False,
+        verbose_name="تشخیص خودکار روز هفته؟",
+        help_text="در صورت فعال بودن، روز هفته بر اساس تاریخ فعلی محاسبه می‌شود.",
+    )
+    filter_use_current_week_type = models.BooleanField(
+        default=False,
+        verbose_name="تشخیص خودکار نوع هفته؟",
+        help_text="در صورت فعال بودن، نوع هفته (زوج/فرد) بر اساس تاریخ فعلی تعیین می‌شود.",
+    )
     filter_date_override = models.DateField(
         null=True,
         blank=True,
