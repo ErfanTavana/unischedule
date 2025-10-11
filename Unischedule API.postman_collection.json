@@ -113,127 +113,125 @@
 						"body": {
 							"mode": "formdata",
 							"formdata": [
-	{
-		"key": "title",
-		"value": "تابلوی اطلاع‌رسانی لابی",
-		"type": "text"
-	},
-	{
-		"key": "refresh_interval",
-		"value": "90",
-		"type": "text"
-	},
-	{
-		"key": "layout_theme",
-		"value": "default",
-		"type": "text"
-	},
-	{
-		"key": "is_active",
-		"value": "true",
-		"type": "text"
-	},
-	{
-		"key": "filter_title",
-		"value": "کلاس‌های امروز ساختمان مرکزی",
-		"type": "text"
-	},
-	{
-		"key": "filter_classroom",
-		"value": "21",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_building",
-		"value": "5",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_course",
-		"value": "8",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_professor",
-		"value": "14",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_semester",
-		"value": "6",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_day_of_week",
-		"value": "شنبه",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_use_current_day_of_week",
-		"value": "true",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_week_type",
-		"value": "odd",
-		"type": "text"
-	},
-	{
-		"key": "filter_use_current_week_type",
-		"value": "true",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_date_override",
-		"value": "2025-09-01",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_start_time",
-		"value": "08:00",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_end_time",
-		"value": "12:00",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_group_code",
-		"value": "A1",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_capacity",
-		"value": "25",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_duration_seconds",
-		"value": "120",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_is_active",
-		"value": "true",
-		"type": "text",
-		"disabled": true
-	}
-]
+								{
+									"key": "title",
+									"value": "تابلوی اطلاع‌رسانی لابی",
+									"type": "text"
+								},
+								{
+									"key": "refresh_interval",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "layout_theme",
+									"value": "default",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "filter_title",
+									"value": "کلاس‌های امروز ساختمان مرکزی",
+									"type": "text"
+								},
+								{
+									"key": "filter_classroom",
+									"value": "21",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_building",
+									"value": "5",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_course",
+									"value": "8",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_professor",
+									"value": "14",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_semester",
+									"value": "6",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_day_of_week",
+									"value": "شنبه",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_use_current_day_of_week",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "filter_week_type",
+									"value": "odd",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_use_current_week_type",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "filter_date_override",
+									"value": "2025-09-01",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_start_time",
+									"value": "08:00",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_end_time",
+									"value": "12:00",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_group_code",
+									"value": "A1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_capacity",
+									"value": "25",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_duration_seconds",
+									"value": "120",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_is_active",
+									"value": "true",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/displays/screens/create/",
@@ -371,69 +369,69 @@
 						"body": {
 							"mode": "formdata",
 							"formdata": [
-	{
-		"key": "title",
-		"value": "تابلوی اطلاع‌رسانی پردیس مرکزی",
-		"type": "text"
-	},
-	{
-		"key": "refresh_interval",
-		"value": "120",
-		"type": "text"
-	},
-	{
-		"key": "layout_theme",
-		"value": "dark",
-		"type": "text"
-	},
-	{
-		"key": "filter_title",
-		"value": "کلاس‌های ویژه",
-		"type": "text"
-	},
-	{
-		"key": "filter_week_type",
-		"value": "every",
-		"type": "text"
-	},
-	{
-		"key": "filter_use_current_day_of_week",
-		"value": "true",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_use_current_week_type",
-		"value": "true",
-		"type": "text",
-		"disabled": true
-	},
-	{
-		"key": "filter_group_code",
-		"value": "B2",
-		"type": "text"
-	},
-	{
-		"key": "filter_start_time",
-		"value": "09:00",
-		"type": "text"
-	},
-	{
-		"key": "filter_end_time",
-		"value": "13:00",
-		"type": "text"
-	},
-	{
-		"key": "filter_duration_seconds",
-		"value": "180",
-		"type": "text"
-	},
-	{
-		"key": "filter_is_active",
-		"value": "true",
-		"type": "text"
-	}
-]
+								{
+									"key": "title",
+									"value": "تابلوی اطلاع‌رسانی پردیس مرکزی",
+									"type": "text"
+								},
+								{
+									"key": "refresh_interval",
+									"value": "120",
+									"type": "text"
+								},
+								{
+									"key": "layout_theme",
+									"value": "dark",
+									"type": "text"
+								},
+								{
+									"key": "filter_title",
+									"value": "کلاس‌های ویژه",
+									"type": "text"
+								},
+								{
+									"key": "filter_week_type",
+									"value": "every",
+									"type": "text"
+								},
+								{
+									"key": "filter_use_current_day_of_week",
+									"value": "true",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_use_current_week_type",
+									"value": "true",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "filter_group_code",
+									"value": "B2",
+									"type": "text"
+								},
+								{
+									"key": "filter_start_time",
+									"value": "09:00",
+									"type": "text"
+								},
+								{
+									"key": "filter_end_time",
+									"value": "13:00",
+									"type": "text"
+								},
+								{
+									"key": "filter_duration_seconds",
+									"value": "180",
+									"type": "text"
+								},
+								{
+									"key": "filter_is_active",
+									"value": "true",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/displays/screens/{{screen_id}}/update/",
@@ -590,6 +588,9 @@
 				{
 					"name": "Login",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -597,12 +598,12 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "erfan",
+									"value": "Alirezza",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "7634",
+									"value": "AA1212aa",
 									"type": "text"
 								}
 							]
@@ -644,210 +645,6 @@
 				}
 			]
 		},
-                {
-                        "name": "Accounts",
-                        "item": [
-                                {
-                                        "name": "POST - Change Password",
-                                        "event": [
-                                                {
-                                                        "listen": "test",
-                                                        "script": {
-                                                                "type": "text/javascript",
-                                                                "exec": [
-                                                                        "pm.test(\"Status code is 200 or 400\", function () {",
-                                                                        "    pm.expect([200, 400]).to.include(pm.response.code);",
-                                                                        "});",
-                                                                        "",
-                                                                        "if (pm.response.code === 200) {",
-                                                                        "    const jsonData = pm.response.json();",
-                                                                        "    pm.test(\"Password change succeeded\", function () {",
-                                                                        "        pm.expect(jsonData.success).to.be.true;",
-                                                                        "        pm.expect(jsonData.code).to.eql(2002);",
-                                                                        "    });",
-                                                                        "} else if (pm.response.code === 400) {",
-                                                                        "    const jsonData = pm.response.json();",
-                                                                        "    pm.test(\"Password change error response\", function () {",
-                                                                        "        pm.expect(jsonData.success).to.be.false;",
-                                                                        "        pm.expect(jsonData.code).to.be.oneOf([\"4000\", \"4704\"]);",
-                                                                        "    });",
-                                                                        "}"
-                                                                ]
-                                                        }
-                                                }
-                                        ],
-                                        "request": {
-                                                "method": "POST",
-                                                "header": [
-                                                        {
-                                                                "key": "Authorization",
-                                                                "value": "Token {{token}}",
-                                                                "type": "text"
-                                                        },
-                                                        {
-                                                                "key": "Content-Type",
-                                                                "value": "multipart/form-data",
-                                                                "type": "text"
-                                                        }
-                                                ],
-                                                "body": {
-                                                        "mode": "formdata",
-                                                        "formdata": [
-                                                                {
-                                                                        "key": "old_password",
-                                                                        "value": "OldPassword123!",
-                                                                        "type": "text"
-                                                                },
-                                                                {
-                                                                        "key": "new_password",
-                                                                        "value": "NewPassword456!",
-                                                                        "type": "text"
-                                                                },
-                                                                {
-                                                                        "key": "confirm_new_password",
-                                                                        "value": "NewPassword456!",
-                                                                        "type": "text"
-                                                                }
-                                                        ]
-                                                },
-                                                "url": {
-                                                        "raw": "{{base_url}}api/accounts/change-password/",
-                                                        "host": [
-                                                                "{{base_url}}api"
-                                                        ],
-                                                        "path": [
-                                                                "accounts",
-                                                                "change-password",
-                                                                ""
-                                                        ]
-                                                },
-                                                "description": "StartFragment\n\n# \ud83d\udcc4 `POST - Change Password`\n\n**Folder:** `Accounts/`  \\n**Request Name:** `POST - Change Password`\n\n---\n\n## \u2705 Description\n\nAllows an authenticated account to securely change its password using the current password and a confirmed new password.\n\n---\n\n## \ud83d\udd17 Endpoint\n\n```\nPOST {{base_url}}/api/accounts/change-password/\n\n ```\n\n---\n\n## \ud83d\udd10 Authentication\n\nToken authentication required. Include `Authorization: Token {{token}}`.\n\n---\n\n## \ud83d\udcc5 Request Body (form-data)\n\n| Field | Type | Required | Description |\n| --- | --- | --- | --- |\n| `old_password` | string | \u2705 | Current account password |\n| `new_password` | string | \u2705 | Desired new password that meets policy requirements |\n| `confirm_new_password` | string | \u2705 | Must exactly match `new_password` |\n\n``` json\n{\n  \"old_password\": \"OldPassword123!\",\n  \"new_password\": \"NewPassword456!\",\n  \"confirm_new_password\": \"NewPassword456!\"\n}\n\n ```\n\n---\n\n## \ud83d\udce4 Success Response\n\n**Status Code:** `200 OK`\n\nUses `SuccessCodes.PASSWORD_CHANGE_SUCCESS`.\n\n``` json\n{\n  \"success\": true,\n  \"code\": 2002,\n  \"message\": \"\u0631\u0645\u0632 \u0639\u0628\u0648\u0631 \u0628\u0627 \u0645\u0648\u0641\u0642\u06cc\u062a \u062a\u063a\u06cc\u06cc\u0631 \u06a9\u0631\u062f.\",\n  \"data\": {},\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n ```\n\n---\n\n## \u26a0\ufe0f Error Responses\n\n### \u274c Validation Failed\n\n**Status Code:** `400 BAD REQUEST`\n\nTriggered when new password confirmation mismatches or violates policy. Maps to `ErrorCodes.VALIDATION_FAILED`.\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4000\",\n  \"message\": \"\u0627\u0637\u0644\u0627\u0639\u0627\u062a \u0648\u0627\u0631\u062f \u0634\u062f\u0647 \u0646\u0627\u0645\u0639\u062a\u0628\u0631 \u0627\u0633\u062a.\",\n  \"errors\": {\n    \"confirm_new_password\": [\"The two password fields didn\\u2019t match.\"]\n  },\n  \"data\": {}\n}\n\n ```\n\n### \u274c Incorrect Current Password\n\n**Status Code:** `400 BAD REQUEST`\n\nUses `ErrorCodes.PASSWORD_INCORRECT`.\n\n``` json\n{\n  \"success\": false,\n  \"code\": \"4704\",\n  \"message\": \"\u0631\u0645\u0632 \u0639\u0628\u0648\u0631 \u0641\u0639\u0644\u06cc \u0646\u0627\u062f\u0631\u0633\u062a \u0627\u0633\u062a.\",\n  \"errors\": [\"The current password provided is incorrect.\"],\n  \"data\": {}\n}\n\n ```\n\n### \u274c Missing Authentication Token\n\n**Status Code:** `401 UNAUTHORIZED`\n\nReturned when `Authorization` header is absent or invalid.\n\n### \u274c Institution Missing\n\n**Status Code:** `403 FORBIDDEN`\n\nReturned when the authenticated user is not associated with an institution (if enforced). Maps to `ErrorCodes.INSTITUTION_REQUIRED`.\n\n### \ud83d\udca5 Internal Server Error\n\n**Status Code:** `500 INTERNAL SERVER ERROR`\n\nUnexpected failure while changing the password. Maps to `ErrorCodes.PASSWORD_CHANGE_FAILED`.\n\n---\n\n## \ud83e\uddea Key Test Scenarios\n\n### \u2705 Successful Password Change\n- Provide correct `old_password` and matching strong new password.\n- Expect `200` with code `2002`.\n\n### \u274c Incorrect Current Password\n- Provide wrong `old_password`.\n- Expect `400` with `ErrorCodes.PASSWORD_INCORRECT`.\n\n### \u274c Validation Errors\n- Provide mismatched confirmation or weak password.\n- Expect `400` with validation details.\n\n### \u26a0\ufe0f Missing Token\n- Omit the `Authorization` header to trigger `401`.\n\n### \u26a0\ufe0f Institution Enforcement\n- Attempt when the user lacks an institution to trigger `403`.\n\n---\n\n## \ud83d\udccc Notes\n\n- After success, prompt the user to re-authenticate with the new credentials.\n- Update stored credentials (e.g., password managers) immediately.\n\n---\n\n## \ud83d\udd27 Implementation Reference\n\n- **View:** `accounts.views.change_password_view`\n- **Serializer:** `ChangePasswordSerializer`\n- **Success Code:** `SuccessCodes.PASSWORD_CHANGE_SUCCESS`\n- **Error Codes:** `ErrorCodes.PASSWORD_INCORRECT`, `ErrorCodes.VALIDATION_FAILED`, `ErrorCodes.PASSWORD_CHANGE_FAILED`\n\nEndFragment"
-                                        },
-                                        "response": [
-                                                {
-                                                        "name": "200 OK - Password Changed",
-                                                        "originalRequest": {
-                                                                "method": "POST",
-                                                                "header": [
-                                                                        {
-                                                                                "key": "Authorization",
-                                                                                "value": "Token {{token}}",
-                                                                                "type": "text"
-                                                                        },
-                                                                        {
-                                                                                "key": "Content-Type",
-                                                                                "value": "multipart/form-data",
-                                                                                "type": "text"
-                                                                        }
-                                                                ],
-                                                                "body": {
-                                                                        "mode": "formdata",
-                                                                        "formdata": [
-                                                                                {
-                                                                                        "key": "old_password",
-                                                                                        "value": "OldPassword123!",
-                                                                                        "type": "text"
-                                                                                },
-                                                                                {
-                                                                                        "key": "new_password",
-                                                                                        "value": "NewPassword456!",
-                                                                                        "type": "text"
-                                                                                },
-                                                                                {
-                                                                                        "key": "confirm_new_password",
-                                                                                        "value": "NewPassword456!",
-                                                                                        "type": "text"
-                                                                                }
-                                                                        ]
-                                                                },
-                                                                "url": {
-                                                                        "raw": "{{base_url}}api/accounts/change-password/",
-                                                                        "host": [
-                                                                                "{{base_url}}api"
-                                                                        ],
-                                                                        "path": [
-                                                                                "accounts",
-                                                                                "change-password",
-                                                                                ""
-                                                                        ]
-                                                                }
-                                                        },
-                                                        "status": "OK",
-                                                        "code": 200,
-                                                        "_postman_previewlanguage": "json",
-                                                        "header": [
-                                                                {
-                                                                        "key": "Content-Type",
-                                                                        "value": "application/json"
-                                                                }
-                                                        ],
-                                                        "cookie": [],
-                                                        "body": "{\n    \"success\": true,\n    \"code\": 2002,\n    \"message\": \"\\u0631\\u0645\\u0632 \\u0639\\u0628\\u0648\\u0631 \\u0628\\u0627 \\u0645\\u0648\\u0641\\u0642\\u06cc\\u062a \\u062a\\u063a\\u06cc\\u06cc\\u0631 \\u06a9\\u0631\\u062f.\",\n    \"data\": {},\n    \"warnings\": [],\n    \"meta\": {}\n}"
-                                                },
-                                                {
-                                                        "name": "400 BAD REQUEST - Incorrect Current Password",
-                                                        "originalRequest": {
-                                                                "method": "POST",
-                                                                "header": [
-                                                                        {
-                                                                                "key": "Authorization",
-                                                                                "value": "Token {{token}}",
-                                                                                "type": "text"
-                                                                        },
-                                                                        {
-                                                                                "key": "Content-Type",
-                                                                                "value": "multipart/form-data",
-                                                                                "type": "text"
-                                                                        }
-                                                                ],
-                                                                "body": {
-                                                                        "mode": "formdata",
-                                                                        "formdata": [
-                                                                                {
-                                                                                        "key": "old_password",
-                                                                                        "value": "OldPassword123!",
-                                                                                        "type": "text"
-                                                                                },
-                                                                                {
-                                                                                        "key": "new_password",
-                                                                                        "value": "NewPassword456!",
-                                                                                        "type": "text"
-                                                                                },
-                                                                                {
-                                                                                        "key": "confirm_new_password",
-                                                                                        "value": "NewPassword456!",
-                                                                                        "type": "text"
-                                                                                }
-                                                                        ]
-                                                                },
-                                                                "url": {
-                                                                        "raw": "{{base_url}}api/accounts/change-password/",
-                                                                        "host": [
-                                                                                "{{base_url}}api"
-                                                                        ],
-                                                                        "path": [
-                                                                                "accounts",
-                                                                                "change-password",
-                                                                                ""
-                                                                        ]
-                                                                }
-                                                        },
-                                                        "status": "Bad Request",
-                                                        "code": 400,
-                                                        "_postman_previewlanguage": "json",
-                                                        "header": [
-                                                                {
-                                                                        "key": "Content-Type",
-                                                                        "value": "application/json"
-                                                                }
-                                                        ],
-                                                        "cookie": [],
-                                                        "body": "{\n    \"success\": false,\n    \"code\": \"4704\",\n    \"message\": \"\\u0631\\u0645\\u0632 \\u0639\\u0628\\u0648\\u0631 \\u0641\\u0639\\u0644\\u06cc \\u0646\\u0627\\u062f\\u0631\\u0633\\u062a \\u0627\\u0633\\u062a.\",\n    \"errors\": [\n        \"The current password provided is incorrect.\"\n    ],\n    \"data\": {}\n}"
-                                                }
-                                        ]
-                                }
-                        ]
-                },
 		{
 			"name": "Semesters",
 			"item": [
@@ -1342,7 +1139,13 @@
 							"name": "List Buildings",
 							"request": {
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Token 4a3e2def6430b53180af595756ed6e7140a9c486",
+										"type": "text"
+									}
+								],
 								"url": {
 									"raw": "{{base_url}}/api/locations/buildings/",
 									"host": [
@@ -1356,6 +1159,41 @@
 									]
 								},
 								"description": "StartFragment\n\n# 📄 `GET - List Buildings`\n\n**Folder:** `Buildings/`  \n**Request Name:** `GET - List Buildings`\n\n---\n\n## ✅ Description\n\nReturns all buildings for the authenticated user's institution. Only buildings that are not soft-deleted (`is_deleted = False`) will be returned.\n\n---\n\n## 🔗 Endpoint\n\n```\nGET {{base_url}}/api/locations/buildings/\n\n ```\n\n---\n\n## 🔐 Authentication\n\nThis endpoint **requires authentication**.\n\n- Header:\n    \n\n``` http\nAuthorization: Token {{token}}\n\n ```\n\n---\n\n## 📥 Request Body\n\n_None_\n\n---\n\n## 📤 Success Response\n\n**Status Code:** `200 OK`\n\n``` json\n{\n  \"success\": true,\n  \"code\": 2500,\n  \"message\": \"لیست ساختمان‌ها با موفقیت دریافت شد.\",\n  \"data\": {\n    \"buildings\": [\n      {\n        \"id\": 1,\n        \"title\": \"ساختمان شماره یک\",\n        \"institution\": 3\n      },\n      {\n        \"id\": 2,\n        \"title\": \"دانشکده علوم پایه\",\n        \"institution\": 3\n      }\n    ]\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n\n ```\n\n---\n\n## ⚠️ Error Responses\n\n### 🔒 401 Unauthorized - Missing Token\n\n``` json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n\n ```\n\n### 🔒 401 Unauthorized - Invalid Token\n\n``` json\n{\n  \"detail\": \"Invalid token.\"\n}\n\n ```\n\n### ⛔ 403 Forbidden\n\n``` json\n{\n  \"detail\": \"You do not have permission to perform this action.\"\n}\n\n ```\n\n### 💥 500 Internal Server Error\n\n``` json\n{\n  \"success\": false,\n  \"code\": 4500,\n  \"message\": \"دریافت لیست ساختمان‌ها با خطا مواجه شد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n\n ```\n\n---\n\n## 🧪 Test Scenarios\n\n### ✅ Success Case\n\n- **When:** Valid token and buildings exist\n    \n- **Then:** Returns 200 with list of buildings\n    \n\n### ❌ No Buildings Exist\n\n- **Then:** Returns empty array\n    \n\n``` json\n\"buildings\": []\n\n ```\n\n### 🚫 Unauthorized\n\n- **Then:** Returns 401\n    \n\n### 💥 Internal Server Error\n\n- **Then:** Returns 500 with code `4500`\n    \n\n---\n\n## 📌 Notes\n\n- Only buildings belonging to the authenticated user's institution are returned\n    \n- Buildings marked as `is_deleted = True` are excluded\n    \n\n---\n\n## 🏷️ Tags\n\n`#Buildings` `#List` `#GET`\n\n---\n\n## 🛠️ Implementation Reference\n\n- **URL:** `/api/locations/buildings/`\n    \n- **View:** `list_buildings_view`\n    \n- **Service:** `list_buildings()`\n    \n- **Repository:** `list_buildings_by_institution()`\n    \n- **Serializer:** `BuildingSerializer`\n    \n- **Model:** `Building`\n    \n\n---\n\nEndFragment"
+							},
+							"response": []
+						},
+						{
+							"name": "List BuildingsCopy",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Token 4a3e2def6430b53180af595756ed6e7140a9c486",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{base_url}}api/schedules/",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"schedules",
+										""
+									]
+								},
+								"description": "### شرح\nنمایش فهرست تمام جلسات کلاسی ثبت‌شده.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2602\",\n  \"message\": \"لیست جلسات کلاس با موفقیت دریافت شد.\",\n  \"data\": {\n    \"class_sessions\": [\n      {\n        \"id\": 1,\n        \"course\": 1,\n        \"professor\": 1,\n        \"classroom\": 1,\n        \"semester\": 1,\n        \"day_of_week\": \"شنبه\",\n        \"start_time\": \"09:00\",\n        \"end_time\": \"11:00\",\n        \"week_type\": \"every\",\n        \"group_code\": \"A1\",\n        \"capacity\": 30,\n        \"note\": \"جلسه اول\"\n      }\n    ]\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"500\",\n  \"message\": \"خطای داخلی سرور.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ درخواست معتبر با توکن → 200 OK\n- ❌ نبود توکن → 401 Unauthorized\n- ❌ خطای سرور → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#List` `#GET`"
 							},
 							"response": []
 						},
@@ -1644,8 +1482,17 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token 4a3e2def6430b53180af595756ed6e7140a9c486",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": []
@@ -1892,7 +1739,12 @@
 		"apikey": [
 			{
 				"key": "value",
-				"value": "Token {{token}}",
+				"value": "Token 4a3e2def6430b53180af595756ed6e7140a9c486",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "header",
 				"type": "string"
 			},
 			{
