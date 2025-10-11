@@ -266,6 +266,41 @@ class DisplayServiceViewAdminTests(TestCase):
         response = unauthenticated.get("/api/displays/screens/")
         self.assertEqual(response.status_code, 401)
 
+    def test_list_display_screens_returns_paginated_response(self):
+        """List endpoint must follow BaseResponse pagination contract."""
+
+        for index in range(11):
+            DisplayScreen.objects.create(
+                institution=self.institution,
+                title=f"Extra Screen {index}",
+            )
+
+        response = self.api_client.get("/api/displays/screens/")
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.data
+        self.assertIn("data", payload)
+        self.assertIn("meta", payload)
+
+        screens = payload["data"]["screens"]
+        meta = payload["meta"]
+
+        self.assertEqual(len(screens), 10)
+        self.assertEqual(meta["total_count"], 12)
+        self.assertEqual(meta["total_pages"], 2)
+        self.assertEqual(meta["current_page"], 1)
+        self.assertTrue(meta["has_more"])
+        self.assertFalse(meta["is_last_page"])
+
+        second_page = self.api_client.get("/api/displays/screens/", {"page": 2})
+        self.assertEqual(second_page.status_code, 200)
+
+        second_meta = second_page.data["meta"]
+        self.assertEqual(len(second_page.data["data"]["screens"]), 2)
+        self.assertEqual(second_meta["current_page"], 2)
+        self.assertTrue(second_meta["is_last_page"])
+        self.assertFalse(second_meta["has_more"])
+
     def test_api_screen_and_filter_flow(self):
         screen_response = self.api_client.post(
             "/api/displays/screens/create/",
