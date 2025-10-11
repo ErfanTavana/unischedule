@@ -524,12 +524,55 @@ class DisplayServiceViewAdminTests(TestCase):
         self._update_screen_filter(
             filter_classroom=self.classroom.id,
             filter_day_of_week="شنبه",
+            filter_is_active=True,
         )
 
         json_response = self.client.get(f"/displays/{self.screen.slug}/")
         self.assertEqual(json_response.status_code, 200)
-        self.assertTrue(json_response.json()["success"])
+        payload = json_response.json()
+        self.assertTrue(payload["success"])
         self.assertEqual(json_response["Content-Type"], "application/json")
+        self.assertIn("meta", payload)
+
+        meta = payload["meta"]
+        sessions = payload["data"]["sessions"]
+
+        self.assertEqual(meta["current_page"], 1)
+        self.assertEqual(meta["total_pages"], 1)
+        self.assertEqual(meta["items_on_page"], len(sessions))
+        self.assertEqual(meta["total_count"], len(sessions))
+
+    def test_public_view_paginates_sessions(self):
+        """Public endpoint must expose page navigators for kiosk clients."""
+        for index in range(3):
+            self._create_session(start_time=time(8 + index, 0), end_time=time(9 + index, 0))
+
+        response = self.client.get(
+            f"/displays/{self.screen.slug}/",
+            {"page_size": 1},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertEqual(len(data["data"]["sessions"]), 1)
+        meta = data["meta"]
+        self.assertEqual(meta["page_size"], 1)
+        self.assertEqual(meta["total_count"], 3)
+        self.assertEqual(meta["total_pages"], 3)
+        self.assertEqual(meta["current_page"], 1)
+        self.assertTrue(meta["has_more"])
+
+        second_page = self.client.get(
+            f"/displays/{self.screen.slug}/",
+            {"page": 2, "page_size": 1},
+        )
+        self.assertEqual(second_page.status_code, 200)
+        second_payload = second_page.json()
+        second_meta = second_payload["meta"]
+
+        self.assertEqual(len(second_payload["data"]["sessions"]), 1)
+        self.assertEqual(second_meta["current_page"], 2)
+        self.assertFalse(second_meta["is_first_page"])
 
     def test_admin_preview_action_returns_redirect(self):
         factory = RequestFactory()

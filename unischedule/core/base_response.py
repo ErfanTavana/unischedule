@@ -95,38 +95,53 @@ class BaseResponse:
     def paginate_queryset(
         queryset,
         request,
-        serializer_class,
+        serializer_class=None,
         message="عملیات موفقیت‌آمیز بود.",
         status_code=status.HTTP_200_OK,
         code=1000,
         warnings=None,
         extra_data=None,
-        data_key='items'
+        data_key='items',
+        extra_data_key='extra_data'
     ):
         """Serialize and wrap a queryset in the standard paginated response.
 
         Args:
             queryset (QuerySet): Data collection that should be paginated.
             request (Request): DRF request used to resolve paging parameters.
-            serializer_class (Serializer): Serializer used to render each item.
+            serializer_class (Serializer|None): Serializer used to render each item. If
+                ``None`` the already-serialised ``queryset`` values are returned as-is.
             message (str): Success message to display to clients.
             status_code (int): HTTP status code for the response.
             code (int): Logical success code that complements HTTP status codes.
             warnings (list): Optional warnings that should accompany the result.
             extra_data (dict): Extra payload that should travel with the list.
             data_key (str): Dict key under which the serialized list is stored.
+            extra_data_key (str|None): Key used to include ``extra_data`` in the
+                response. When set to ``None`` the dict is merged directly into the
+                response alongside the list key.
 
         Returns:
             Response: DRF response compatible with :class:`DefaultPageNumberPagination`.
         """
         paginator = DefaultPageNumberPagination()
         paginated_queryset = paginator.paginate_queryset(queryset, request) or []
-        serializer = serializer_class(paginated_queryset, many=True)
 
-        response_data = {data_key: serializer.data}
+        if serializer_class is not None:
+            serializer = serializer_class(paginated_queryset, many=True)
+            serialized_items = serializer.data
+        else:
+            serialized_items = paginated_queryset
 
-        if extra_data:
-            response_data["extra_data"] = extra_data
+        response_data = {data_key: serialized_items}
+
+        if extra_data is not None:
+            if extra_data_key is None:
+                if not isinstance(extra_data, dict):
+                    raise ValueError("extra_data must be a dict when extra_data_key is None")
+                response_data.update(extra_data)
+            else:
+                response_data[extra_data_key] = extra_data
 
         total_pages = paginator.page.paginator.num_pages
         current_page = paginator.page.number
