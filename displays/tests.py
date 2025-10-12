@@ -363,6 +363,43 @@ class DisplayServiceViewAdminTests(TestCase):
         retrieved_screen = retrieve_response.data["data"]["screen"]
         self.assertFalse(retrieved_screen["filter_is_active"])
 
+    def test_api_accepts_page_pause_seconds_alias(self):
+        response = self.api_client.post(
+            "/api/displays/screens/create/",
+            {
+                "title": "Paused",
+                "refresh_interval": 30,
+                "layout_theme": "default",
+                "filter_page_pause_seconds": 12,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        screen_data = response.data["data"]["screen"]
+        self.assertEqual(screen_data["filter_duration_seconds"], 12)
+        self.assertEqual(screen_data["filter_page_pause_seconds"], 12)
+
+        screen_id = screen_data["id"]
+        update_response = self.api_client.put(
+            f"/api/displays/screens/{screen_id}/update/",
+            {"filter_page_pause_seconds": 7},
+            format="json",
+        )
+
+        self.assertEqual(update_response.status_code, 200)
+        updated_screen = update_response.data["data"]["screen"]
+        self.assertEqual(updated_screen["filter_duration_seconds"], 7)
+        self.assertEqual(updated_screen["filter_page_pause_seconds"], 7)
+
+        screen = DisplayScreen.objects.get(pk=screen_id)
+        self.assertEqual(screen.filter_duration_seconds, 7)
+        self.assertEqual(screen.filter_page_pause_seconds, 7)
+
+        payload = display_service.build_public_payload(screen, use_cache=False)
+        self.assertEqual(payload["filter"]["duration_seconds"], 7)
+        self.assertEqual(payload["filter"]["page_pause_seconds"], 7)
+
     def test_api_allows_creating_screen_without_selectors(self):
         response = self.api_client.post(
             "/api/displays/screens/create/",

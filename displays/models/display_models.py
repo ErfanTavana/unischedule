@@ -163,6 +163,11 @@ class DisplayScreen(BaseModel):
         default=0,
         verbose_name="مدت نمایش (ثانیه)",
     )
+    filter_page_pause_seconds = models.PositiveIntegerField(
+        default=0,
+        verbose_name="مدت مکث صفحه (ثانیه)",
+        help_text="مقدار مکث بین نمایش صفحات در نمایشگر عمومی.",
+    )
     filter_is_active = models.BooleanField(
         default=True,
         verbose_name="فیلتر فعال است؟",
