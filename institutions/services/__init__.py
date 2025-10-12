@@ -5,6 +5,9 @@ from .institution_service import (
     get_institution_by_id_or_404,
     update_institution,
     delete_institution,
+    get_institution_logo,
+    update_institution_logo,
+    delete_institution_logo,
 )
 
 __all__ = [
@@ -14,4 +17,7 @@ __all__ = [
     "get_institution_by_id_or_404",
     "update_institution",
     "delete_institution",
+    "get_institution_logo",
+    "update_institution_logo",
+    "delete_institution_logo",
 ]

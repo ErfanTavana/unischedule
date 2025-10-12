@@ -41,6 +41,21 @@ class SuccessCodes:
         "message": "مؤسسه با موفقیت حذف شد.",
         "data": {},
     }
+    INSTITUTION_LOGO_RETRIEVED = {
+        "code": "2805",
+        "message": "لوگوی مؤسسه با موفقیت دریافت شد.",
+        "data": {},
+    }
+    INSTITUTION_LOGO_UPDATED = {
+        "code": "2806",
+        "message": "لوگوی مؤسسه با موفقیت به‌روزرسانی شد.",
+        "data": {},
+    }
+    INSTITUTION_LOGO_DELETED = {
+        "code": "2807",
+        "message": "لوگوی مؤسسه با موفقیت حذف شد.",
+        "data": {},
+    }
 
     # Semesters: the 21xx series communicates academic term lifecycle events.
     SEMESTER_CREATED = {

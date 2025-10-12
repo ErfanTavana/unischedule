@@ -10,6 +10,13 @@ class Institution(BaseModel):
 
     name = models.CharField(max_length=255, unique=True, verbose_name="نام")
     slug = models.SlugField(max_length=255, unique=True, verbose_name="نامک")
+    logo = models.FileField(
+        upload_to="institution_logos/",
+        null=True,
+        blank=True,
+        verbose_name="لوگو",
+        help_text="مسیر فایل لوگوی مؤسسه.",
+    )
     is_active = models.BooleanField(default=True, verbose_name="فعال")
 
     class Meta:

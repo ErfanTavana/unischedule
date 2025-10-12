@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import shutil
+import tempfile
 from datetime import date, time
 from unittest.mock import patch
 
 from django.contrib.admin.sites import AdminSite
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponseRedirect
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from rest_framework.test import APIClient
 
 from accounts.models import User
@@ -27,6 +30,12 @@ class DisplayServiceViewAdminTests(TestCase):
     maxDiff = None
 
     def setUp(self):
+        self.tempdir = tempfile.mkdtemp(prefix="display-logos-")
+        self.addCleanup(shutil.rmtree, self.tempdir, ignore_errors=True)
+        override = override_settings(MEDIA_ROOT=self.tempdir)
+        override.enable()
+        self.addCleanup(override.disable)
+
         self.institution = Institution.objects.create(name="Inst", slug="inst")
         self.other_institution = Institution.objects.create(name="Other", slug="other")
         self.user = User.objects.create_user(
@@ -205,6 +214,20 @@ class DisplayServiceViewAdminTests(TestCase):
 
         self.assertSetEqual(session_ids, {odd_session.id, even_session.id, every_session.id})
         self.assertIsNone(payload["filter"]["computed_week_type"])
+
+    def test_public_payload_includes_institution_logo(self):
+        self.institution.logo.save(
+            "logo.png",
+            SimpleUploadedFile("logo.png", b"logo-bytes", content_type="image/png"),
+            save=True,
+        )
+        cache.delete(f"display:{self.screen.slug}")
+
+        payload = display_service.build_public_payload(self.screen, use_cache=False)
+
+        self.assertIn("institution", payload)
+        self.assertEqual(payload["institution"]["id"], self.institution.id)
+        self.assertIsNotNone(payload["institution"]["logo_url"])
 
     def test_service_filters_by_building_group_and_time_range(self):
         """Combined building, group and time filters narrow sessions correctly."""
