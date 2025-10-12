@@ -1,7 +1,10 @@
 from django.contrib.auth import authenticate
-from accounts.repositories import get_token_by_user, delete_token
+from accounts.repositories import (
+    delete_token,
+    get_or_create_token_by_user,
+    get_token_by_user,
+)
 from accounts.serializers import LoginSerializer, ChangePasswordSerializer
-from rest_framework.authtoken.models import Token
 from unischedule.core.exceptions import CustomValidationError
 from unischedule.core.error_codes import ErrorCodes
 
@@ -46,9 +49,7 @@ def login_user(data: dict) -> dict:
         )
 
     # Get or create token via repository
-    token = get_token_by_user(user)
-    if not token:
-        token = Token.objects.create(user=user)
+    token = get_or_create_token_by_user(user)
 
     return {
         "token": token.key,
