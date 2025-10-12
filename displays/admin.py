@@ -55,6 +55,7 @@ class DisplayScreenAdmin(admin.ModelAdmin):
                     "filter_use_current_week_type",
                     "filter_date_override",
                     "filter_duration_seconds",
+                    "filter_page_pause_seconds",
                 )
             },
         ),

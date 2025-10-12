@@ -55,6 +55,7 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
             "filter_group_code",
             "filter_capacity",
             "filter_duration_seconds",
+            "filter_page_pause_seconds",
             "filter_is_active",
             "filter_computed_day_of_week",
             "filter_computed_week_type",
@@ -114,6 +115,7 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
     filter_group_code = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     filter_capacity = serializers.IntegerField(required=False, allow_null=True, min_value=0)
     filter_duration_seconds = serializers.IntegerField(required=False, min_value=0)
+    filter_page_pause_seconds = serializers.IntegerField(required=False, min_value=0)
     filter_is_active = serializers.BooleanField(required=False)
 
     class Meta:
@@ -139,6 +141,7 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
             "filter_group_code",
             "filter_capacity",
             "filter_duration_seconds",
+            "filter_page_pause_seconds",
             "filter_is_active",
         ]
 
@@ -154,6 +157,14 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         instance = self.instance
+
+        provided_page_pause = attrs.get("filter_page_pause_seconds", serializers.empty)
+        provided_duration = attrs.get("filter_duration_seconds", serializers.empty)
+
+        if provided_page_pause is not serializers.empty:
+            attrs["filter_duration_seconds"] = provided_page_pause
+        elif provided_duration is not serializers.empty:
+            attrs["filter_page_pause_seconds"] = provided_duration
 
         day_of_week = attrs.get("filter_day_of_week", serializers.empty)
         if day_of_week is not serializers.empty:
@@ -203,6 +214,12 @@ class DisplayScreenWriteSerializer(serializers.ModelSerializer):
         duration = attrs.get("filter_duration_seconds", serializers.empty)
         if duration is serializers.empty and instance is None:
             attrs.setdefault("filter_duration_seconds", 0)
+
+        page_pause = attrs.get("filter_page_pause_seconds", serializers.empty)
+        if page_pause is serializers.empty and instance is None:
+            attrs.setdefault(
+                "filter_page_pause_seconds", attrs.get("filter_duration_seconds", 0)
+            )
 
         filter_is_active_provided = "filter_is_active" in attrs
         if filter_is_active_provided:
@@ -358,6 +375,7 @@ class DisplayPublicFilterSerializer(serializers.Serializer):
             if instance.filter_date_override
             else None,
             "duration_seconds": instance.filter_duration_seconds,
+            "page_pause_seconds": instance.filter_page_pause_seconds,
             "is_active": instance.filter_is_active,
         }
 
