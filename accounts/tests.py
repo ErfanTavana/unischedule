@@ -1,11 +1,14 @@
 import shutil
 import tempfile
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.authtoken.models import Token
 
 from institutions.models import Institution
 from unischedule.core.error_codes import ErrorCodes
@@ -170,3 +173,34 @@ class InstitutionLogoAPITestCase(TestCase):
         self.assertTrue(response.data["success"])
         self.assertEqual(response.data["code"], SuccessCodes.INSTITUTION_LOGO_DELETED["code"])
         self.assertIsNone(response.data["data"]["institution"]["logo_url"])
+
+
+class LoginAPITestCase(TestCase):
+    """Authentication endpoint tests covering login edge cases."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            username="login-user",
+            password="StrongPassword123!",
+        )
+        self.url = "/api/auth/login/"
+
+    def test_login_handles_token_race_condition(self):
+        """Simulate a concurrent token creation to ensure login still succeeds."""
+
+        payload = {"username": "login-user", "password": "StrongPassword123!"}
+        original_create = Token.objects.create
+
+        def fake_create(*args, **kwargs):
+            original_create(*args, **kwargs)
+            raise IntegrityError("duplicate key value violates unique constraint")
+
+        with patch("accounts.repositories.auth_repository.Token.objects.create", side_effect=fake_create):
+            response = self.client.post(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+        self.assertEqual(response.data["code"], SuccessCodes.LOGIN_SUCCESS["code"])
+        self.assertIn("token", response.data["data"])
+        self.assertEqual(Token.objects.filter(user=self.user).count(), 1)
