@@ -7,10 +7,33 @@ from institutions.models import Institution
 class InstitutionSerializer(serializers.ModelSerializer):
     """Serialize institution instances for API responses."""
 
+    logo_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Institution
-        fields = ("id", "name", "slug", "is_active", "created_at", "updated_at")
-        read_only_fields = ("id", "created_at", "updated_at")
+        fields = (
+            "id",
+            "name",
+            "slug",
+            "logo",
+            "logo_url",
+            "is_active",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "created_at", "updated_at", "logo_url")
+
+    def get_logo_url(self, obj: Institution) -> str | None:
+        if not obj.logo:
+            return None
+        request = self.context.get("request") if hasattr(self, "context") else None
+        try:
+            url = obj.logo.url
+        except ValueError:
+            return None
+        if request is not None:
+            return request.build_absolute_uri(url)
+        return url
 
 
 class BaseInstitutionSerializer(serializers.ModelSerializer):
@@ -18,7 +41,10 @@ class BaseInstitutionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Institution
-        fields = ("name", "slug", "is_active")
+        fields = ("name", "slug", "is_active", "logo")
+        extra_kwargs = {
+            "logo": {"required": False, "allow_null": True},
+        }
 
     def validate_slug(self, value: str) -> str:
         """Normalize the slug and ensure it stays unique among active institutions."""
@@ -54,3 +80,27 @@ class UpdateInstitutionSerializer(BaseInstitutionSerializer):
             setattr(instance, field, value)
         instance.save()
         return instance
+
+
+class InstitutionLogoSerializer(serializers.ModelSerializer):
+    """Dedicated serializer for exposing and mutating institution logos."""
+
+    logo = serializers.FileField(required=False, allow_null=True, write_only=True)
+    logo_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Institution
+        fields = ("id", "name", "slug", "logo", "logo_url")
+        read_only_fields = ("id", "name", "slug", "logo_url")
+
+    def get_logo_url(self, obj: Institution) -> str | None:
+        if not obj.logo:
+            return None
+        request = self.context.get("request") if hasattr(self, "context") else None
+        try:
+            url = obj.logo.url
+        except ValueError:
+            return None
+        if request is not None:
+            return request.build_absolute_uri(url)
+        return url

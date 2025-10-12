@@ -1,8 +1,13 @@
+import shutil
+import tempfile
+
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APIClient
-from django.test import TestCase
 
+from institutions.models import Institution
 from unischedule.core.error_codes import ErrorCodes
 from unischedule.core.success_codes import SuccessCodes
 
@@ -102,3 +107,66 @@ class ChangePasswordAPITestCase(TestCase):
                 for message in response.data["errors"]["new_password"]
             )
         )
+
+
+class InstitutionLogoAPITestCase(TestCase):
+    """Integration tests for the institution logo management endpoints."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.tempdir = tempfile.mkdtemp(prefix="logo-tests-")
+        self.addCleanup(shutil.rmtree, self.tempdir, ignore_errors=True)
+        override = override_settings(MEDIA_ROOT=self.tempdir)
+        override.enable()
+        self.addCleanup(override.disable)
+
+        self.institution = Institution.objects.create(name="Test Inst", slug="test-inst")
+        self.user = get_user_model().objects.create_user(
+            username="logo-user",
+            password="Password123!",
+            institution=self.institution,
+        )
+        self.client.force_authenticate(user=self.user)
+        self.url = "/api/auth/institution/logo/"
+
+    def _fake_logo(self, name: str = "logo.png") -> SimpleUploadedFile:
+        return SimpleUploadedFile(
+            name,
+            b"fake image bytes",
+            content_type="image/png",
+        )
+
+    def test_get_logo_returns_empty_payload_when_missing(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+        self.assertEqual(response.data["code"], SuccessCodes.INSTITUTION_LOGO_RETRIEVED["code"])
+        self.assertIsNone(response.data["data"]["institution"]["logo_url"])
+
+    def test_put_logo_updates_file(self):
+        response = self.client.put(
+            self.url,
+            data={"logo": self._fake_logo()},
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+        self.assertEqual(response.data["code"], SuccessCodes.INSTITUTION_LOGO_UPDATED["code"])
+        logo_url = response.data["data"]["institution"]["logo_url"]
+        self.assertIsNotNone(logo_url)
+
+    def test_delete_logo_removes_file(self):
+        self.client.put(
+            self.url,
+            data={"logo": self._fake_logo("delete.png")},
+            format="multipart",
+        )
+
+        response = self.client.delete(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+        self.assertEqual(response.data["code"], SuccessCodes.INSTITUTION_LOGO_DELETED["code"])
+        self.assertIsNone(response.data["data"]["institution"]["logo_url"])

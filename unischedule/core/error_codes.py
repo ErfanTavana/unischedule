@@ -69,6 +69,27 @@ class ErrorCodes:
         "errors": [],
         "data": {},
     }
+    INSTITUTION_LOGO_RETRIEVE_FAILED = {
+        "code": "4905",
+        "message": "دریافت لوگوی مؤسسه با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    INSTITUTION_LOGO_UPDATE_FAILED = {
+        "code": "4906",
+        "message": "به‌روزرسانی لوگوی مؤسسه با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
+    INSTITUTION_LOGO_DELETE_FAILED = {
+        "code": "4907",
+        "message": "حذف لوگوی مؤسسه با خطا مواجه شد.",
+        "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "errors": [],
+        "data": {},
+    }
 
     # Semester: 41xx warnings communicate failures on academic terms.
     SEMESTER_NOT_FOUND = {

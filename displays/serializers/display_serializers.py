@@ -27,12 +27,14 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
 
     filter_computed_day_of_week = serializers.SerializerMethodField()
     filter_computed_week_type = serializers.SerializerMethodField()
+    institution_logo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = DisplayScreen
         fields = [
             "id",
             "institution",
+            "institution_logo_url",
             "title",
             "slug",
             "access_token",
@@ -59,6 +61,7 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
             "filter_is_active",
             "filter_computed_day_of_week",
             "filter_computed_week_type",
+            "institution_logo_url",
             "created_at",
             "updated_at",
         ]
@@ -71,6 +74,7 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
             "institution",
             "filter_computed_day_of_week",
             "filter_computed_week_type",
+            "institution_logo_url",
         )
 
     def get_filter_computed_day_of_week(self, obj: DisplayScreen) -> str | None:
@@ -78,6 +82,19 @@ class DisplayScreenSerializer(serializers.ModelSerializer):
 
     def get_filter_computed_week_type(self, obj: DisplayScreen) -> str | None:
         return compute_filter_week_type(obj)
+
+    def get_institution_logo_url(self, obj: DisplayScreen) -> str | None:
+        institution = obj.institution
+        if not institution or not institution.logo:
+            return None
+        request = self.context.get("request") if hasattr(self, "context") else None
+        try:
+            url = institution.logo.url
+        except ValueError:
+            return None
+        if request is not None:
+            return request.build_absolute_uri(url)
+        return url
 
 
 class DisplayScreenWriteSerializer(serializers.ModelSerializer):
@@ -421,9 +438,34 @@ class DisplayPublicPayloadSerializer(serializers.Serializer):
     filter = serializers.SerializerMethodField()
     sessions = DisplayPublicSessionSerializer(many=True, read_only=True)
     generated_at = serializers.DateTimeField(read_only=True)
+    institution = serializers.SerializerMethodField()
 
     def get_filter(self, instance: dict[str, Any]) -> dict[str, Any] | None:
         screen = instance.get("filter") or instance.get("screen")
         if not screen:
             return None
         return DisplayPublicFilterSerializer(screen).data
+
+    def get_institution(self, instance: dict[str, Any]) -> dict[str, Any] | None:
+        screen = instance.get("screen")
+        if not screen:
+            return None
+        institution = screen.institution
+        if not institution:
+            return None
+        logo_url = None
+        if institution.logo:
+            try:
+                logo_url = institution.logo.url
+            except ValueError:
+                logo_url = None
+        if logo_url and hasattr(self, "context"):
+            request = self.context.get("request")
+            if request is not None:
+                logo_url = request.build_absolute_uri(logo_url)
+        return {
+            "id": institution.id,
+            "name": institution.name,
+            "slug": institution.slug,
+            "logo_url": logo_url,
+        }
