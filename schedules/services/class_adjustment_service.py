@@ -63,16 +63,60 @@ def _check_duplicate_cancellation(
         )
 
 
+# Error messages produced by serializers that should map to domain-level
+# CustomValidationError instances for class cancellations.
+_CANCELLATION_DATE_MISMATCH_MESSAGES = {
+    "تاریخ انتخابی با روز برگزاری کلاس همخوانی ندارد.",
+    "تاریخ انتخابی با نوع هفته کلاس همخوانی ندارد.",
+    "تاریخ لغو باید در محدوده ترم مربوطه باشد.",
+}
+
+
+def _normalize_error_details(errors):
+    """Convert DRF ``ErrorDetail`` structures to plain Python objects."""
+
+    if isinstance(errors, dict):
+        return {key: _normalize_error_details(value) for key, value in errors.items()}
+    if isinstance(errors, list):
+        return [_normalize_error_details(item) for item in errors]
+    return str(errors)
+
+
+def _raise_cancellation_validation_error(raw_errors) -> None:
+    """Translate serializer errors into domain-specific validation failures."""
+
+    errors = _normalize_error_details(raw_errors)
+    date_errors = []
+    if isinstance(errors, dict):
+        date_errors = errors.get("date", []) or []
+        if not isinstance(date_errors, list):
+            date_errors = [date_errors]
+
+    matching_messages = [
+        message for message in date_errors if message in _CANCELLATION_DATE_MISMATCH_MESSAGES
+    ]
+
+    if matching_messages:
+        raise CustomValidationError(
+            message=ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["message"],
+            code=ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["code"],
+            status_code=ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["status_code"],
+            errors={"date": matching_messages},
+        )
+
+    raise CustomValidationError(
+        message=ErrorCodes.VALIDATION_FAILED["message"],
+        code=ErrorCodes.VALIDATION_FAILED["code"],
+        status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
+        errors=errors,
+    )
+
+
 def create_class_cancellation(data: dict, institution) -> dict:
     _ensure_institution(institution)
     serializer = CreateClassCancellationSerializer(data=data)
     if not serializer.is_valid():
-        raise CustomValidationError(
-            message=ErrorCodes.VALIDATION_FAILED["message"],
-            code=ErrorCodes.VALIDATION_FAILED["code"],
-            status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
-            errors=serializer.errors,
-        )
+        _raise_cancellation_validation_error(serializer.errors)
 
     validated = dict(serializer.validated_data)
     session: ClassSession = validated["class_session"]
@@ -99,12 +143,7 @@ def update_class_cancellation(
         partial=True,
     )
     if not serializer.is_valid():
-        raise CustomValidationError(
-            message=ErrorCodes.VALIDATION_FAILED["message"],
-            code=ErrorCodes.VALIDATION_FAILED["code"],
-            status_code=ErrorCodes.VALIDATION_FAILED["status_code"],
-            errors=serializer.errors,
-        )
+        _raise_cancellation_validation_error(serializer.errors)
 
     original_session = cancellation.class_session
     updated_session = serializer.validated_data.get("class_session", original_session)

@@ -8,8 +8,8 @@ from professors.models import Professor
 from courses.models import Course
 from locations.models import Building, Classroom
 from semesters.models import Semester
-from schedules.models import ClassSession
-from schedules.services import class_session_service
+from schedules.models import ClassSession, ClassCancellation
+from schedules.services import class_session_service, class_adjustment_service
 from schedules.serializers.class_adjustment_serializers import (
     CreateClassCancellationSerializer,
 )
@@ -200,3 +200,41 @@ class ClassCancellationValidationTests(TestCase):
         )
 
         self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_service_create_uses_domain_error_for_date_mismatch(self) -> None:
+        session = self._create_session()
+
+        with self.assertRaises(CustomValidationError) as ctx:
+            class_adjustment_service.create_class_cancellation(
+                {"class_session": session.id, "date": date(2024, 1, 7)},
+                self.institution,
+            )
+
+        exc = ctx.exception
+        self.assertEqual(
+            exc.detail["code"],
+            ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["code"],
+        )
+        self.assertIn("روز برگزاری", exc.detail["errors"]["date"][0])
+
+    def test_service_update_uses_domain_error_for_date_mismatch(self) -> None:
+        session = self._create_session()
+        created = class_adjustment_service.create_class_cancellation(
+            {"class_session": session.id, "date": self.semester.start_date},
+            self.institution,
+        )
+
+        instance = ClassCancellation.objects.get(pk=created["id"])
+
+        with self.assertRaises(CustomValidationError) as ctx:
+            class_adjustment_service.update_class_cancellation(
+                instance,
+                {"date": self.semester.start_date + timedelta(days=1)},
+            )
+
+        exc = ctx.exception
+        self.assertEqual(
+            exc.detail["code"],
+            ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["code"],
+        )
+        self.assertIn("روز برگزاری", exc.detail["errors"]["date"][0])
