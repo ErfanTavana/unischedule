@@ -2,10 +2,24 @@ from __future__ import annotations
 
 from datetime import date
 
+from typing import Dict
+
 from rest_framework import serializers
 
 from locations.models import Classroom
 from schedules.models import ClassSession, ClassCancellation, MakeupClassSession
+
+
+# Mapping Python's weekday index to the Persian labels stored on ClassSession
+PY_WEEKDAY_TO_PERSIAN: Dict[int, str] = {
+    5: "شنبه",
+    6: "یکشنبه",
+    0: "دوشنبه",
+    1: "سه‌شنبه",
+    2: "چهارشنبه",
+    3: "پنجشنبه",
+    4: "جمعه",
+}
 
 
 class ClassCancellationSerializer(serializers.ModelSerializer):
@@ -43,6 +57,43 @@ class BaseClassCancellationWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassCancellation
         fields = ["class_session", "date", "reason", "note"]
+
+    def validate(self, attrs: dict) -> dict:
+        attrs = super().validate(attrs)
+
+        session = attrs.get("class_session") or self._resolve_session()
+        cancellation_date = attrs.get("date") or getattr(self.instance, "date", None)
+
+        errors = {}
+
+        if session and cancellation_date:
+            weekday_label = PY_WEEKDAY_TO_PERSIAN.get(cancellation_date.weekday())
+            if weekday_label and session.day_of_week and weekday_label != session.day_of_week:
+                errors.setdefault("date", []).append(
+                    "تاریخ انتخابی با روز برگزاری کلاس همخوانی ندارد."
+                )
+
+            if session.week_type != ClassSession.WeekTypeChoices.EVERY:
+                semester = getattr(session, "semester", None)
+                start_date = getattr(semester, "start_date", None)
+                if semester and start_date:
+                    delta_days = (cancellation_date - start_date).days
+                    if delta_days >= 0:
+                        weeks_since_start = delta_days // 7
+                        computed_week_type = (
+                            ClassSession.WeekTypeChoices.ODD
+                            if weeks_since_start % 2 == 0
+                            else ClassSession.WeekTypeChoices.EVEN
+                        )
+                        if computed_week_type != session.week_type:
+                            errors.setdefault("date", []).append(
+                                "تاریخ انتخابی با نوع هفته کلاس همخوانی ندارد."
+                            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
 
     def _resolve_session(self) -> ClassSession | None:
         candidate = self.initial_data.get("class_session")
