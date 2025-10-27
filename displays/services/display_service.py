@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date, time as time_cls, timedelta
 from typing import Iterable, List
 
 from django.db.models import QuerySet
@@ -12,6 +13,7 @@ from unischedule.core.exceptions import CustomValidationError
 
 from displays import repositories as display_repository
 from displays.models import DisplayScreen
+from displays.models.display_models import PY_WEEKDAY_TO_PERSIAN
 from displays.serializers import (
     DisplayScreenSerializer,
     DisplayScreenWriteSerializer,
@@ -22,7 +24,13 @@ from displays.utils import (
     compute_filter_week_type,
     parse_date,
 )
-from schedules.models import ClassSession
+from schedules.models import (
+    ClassSession,
+    ClassCancellation,
+    MakeupClassSession,
+)
+
+PERSIAN_TO_PY_WEEKDAY = {value: key for key, value in PY_WEEKDAY_TO_PERSIAN.items()}
 
 DAY_ORDER = {value: index for index, (value, _) in enumerate(ClassSession.DAY_OF_WEEK_CHOICES)}
 
@@ -144,16 +152,248 @@ def _base_session_queryset(screen: DisplayScreen):
     )
 
 
-def _sort_sessions(sessions: Iterable[ClassSession]) -> List[ClassSession]:
+def _sort_sessions(sessions: Iterable[dict]) -> List[dict]:
+    def _normalise_date(value):
+        if isinstance(value, date):
+            return value
+        if isinstance(value, str):
+            try:
+                return date.fromisoformat(value)
+            except ValueError:  # pragma: no cover - defensive
+                return date.min
+        return date.min
+
+    def _normalise_time(value):
+        if value:
+            return value
+        return time_cls.min
+
     return sorted(
         sessions,
-        key=lambda session: (
-            DAY_ORDER.get(session.day_of_week, 0),
-            session.start_time,
-            session.course.title,
+        key=lambda item: (
+            _normalise_date(item.get("date")),
+            DAY_ORDER.get(item.get("day_of_week"), 0),
+            _normalise_time(item.get("start_time")),
+            item.get("course_title", ""),
+            item.get("status", ""),
         ),
     )
 
+
+def _resolve_target_date(screen: DisplayScreen, computed_day: str | None) -> date | None:
+    override = parse_date(screen.filter_date_override)
+    if override:
+        return override
+
+    if computed_day or screen.filter_use_current_day_of_week or screen.filter_use_current_week_type:
+        base_date = timezone.localdate()
+        if computed_day:
+            weekday = PERSIAN_TO_PY_WEEKDAY.get(computed_day)
+            if weekday is not None:
+                delta = weekday - base_date.weekday()
+                if delta < 0:
+                    delta += 7
+                return base_date + timedelta(days=delta)
+        return base_date
+    return None
+
+
+def _load_cancellations(
+    screen: DisplayScreen, sessions: Iterable[ClassSession], target_date: date | None
+):
+    if not target_date:
+        return {}
+    session_ids = [session.id for session in sessions]
+    if not session_ids:
+        return {}
+    cancellations = (
+        ClassCancellation.objects.filter(
+            institution=screen.institution,
+            class_session_id__in=session_ids,
+            date=target_date,
+            is_deleted=False,
+        )
+        .select_related("class_session__professor", "class_session__course")
+    )
+    return {cancellation.class_session_id: cancellation for cancellation in cancellations}
+
+
+def _build_session_payload(
+    session: ClassSession,
+    *,
+    target_date: date | None,
+    cancellation: ClassCancellation | None,
+) -> dict:
+    professor = session.professor
+    classroom = session.classroom
+    building = classroom.building if classroom else None
+    note = session.note or ""
+    cancellation_note = None
+    cancellation_reason = None
+    status = "scheduled"
+    if cancellation:
+        cancellation_reason = cancellation.reason or None
+        cancellation_note = cancellation.note or None
+        if cancellation_note:
+            note = cancellation_note
+        status = "cancelled"
+
+    return {
+        "id": session.id,
+        "session_id": session.id,
+        "course_title": session.course.title,
+        "professor_name": f"{professor.first_name} {professor.last_name}".strip(),
+        "day_of_week": session.day_of_week,
+        "start_time": session.start_time,
+        "end_time": session.end_time,
+        "week_type": session.week_type,
+        "classroom_title": classroom.title if classroom else None,
+        "building_title": building.title if building else None,
+        "group_code": session.group_code,
+        "note": note,
+        "date": target_date,
+        "is_cancelled": bool(cancellation),
+        "cancellation_reason": cancellation_reason,
+        "cancellation_note": cancellation_note,
+        "status": status,
+        "is_makeup": False,
+        "makeup_for_session_id": None,
+    }
+
+
+def _week_type_for_date(semester, target_date: date | None) -> str | None:
+    if not semester or not target_date:
+        return None
+    start_date = getattr(semester, "start_date", None)
+    if not start_date:
+        return None
+    delta_days = (target_date - start_date).days
+    if delta_days < 0:
+        delta_days = 0
+    weeks_since_start = delta_days // 7
+    if weeks_since_start % 2 == 0:
+        return ClassSession.WeekTypeChoices.ODD
+    return ClassSession.WeekTypeChoices.EVEN
+
+
+def _makeup_matches_week_type(
+    *,
+    screen_week_type: str | None,
+    session_week_type: str,
+    date_week_type: str | None,
+) -> bool:
+    if not screen_week_type or screen_week_type == ClassSession.WeekTypeChoices.EVERY:
+        return True
+    valid_types = {screen_week_type, ClassSession.WeekTypeChoices.EVERY}
+    if session_week_type not in valid_types:
+        return False
+    if date_week_type is None:
+        return screen_week_type == session_week_type
+    return date_week_type in valid_types
+
+
+def _build_makeup_payload(makeup: MakeupClassSession) -> dict:
+    session = makeup.class_session
+    professor = session.professor
+    classroom = makeup.classroom
+    building = classroom.building if classroom else None
+    semester = session.semester
+    week_type = _week_type_for_date(semester, makeup.date)
+    return {
+        "id": makeup.id,
+        "session_id": session.id,
+        "course_title": session.course.title,
+        "professor_name": f"{professor.first_name} {professor.last_name}".strip(),
+        "day_of_week": PY_WEEKDAY_TO_PERSIAN.get(makeup.date.weekday(), session.day_of_week),
+        "start_time": makeup.start_time,
+        "end_time": makeup.end_time,
+        "week_type": week_type or session.week_type,
+        "classroom_title": classroom.title if classroom else None,
+        "building_title": building.title if building else None,
+        "group_code": makeup.group_code or session.group_code,
+        "note": makeup.note or session.note or "",
+        "date": makeup.date,
+        "is_cancelled": False,
+        "cancellation_reason": None,
+        "cancellation_note": None,
+        "status": "makeup",
+        "is_makeup": True,
+        "makeup_for_session_id": session.id,
+    }
+
+
+def _collect_makeup_payloads(
+    screen: DisplayScreen,
+    *,
+    target_date: date | None,
+    computed_week_type: str | None,
+) -> List[dict]:
+    if not target_date:
+        return []
+
+    qs = (
+        MakeupClassSession.objects.filter(
+            institution=screen.institution,
+            is_deleted=False,
+            date=target_date,
+        )
+        .select_related(
+            "class_session__course",
+            "class_session__professor",
+            "class_session__semester",
+            "classroom__building",
+        )
+    )
+
+    if screen.filter_classroom_id:
+        qs = qs.filter(classroom_id=screen.filter_classroom_id)
+
+    if screen.filter_building_id:
+        qs = qs.filter(classroom__building_id=screen.filter_building_id)
+
+    if screen.filter_course_id:
+        qs = qs.filter(class_session__course_id=screen.filter_course_id)
+
+    if screen.filter_professor_id:
+        qs = qs.filter(class_session__professor_id=screen.filter_professor_id)
+
+    if screen.filter_semester_id:
+        qs = qs.filter(class_session__semester_id=screen.filter_semester_id)
+
+    if screen.filter_start_time:
+        qs = qs.filter(start_time__gte=screen.filter_start_time)
+
+    if screen.filter_end_time:
+        qs = qs.filter(end_time__lte=screen.filter_end_time)
+
+    payloads: List[dict] = []
+    for makeup in qs:
+        session = makeup.class_session
+        if screen.filter_capacity is not None:
+            if session.capacity is None or session.capacity < screen.filter_capacity:
+                continue
+
+        if screen.filter_group_code:
+            group_code = screen.filter_group_code
+            available_codes = {
+                code
+                for code in [makeup.group_code, session.group_code]
+                if code not in (None, "")
+            }
+            if group_code not in available_codes:
+                continue
+
+        week_type_for_date = _week_type_for_date(session.semester, makeup.date)
+        if not _makeup_matches_week_type(
+            screen_week_type=computed_week_type,
+            session_week_type=session.week_type,
+            date_week_type=week_type_for_date,
+        ):
+            continue
+
+        payloads.append(_build_makeup_payload(makeup))
+
+    return payloads
 
 def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
     """Return all sessions that match the screen filter configuration.
@@ -259,8 +499,28 @@ def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> di
         if cached:
             return cached
 
-    sessions = _collect_sessions_for_screen(screen)
-    sessions = _sort_sessions(sessions)
+    base_sessions = _collect_sessions_for_screen(screen)
+    computed_day = compute_filter_day_of_week(screen)
+    computed_week_type = compute_filter_week_type(screen)
+    target_date = _resolve_target_date(screen, computed_day)
+    cancellations = _load_cancellations(screen, base_sessions, target_date)
+
+    session_payloads = [
+        _build_session_payload(
+            session,
+            target_date=target_date,
+            cancellation=cancellations.get(session.id),
+        )
+        for session in base_sessions
+    ]
+
+    makeup_payloads = _collect_makeup_payloads(
+        screen,
+        target_date=target_date,
+        computed_week_type=computed_week_type,
+    )
+
+    sessions = _sort_sessions(session_payloads + makeup_payloads)
 
     payload_serializer = DisplayPublicPayloadSerializer({
         "screen": screen,
