@@ -224,6 +224,56 @@ class SuccessCodes:
         "message": "جلسه کلاس با موفقیت حذف شد.",
         "data": {},
     }
+    CLASS_CANCELLATION_CREATED = {
+        "code": "2606",
+        "message": "لغو جلسه با موفقیت ثبت شد.",
+        "data": {},
+    }
+    CLASS_CANCELLATION_LISTED = {
+        "code": "2607",
+        "message": "لیست لغو جلسات با موفقیت دریافت شد.",
+        "data": {},
+    }
+    CLASS_CANCELLATION_RETRIEVED = {
+        "code": "2608",
+        "message": "اطلاعات لغو جلسه با موفقیت دریافت شد.",
+        "data": {},
+    }
+    CLASS_CANCELLATION_UPDATED = {
+        "code": "2609",
+        "message": "لغو جلسه با موفقیت به‌روزرسانی شد.",
+        "data": {},
+    }
+    CLASS_CANCELLATION_DELETED = {
+        "code": "2610",
+        "message": "لغو جلسه با موفقیت حذف شد.",
+        "data": {},
+    }
+    MAKEUP_SESSION_CREATED = {
+        "code": "2611",
+        "message": "جلسه جبرانی با موفقیت ثبت شد.",
+        "data": {},
+    }
+    MAKEUP_SESSION_LISTED = {
+        "code": "2612",
+        "message": "لیست جلسات جبرانی با موفقیت دریافت شد.",
+        "data": {},
+    }
+    MAKEUP_SESSION_RETRIEVED = {
+        "code": "2613",
+        "message": "اطلاعات جلسه جبرانی با موفقیت دریافت شد.",
+        "data": {},
+    }
+    MAKEUP_SESSION_UPDATED = {
+        "code": "2614",
+        "message": "جلسه جبرانی با موفقیت به‌روزرسانی شد.",
+        "data": {},
+    }
+    MAKEUP_SESSION_DELETED = {
+        "code": "2615",
+        "message": "جلسه جبرانی با موفقیت حذف شد.",
+        "data": {},
+    }
 
     # Display screens: 27xx is dedicated to digital signage endpoints.
     DISPLAY_SCREEN_CREATED = {
