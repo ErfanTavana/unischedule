@@ -10,12 +10,16 @@ from schedules.models import ClassCancellation, MakeupClassSession
 # --- Class cancellation operations ------------------------------------------
 
 def create_class_cancellation(data: dict) -> ClassCancellation:
+    """یک رکورد لغو کلاس را با داده‌های دریافتی ایجاد می‌کند."""
+
     return ClassCancellation.objects.create(**data)
 
 
 def update_class_cancellation_fields(
     cancellation: ClassCancellation, fields: dict
 ) -> ClassCancellation:
+    """فیلدهای دلخواه لغو کلاس را به‌روزرسانی و نمونهٔ ذخیره‌شده را بازمی‌گرداند."""
+
     for key, value in fields.items():
         setattr(cancellation, key, value)
     cancellation.save()
@@ -25,6 +29,8 @@ def update_class_cancellation_fields(
 def get_class_cancellation_by_id_and_institution(
     cancellation_id: int, institution
 ) -> ClassCancellation | None:
+    """لغو کلاس مربوط به شناسه و مؤسسهٔ مشخص را جست‌وجو می‌کند."""
+
     return (
         ClassCancellation.objects.filter(
             id=cancellation_id,
@@ -37,6 +43,8 @@ def get_class_cancellation_by_id_and_institution(
 
 
 def list_class_cancellations_by_institution(institution) -> QuerySet[ClassCancellation]:
+    """تمام لغوهای فعال یک مؤسسه را با روابط مورد نیاز برای نمایش بازمی‌گرداند."""
+
     return ClassCancellation.objects.filter(
         institution=institution,
         is_deleted=False,
@@ -48,6 +56,8 @@ def list_class_cancellations_by_institution(institution) -> QuerySet[ClassCancel
 
 
 def soft_delete_class_cancellation(cancellation: ClassCancellation) -> None:
+    """لغو کلاس را به صورت نرم حذف می‌کند تا در لیست نتایج نمایش داده نشود."""
+
     cancellation.delete()
 
 
@@ -58,6 +68,8 @@ def cancellation_exists_for_session_and_date(
     institution,
     exclude_id: int | None = None,
 ) -> bool:
+    """آیا در همان تاریخ برای جلسهٔ موردنظر قبلاً لغوی ثبت شده است یا خیر."""
+
     qs = ClassCancellation.objects.filter(
         class_session_id=class_session_id,
         date=cancellation_date,
@@ -72,12 +84,16 @@ def cancellation_exists_for_session_and_date(
 # --- Makeup session operations ---------------------------------------------
 
 def create_makeup_class_session(data: dict) -> MakeupClassSession:
+    """یک جلسهٔ جبرانی جدید بر اساس داده‌های اعتبارسنجی‌شده می‌سازد."""
+
     return MakeupClassSession.objects.create(**data)
 
 
 def update_makeup_class_session_fields(
     makeup_session: MakeupClassSession, fields: dict
 ) -> MakeupClassSession:
+    """فیلدهای جلسهٔ جبرانی را تغییر داده و نمونهٔ بروزشده را بازمی‌گرداند."""
+
     for key, value in fields.items():
         setattr(makeup_session, key, value)
     makeup_session.save()
@@ -87,6 +103,8 @@ def update_makeup_class_session_fields(
 def get_makeup_class_session_by_id_and_institution(
     makeup_id: int, institution
 ) -> MakeupClassSession | None:
+    """جلسهٔ جبرانی متعلق به مؤسسه و شناسهٔ داده شده را بازیابی می‌کند."""
+
     return (
         MakeupClassSession.objects.filter(
             id=makeup_id,
@@ -106,6 +124,8 @@ def get_makeup_class_session_by_id_and_institution(
 def list_makeup_class_sessions_by_institution(
     institution,
 ) -> QuerySet[MakeupClassSession]:
+    """جلسات جبرانی فعال یک مؤسسه را به همراه روابط کلیدی برای مصرف API فراهم می‌کند."""
+
     return MakeupClassSession.objects.filter(
         institution=institution,
         is_deleted=False,
@@ -118,6 +138,8 @@ def list_makeup_class_sessions_by_institution(
 
 
 def soft_delete_makeup_class_session(makeup_session: MakeupClassSession) -> None:
+    """جلسهٔ جبرانی را بدون حذف نهایی از پایگاه داده علامت حذف می‌کند."""
+
     makeup_session.delete()
 
 
@@ -132,6 +154,8 @@ def makeup_time_conflict_exists(
     end_time: time,
     exclude_id: int | None = None,
 ) -> bool:
+    """وجود تداخل زمانی بین جلسهٔ جبرانی مورد نظر و سایر جلسات فعال را بررسی می‌کند."""
+
     overlap = Q(start_time__lt=end_time) & Q(end_time__gt=start_time)
     qs = MakeupClassSession.objects.filter(
         institution=institution,
