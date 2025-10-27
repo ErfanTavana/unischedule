@@ -2027,6 +2027,404 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Class Adjustments",
+      "item": [
+        {
+          "name": "Class Cancellations",
+          "item": [
+            {
+              "name": "List Class Cancellations",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/cancellations/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "cancellations",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nنمایش تمامی لغوهای ثبت‌شده برای جلسات کلاس یک مؤسسه.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/cancellations/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2607\",\n  \"message\": \"لیست لغو جلسات با موفقیت دریافت شد.\",\n  \"data\": {\n    \"cancellations\": [\n      {\n        \"id\": 3,\n        \"institution\": 1,\n        \"class_session\": 12,\n        \"class_session_title\": \"زبان تخصصی\",\n        \"professor_name\": \"مینا سادات حسینی\",\n        \"date\": \"2024-10-12\",\n        \"reason\": \"حضور استاد در همایش\",\n        \"note\": \"جلسه در تاریخ دیگری جبرانی خواهد شد.\",\n        \"created_at\": \"2024-09-18T08:15:00Z\",\n        \"updated_at\": \"2024-09-18T08:15:00Z\"\n      }\n    ]\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"500\",\n  \"message\": \"خطای داخلی سرور.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ درخواست با توکن معتبر → 200 OK\n- ❌ بدون توکن → 401 Unauthorized\n- ❌ خطای غیرمنتظره سرویس → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#Cancellations` `#GET`"
+              },
+              "response": [],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              }
+            },
+            {
+              "name": "Create Class Cancellation",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/cancellations/create/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "cancellations",
+                    "create",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nثبت لغو برای یک جلسه کلاس مشخص در بازه زمانی ترم.\n\n### Endpoint\n`POST {{base_url}}/api/schedules/cancellations/create/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\n```json\n{\n  \"class_session\": 12,\n  \"date\": \"2024-10-12\",\n  \"reason\": \"حضور استاد در همایش\",\n  \"note\": \"جلسه در تاریخ دیگری جبرانی خواهد شد.\"\n}\n```\n### Response Sample\n#### ✅ موفق (201)\n```json\n{\n  \"success\": true,\n  \"code\": \"2606\",\n  \"message\": \"لغو جلسه با موفقیت ثبت شد.\",\n  \"data\": {\n    \"cancellation\": {\n      \"id\": 3,\n      \"institution\": 1,\n      \"class_session\": 12,\n      \"class_session_title\": \"زبان تخصصی\",\n      \"professor_name\": \"مینا سادات حسینی\",\n      \"date\": \"2024-10-12\",\n      \"reason\": \"حضور استاد در همایش\",\n      \"note\": \"جلسه در تاریخ دیگری جبرانی خواهد شد.\",\n      \"created_at\": \"2024-09-18T08:15:00Z\",\n      \"updated_at\": \"2024-09-18T08:15:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ تداخل ثبت لغو (400)\n```json\n{\n  \"success\": false,\n  \"code\": \"4606\",\n  \"message\": \"برای این تاریخ قبلاً لغو ثبت شده است.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ ارسال داده معتبر → 201 Created\n- ❌ لغو تکراری برای همان تاریخ → 400 Bad Request\n- ❌ بدون توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Cancellations` `#POST`",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"class_session\": 12,\n  \"date\": \"2024-10-12\",\n  \"reason\": \"حضور استاد در همایش\",\n  \"note\": \"جلسه در تاریخ دیگری جبرانی خواهد شد.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve Class Cancellation",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/cancellations/{{cancellation_id}}/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "cancellations",
+                    "{{cancellation_id}}",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nدریافت جزئیات یک لغو جلسه بر اساس شناسه.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/cancellations/{{cancellation_id}}/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2608\",\n  \"message\": \"اطلاعات لغو جلسه با موفقیت دریافت شد.\",\n  \"data\": {\n    \"cancellation\": {\n      \"id\": 3,\n      \"institution\": 1,\n      \"class_session\": 12,\n      \"class_session_title\": \"زبان تخصصی\",\n      \"professor_name\": \"مینا سادات حسینی\",\n      \"date\": \"2024-10-12\",\n      \"reason\": \"حضور استاد در همایش\",\n      \"note\": \"جلسه در تاریخ دیگری جبرانی خواهد شد.\",\n      \"created_at\": \"2024-09-18T08:15:00Z\",\n      \"updated_at\": \"2024-09-18T08:15:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ یافت نشدن (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4605\",\n  \"message\": \"لغو جلسه مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ شناسه معتبر → 200 OK\n- ❌ شناسه اشتباه → 404 Not Found\n- ❌ بدون توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Cancellations` `#GET`"
+              },
+              "response": [],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              }
+            },
+            {
+              "name": "Update Class Cancellation",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/cancellations/{{cancellation_id}}/update/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "cancellations",
+                    "{{cancellation_id}}",
+                    "update",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nویرایش اطلاعات یک لغو جلسه از جمله دلیل یا یادداشت.\n\n### Endpoint\n`PUT {{base_url}}/api/schedules/cancellations/{{cancellation_id}}/update/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\n```json\n{\n  \"reason\": \"تعطیلی اضطراری دانشگاه\",\n  \"note\": \"جلسه با اطلاع‌رسانی پیامکی اعلام شد.\"\n}\n```\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2609\",\n  \"message\": \"لغو جلسه با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"cancellation\": {\n      \"id\": 3,\n      \"institution\": 1,\n      \"class_session\": 12,\n      \"class_session_title\": \"زبان تخصصی\",\n      \"professor_name\": \"مینا سادات حسینی\",\n      \"date\": \"2024-10-12\",\n      \"reason\": \"تعطیلی اضطراری دانشگاه\",\n      \"note\": \"جلسه با اطلاع‌رسانی پیامکی اعلام شد.\",\n      \"created_at\": \"2024-09-18T08:15:00Z\",\n      \"updated_at\": \"2024-09-19T10:30:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ یافت نشدن (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4605\",\n  \"message\": \"لغو جلسه مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ ارسال فیلدهای مجاز → 200 OK\n- ❌ لغو حذف‌شده یا نامعتبر → 404 Not Found\n- ❌ بدون توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Cancellations` `#PUT`",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"تعطیلی اضطراری دانشگاه\",\n  \"note\": \"جلسه با اطلاع‌رسانی پیامکی اعلام شد.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Class Cancellation",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/cancellations/{{cancellation_id}}/delete/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "cancellations",
+                    "{{cancellation_id}}",
+                    "delete",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nحذف نرم یک لغو جلسه و آزادسازی آن برای ثبت مجدد.\n\n### Endpoint\n`DELETE {{base_url}}/api/schedules/cancellations/{{cancellation_id}}/delete/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2610\",\n  \"message\": \"لغو جلسه با موفقیت حذف شد.\",\n  \"data\": {}\n}\n```\n#### ❌ یافت نشدن (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4605\",\n  \"message\": \"لغو جلسه مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ شناسه معتبر → 200 OK\n- ❌ رکورد حذف‌شده یا نادرست → 404 Not Found\n- ❌ بدون توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Cancellations` `#DELETE`"
+              },
+              "response": []
+            }
+          ],
+          "description": "مدیریت لغو جلسات برنامه‌ریزی‌شده شامل ثبت، مشاهده، و حذف نرم."
+        },
+        {
+          "name": "Makeup Class Sessions",
+          "item": [
+            {
+              "name": "List Makeup Class Sessions",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/makeups/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "makeups",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nفهرست تمام جلسه‌های جبرانی تعریف‌شده برای جلسات کلاس.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/makeups/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2612\",\n  \"message\": \"لیست جلسات جبرانی با موفقیت دریافت شد.\",\n  \"data\": {\n    \"makeup_sessions\": [\n      {\n        \"id\": 4,\n        \"institution\": 1,\n        \"class_session\": 12,\n        \"class_session_title\": \"زبان تخصصی\",\n        \"professor_name\": \"مینا سادات حسینی\",\n        \"date\": \"2024-11-05\",\n        \"start_time\": \"14:00\",\n        \"end_time\": \"16:00\",\n        \"classroom\": 7,\n        \"building_title\": \"دانشکده علوم\",\n        \"group_code\": \"B1\",\n        \"note\": \"جبرانی برای کلاس لغو شده هفته گذشته.\",\n        \"created_at\": \"2024-09-19T09:00:00Z\",\n        \"updated_at\": \"2024-09-19T09:00:00Z\"\n      }\n    ]\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n#### ❌ خطای سرور (500)\n```json\n{\n  \"success\": false,\n  \"code\": \"500\",\n  \"message\": \"خطای داخلی سرور.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n\n### Scenarios\n- ✅ درخواست با توکن معتبر → 200 OK\n- ❌ بدون احراز هویت → 401 Unauthorized\n- ❌ خطای پیش‌بینی‌نشده سرویس → 500 Internal Server Error\n\n### Tags\n`#Schedules` `#Makeup` `#GET`"
+              },
+              "response": [],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              }
+            },
+            {
+              "name": "Create Makeup Class Session",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/makeups/create/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "makeups",
+                    "create",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nایجاد جلسه جبرانی برای یک جلسه کلاس با تعیین تاریخ، ساعت و کلاس برگزارکننده.\n\n### Endpoint\n`POST {{base_url}}/api/schedules/makeups/create/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\n```json\n{\n  \"class_session\": 12,\n  \"date\": \"2024-11-05\",\n  \"start_time\": \"14:00\",\n  \"end_time\": \"16:00\",\n  \"classroom\": 7,\n  \"group_code\": \"B1\",\n  \"note\": \"جبرانی برای کلاس لغو شده هفته گذشته.\"\n}\n```\n### Response Sample\n#### ✅ موفق (201)\n```json\n{\n  \"success\": true,\n  \"code\": \"2611\",\n  \"message\": \"جلسه جبرانی با موفقیت ثبت شد.\",\n  \"data\": {\n    \"makeup_session\": {\n      \"id\": 4,\n      \"institution\": 1,\n      \"class_session\": 12,\n      \"class_session_title\": \"زبان تخصصی\",\n      \"professor_name\": \"مینا سادات حسینی\",\n      \"date\": \"2024-11-05\",\n      \"start_time\": \"14:00\",\n      \"end_time\": \"16:00\",\n      \"classroom\": 7,\n      \"building_title\": \"دانشکده علوم\",\n      \"group_code\": \"B1\",\n      \"note\": \"جبرانی برای کلاس لغو شده هفته گذشته.\",\n      \"created_at\": \"2024-09-19T09:00:00Z\",\n      \"updated_at\": \"2024-09-19T09:00:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ تداخل برنامه (400)\n```json\n{\n  \"success\": false,\n  \"code\": \"4611\",\n  \"message\": \"زمان جلسه جبرانی با برنامه‌های دیگر تداخل دارد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ بازه زمانی آزاد → 201 Created\n- ❌ تداخل با کلاس دیگر → 400 Bad Request\n- ❌ بدون توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Makeup` `#POST`",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"class_session\": 12,\n  \"date\": \"2024-11-05\",\n  \"start_time\": \"14:00\",\n  \"end_time\": \"16:00\",\n  \"classroom\": 7,\n  \"group_code\": \"B1\",\n  \"note\": \"جبرانی برای کلاس لغو شده هفته گذشته.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve Makeup Class Session",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/makeups/{{makeup_id}}/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "makeups",
+                    "{{makeup_id}}",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nنمایش جزئیات یک جلسه جبرانی بر اساس شناسه.\n\n### Endpoint\n`GET {{base_url}}/api/schedules/makeups/{{makeup_id}}/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2613\",\n  \"message\": \"اطلاعات جلسه جبرانی با موفقیت دریافت شد.\",\n  \"data\": {\n    \"makeup_session\": {\n      \"id\": 4,\n      \"institution\": 1,\n      \"class_session\": 12,\n      \"class_session_title\": \"زبان تخصصی\",\n      \"professor_name\": \"مینا سادات حسینی\",\n      \"date\": \"2024-11-05\",\n      \"start_time\": \"14:00\",\n      \"end_time\": \"16:00\",\n      \"classroom\": 7,\n      \"building_title\": \"دانشکده علوم\",\n      \"group_code\": \"B1\",\n      \"note\": \"جبرانی برای کلاس لغو شده هفته گذشته.\",\n      \"created_at\": \"2024-09-19T09:00:00Z\",\n      \"updated_at\": \"2024-09-19T09:00:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ یافت نشدن (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4610\",\n  \"message\": \"جلسه جبرانی مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ شناسه معتبر → 200 OK\n- ❌ شناسه اشتباه → 404 Not Found\n- ❌ بدون توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Makeup` `#GET`"
+              },
+              "response": [],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              }
+            },
+            {
+              "name": "Update Makeup Class Session",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/makeups/{{makeup_id}}/update/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "makeups",
+                    "{{makeup_id}}",
+                    "update",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nبه‌روزرسانی تاریخ، ساعت یا کلاس برگزاری یک جلسه جبرانی.\n\n### Endpoint\n`PUT {{base_url}}/api/schedules/makeups/{{makeup_id}}/update/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\n```json\n{\n  \"start_time\": \"15:00\",\n  \"end_time\": \"17:00\",\n  \"note\": \"به‌روزرسانی ساعت به دلیل تداخل با کلاس دیگر.\"\n}\n```\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2614\",\n  \"message\": \"جلسه جبرانی با موفقیت به‌روزرسانی شد.\",\n  \"data\": {\n    \"makeup_session\": {\n      \"id\": 4,\n      \"institution\": 1,\n      \"class_session\": 12,\n      \"class_session_title\": \"زبان تخصصی\",\n      \"professor_name\": \"مینا سادات حسینی\",\n      \"date\": \"2024-11-05\",\n      \"start_time\": \"15:00\",\n      \"end_time\": \"17:00\",\n      \"classroom\": 7,\n      \"building_title\": \"دانشکده علوم\",\n      \"group_code\": \"B1\",\n      \"note\": \"به‌روزرسانی ساعت به دلیل تداخل با کلاس دیگر.\",\n      \"created_at\": \"2024-09-19T09:00:00Z\",\n      \"updated_at\": \"2024-09-20T07:45:00Z\"\n    }\n  },\n  \"warnings\": [],\n  \"meta\": {}\n}\n```\n#### ❌ یافت نشدن (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4610\",\n  \"message\": \"جلسه جبرانی مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ ارسال فیلدهای مجاز → 200 OK\n- ❌ جلسه حذف‌شده یا نامعتبر → 404 Not Found\n- ❌ بدون توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Makeup` `#PUT`",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"start_time\": \"15:00\",\n  \"end_time\": \"17:00\",\n  \"note\": \"به‌روزرسانی ساعت به دلیل تداخل با کلاس دیگر.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Makeup Class Session",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Token {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/schedules/makeups/{{makeup_id}}/delete/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedules",
+                    "makeups",
+                    "{{makeup_id}}",
+                    "delete",
+                    ""
+                  ]
+                },
+                "description": "### شرح\nحذف نرم جلسه جبرانی و آزادسازی بازه زمانی برای برنامه‌های آینده.\n\n### Endpoint\n`DELETE {{base_url}}/api/schedules/makeups/{{makeup_id}}/delete/`\n\n### Authentication\n`Authorization: Token {{token}}`\n\n### Request Sample\nبدنه‌ای ندارد.\n\n### Response Sample\n#### ✅ موفق (200)\n```json\n{\n  \"success\": true,\n  \"code\": \"2615\",\n  \"message\": \"جلسه جبرانی با موفقیت حذف شد.\",\n  \"data\": {}\n}\n```\n#### ❌ یافت نشدن (404)\n```json\n{\n  \"success\": false,\n  \"code\": \"4610\",\n  \"message\": \"جلسه جبرانی مورد نظر یافت نشد.\",\n  \"errors\": [],\n  \"data\": {}\n}\n```\n#### ❌ عدم احراز هویت (401)\n```json\n{\n  \"detail\": \"Authentication credentials were not provided.\"\n}\n```\n\n### Scenarios\n- ✅ شناسه معتبر → 200 OK\n- ❌ رکورد یافت نشد → 404 Not Found\n- ❌ بدون توکن → 401 Unauthorized\n\n### Tags\n`#Schedules` `#Makeup` `#DELETE`"
+              },
+              "response": []
+            }
+          ],
+          "description": "تعریف و مدیریت جلسه‌های جبرانی برای جایگزینی جلسات لغوشده یا تکمیلی."
+        }
+      ],
+      "description": "مستندات مربوط به مدیریت لغو و جلسات جبرانی برای برنامهٔ کلاس‌ها."
     }
   ],
   "auth": {
