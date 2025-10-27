@@ -397,33 +397,28 @@ class DisplayPublicFilterSerializer(serializers.Serializer):
         }
 
 
-class DisplayPublicSessionSerializer(serializers.ModelSerializer):
+class DisplayPublicSessionSerializer(serializers.Serializer):
     """Serialize session data enriched with display-friendly labels."""
 
-    course_title = serializers.CharField(source="course.title", read_only=True)
-    professor_name = serializers.SerializerMethodField()
-    classroom_title = serializers.CharField(source="classroom.title", read_only=True)
-    building_title = serializers.CharField(source="classroom.building.title", read_only=True)
-
-    class Meta:
-        model = ClassSession
-        fields = [
-            "id",
-            "course_title",
-            "professor_name",
-            "day_of_week",
-            "start_time",
-            "end_time",
-            "week_type",
-            "classroom_title",
-            "building_title",
-            "group_code",
-            "note",
-        ]
-        read_only_fields = fields
-
-    def get_professor_name(self, obj: ClassSession) -> str:
-        return f"{obj.professor.first_name} {obj.professor.last_name}".strip()
+    id = serializers.IntegerField()
+    session_id = serializers.IntegerField(allow_null=True)
+    course_title = serializers.CharField()
+    professor_name = serializers.CharField()
+    day_of_week = serializers.CharField(allow_null=True)
+    start_time = serializers.TimeField(allow_null=True)
+    end_time = serializers.TimeField(allow_null=True)
+    week_type = serializers.CharField(allow_null=True)
+    classroom_title = serializers.CharField(allow_null=True)
+    building_title = serializers.CharField(allow_null=True)
+    group_code = serializers.CharField(allow_null=True, allow_blank=True)
+    note = serializers.CharField(allow_null=True, allow_blank=True)
+    date = serializers.DateField(allow_null=True)
+    is_cancelled = serializers.BooleanField()
+    cancellation_reason = serializers.CharField(allow_null=True, allow_blank=True)
+    cancellation_note = serializers.CharField(allow_null=True, allow_blank=True)
+    status = serializers.CharField()
+    is_makeup = serializers.BooleanField()
+    makeup_for_session_id = serializers.IntegerField(allow_null=True)
 
 
 class DisplayPublicPayloadSerializer(serializers.Serializer):
