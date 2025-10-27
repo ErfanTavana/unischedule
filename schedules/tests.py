@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, time, timedelta
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -9,7 +9,7 @@ from courses.models import Course
 from locations.models import Building, Classroom
 from semesters.models import Semester
 from schedules.models import ClassSession
-from schedules.services import class_session_service
+from schedules.services import class_session_service, class_adjustment_service
 from unischedule.core.exceptions import CustomValidationError
 from unischedule.core.error_codes import ErrorCodes
 
@@ -126,3 +126,89 @@ class ClassSessionModelServiceViewTests(TestCase):
 
         delete_response = other_client.delete(f"/api/schedules/{session.id}/delete/")
         self._assert_institution_required_response(delete_response)
+
+
+class ClassCancellationValidationTests(TestCase):
+    def setUp(self) -> None:
+        self.institution = Institution.objects.create(name="Uni", slug="uni-cancel")
+        self.professor = Professor.objects.create(
+            institution=self.institution,
+            first_name="Sara",
+            last_name="Karimi",
+            national_code="9876543210",
+        )
+        self.course = Course.objects.create(
+            institution=self.institution,
+            code="C2",
+            title="Course 2",
+            professor=self.professor,
+            offer_code="O2",
+            unit_count=2,
+        )
+        self.building = Building.objects.create(title="Main", institution=self.institution)
+        self.classroom = Classroom.objects.create(title="201", building=self.building)
+        self.semester = Semester.objects.create(
+            institution=self.institution,
+            title="Winter",
+            start_date=date(2024, 1, 6),
+            end_date=date(2024, 3, 30),
+        )
+
+    def _create_session(self, **overrides) -> ClassSession:
+        payload = {
+            "institution": self.institution,
+            "course": self.course,
+            "professor": self.professor,
+            "classroom": self.classroom,
+            "semester": self.semester,
+            "day_of_week": "شنبه",
+            "start_time": time(10, 0),
+            "end_time": time(12, 0),
+            "week_type": ClassSession.WeekTypeChoices.EVERY,
+        }
+        payload.update(overrides)
+        return ClassSession.objects.create(**payload)
+
+    def test_rejects_date_with_mismatched_day_of_week(self) -> None:
+        session = self._create_session()
+        with self.assertRaises(CustomValidationError) as exc_info:
+            class_adjustment_service.create_class_cancellation(
+                data={"class_session": session.id, "date": date(2024, 1, 7)},
+                institution=self.institution,
+            )
+
+        detail = exc_info.exception.detail
+        self.assertEqual(
+            detail["code"], ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["code"]
+        )
+        self.assertIn("date", detail["errors"])
+        self.assertIn("روز برگزاری", detail["errors"]["date"][0])
+
+    def test_rejects_date_with_mismatched_week_type(self) -> None:
+        session = self._create_session(week_type=ClassSession.WeekTypeChoices.EVEN)
+        with self.assertRaises(CustomValidationError) as exc_info:
+            class_adjustment_service.create_class_cancellation(
+                data={
+                    "class_session": session.id,
+                    "date": self.semester.start_date,
+                },
+                institution=self.institution,
+            )
+
+        detail = exc_info.exception.detail
+        self.assertEqual(
+            detail["code"], ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["code"]
+        )
+        self.assertIn("date", detail["errors"])
+        self.assertIn("نوع هفته", detail["errors"]["date"][0])
+
+    def test_accepts_matching_day_and_week_type(self) -> None:
+        session = self._create_session(week_type=ClassSession.WeekTypeChoices.EVEN)
+        valid_date = self.semester.start_date + timedelta(days=7)
+        result = class_adjustment_service.create_class_cancellation(
+            data={"class_session": session.id, "date": valid_date},
+            institution=self.institution,
+        )
+
+        self.assertEqual(result["class_session"], session.id)
+        self.assertEqual(result["date"], valid_date.isoformat())
