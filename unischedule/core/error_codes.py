@@ -305,6 +305,13 @@ class ErrorCodes:
         "errors": [],
         "data": {},
     }
+    CLASS_CANCELLATION_DATE_MISMATCH = {
+        "code": "4612",
+        "message": "تاریخ انتخابی با برنامه کلاس همخوانی ندارد.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "errors": [],
+        "data": {},
+    }
     CLASS_CANCELLATION_CREATION_FAILED = {
         "code": "4607",
         "message": "ثبت لغو جلسه با خطا مواجه شد.",
