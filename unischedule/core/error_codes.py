@@ -305,57 +305,64 @@ class ErrorCodes:
         "errors": [],
         "data": {},
     }
-    CLASS_CANCELLATION_CREATION_FAILED = {
+    CLASS_CANCELLATION_DATE_MISMATCH = {
         "code": "4607",
+        "message": "تاریخ انتخابی با برنامه زمان‌بندی کلاس همخوانی ندارد.",
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "errors": [],
+        "data": {},
+    }
+    CLASS_CANCELLATION_CREATION_FAILED = {
+        "code": "4608",
         "message": "ثبت لغو جلسه با خطا مواجه شد.",
         "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
         "errors": [],
         "data": {},
     }
     CLASS_CANCELLATION_UPDATE_FAILED = {
-        "code": "4608",
+        "code": "4609",
         "message": "به‌روزرسانی لغو جلسه با خطا مواجه شد.",
         "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
         "errors": [],
         "data": {},
     }
     CLASS_CANCELLATION_DELETION_FAILED = {
-        "code": "4609",
+        "code": "4610",
         "message": "حذف لغو جلسه با خطا مواجه شد.",
         "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
         "errors": [],
         "data": {},
     }
     MAKEUP_SESSION_NOT_FOUND = {
-        "code": "4610",
+        "code": "4611",
         "message": "جلسه جبرانی مورد نظر یافت نشد.",
         "status_code": status.HTTP_404_NOT_FOUND,
         "errors": [],
         "data": {},
     }
     MAKEUP_SESSION_CONFLICT = {
-        "code": "4611",
+        "code": "4612",
         "message": "زمان جلسه جبرانی با برنامه‌های دیگر تداخل دارد.",
         "status_code": status.HTTP_400_BAD_REQUEST,
         "errors": [],
         "data": {},
     }
     MAKEUP_SESSION_CREATION_FAILED = {
-        "code": "4612",
+        "code": "4613",
         "message": "ایجاد جلسه جبرانی با خطا مواجه شد.",
         "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
         "errors": [],
         "data": {},
     }
     MAKEUP_SESSION_UPDATE_FAILED = {
-        "code": "4613",
+        "code": "4614",
         "message": "به‌روزرسانی جلسه جبرانی با خطا مواجه شد.",
         "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
         "errors": [],
         "data": {},
     }
     MAKEUP_SESSION_DELETION_FAILED = {
-        "code": "4614",
+        "code": "4615",
         "message": "حذف جلسه جبرانی با خطا مواجه شد.",
         "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
         "errors": [],

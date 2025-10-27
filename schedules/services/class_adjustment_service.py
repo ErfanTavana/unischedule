@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import Dict
 
 from unischedule.core.error_codes import ErrorCodes
 from unischedule.core.exceptions import CustomValidationError
@@ -15,6 +16,17 @@ from schedules.serializers import (
 )
 from schedules import repositories as schedule_repository
 from schedules.services.display_invalidation import invalidate_related_displays
+
+
+PY_WEEKDAY_TO_PERSIAN: Dict[int, str] = {
+    5: "شنبه",
+    6: "یکشنبه",
+    0: "دوشنبه",
+    1: "سه‌شنبه",
+    2: "چهارشنبه",
+    3: "پنجشنبه",
+    4: "جمعه",
+}
 
 
 def _ensure_institution(institution) -> None:
@@ -63,6 +75,39 @@ def _check_duplicate_cancellation(
         )
 
 
+def _validate_cancellation_alignment(*, session: ClassSession, cancellation_date: date) -> None:
+    """Ensure the requested cancellation aligns with the session schedule."""
+
+    mismatch_messages: list[str] = []
+
+    weekday_label = PY_WEEKDAY_TO_PERSIAN.get(cancellation_date.weekday())
+    if weekday_label and session.day_of_week and weekday_label != session.day_of_week:
+        mismatch_messages.append("تاریخ انتخابی با روز برگزاری کلاس مغایرت دارد.")
+
+    if session.week_type != ClassSession.WeekTypeChoices.EVERY:
+        semester = getattr(session, "semester", None)
+        start_date = getattr(semester, "start_date", None)
+        if semester and start_date:
+            delta_days = (cancellation_date - start_date).days
+            if delta_days >= 0:
+                weeks_since_start = delta_days // 7
+                computed_week_type = (
+                    ClassSession.WeekTypeChoices.ODD
+                    if weeks_since_start % 2 == 0
+                    else ClassSession.WeekTypeChoices.EVEN
+                )
+                if computed_week_type != session.week_type:
+                    mismatch_messages.append("تاریخ انتخابی با نوع هفته کلاس مغایرت دارد.")
+
+    if mismatch_messages:
+        raise CustomValidationError(
+            message=ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["message"],
+            code=ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["code"],
+            status_code=ErrorCodes.CLASS_CANCELLATION_DATE_MISMATCH["status_code"],
+            errors={"date": mismatch_messages},
+        )
+
+
 def create_class_cancellation(data: dict, institution) -> dict:
     _ensure_institution(institution)
     serializer = CreateClassCancellationSerializer(data=data)
@@ -77,6 +122,10 @@ def create_class_cancellation(data: dict, institution) -> dict:
     validated = dict(serializer.validated_data)
     session: ClassSession = validated["class_session"]
     _ensure_session_institution(session, institution)
+    _validate_cancellation_alignment(
+        session=session,
+        cancellation_date=validated["date"],
+    )
     _check_duplicate_cancellation(
         session=session,
         institution=institution,
@@ -110,6 +159,10 @@ def update_class_cancellation(
     updated_session = serializer.validated_data.get("class_session", original_session)
     _ensure_session_institution(updated_session, cancellation.institution)
     cancellation_date = serializer.validated_data.get("date", cancellation.date)
+    _validate_cancellation_alignment(
+        session=updated_session,
+        cancellation_date=cancellation_date,
+    )
     _check_duplicate_cancellation(
         session=updated_session,
         institution=cancellation.institution,
