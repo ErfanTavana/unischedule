@@ -1,3 +1,12 @@
+"""Service-layer helpers responsible for user authentication workflows.
+
+The functions in this module orchestrate serializer validation, repository
+interaction, and error handling for login, logout, and password management.
+They intentionally keep business rules outside of the view layer so they can
+be reused across API endpoints, admin actions, and automated jobs without
+duplicating validation logic.
+"""
+
 from django.contrib.auth import authenticate
 from accounts.repositories import (
     delete_token,

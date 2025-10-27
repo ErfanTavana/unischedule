@@ -1,3 +1,10 @@
+"""Services that manage class cancellations and makeup sessions.
+
+این ماژول منطق ایجاد، ویرایش و حذف لغوها و جلسات جبرانی را متمرکز می‌کند تا
+تمام اعتبارسنجی‌ها و پیام‌های خطای ساخت‌یافته در یک مکان قابل نگهداری
+باشند.
+"""
+
 from __future__ import annotations
 
 from datetime import date
@@ -18,7 +25,14 @@ from schedules.services.display_invalidation import invalidate_related_displays
 
 
 def _ensure_institution(institution) -> None:
-    """بررسی می‌کند که عملیات به یک مؤسسهٔ معتبر نسبت داده شده باشد."""
+    """بررسی می‌کند که عملیات به یک مؤسسهٔ معتبر نسبت داده شده باشد.
+
+    Args:
+        institution: نمونهٔ مؤسسه یا ``None``.
+
+    Raises:
+        CustomValidationError: در صورت نبود مؤسسه معتبر.
+    """
 
     if not institution:
         raise CustomValidationError(
@@ -31,7 +45,15 @@ def _ensure_institution(institution) -> None:
 
 
 def _ensure_session_institution(session: ClassSession, institution) -> None:
-    """صحت تعلق جلسهٔ کلاسی به مؤسسهٔ درخواست‌دهنده را تضمین می‌کند."""
+    """صحت تعلق جلسهٔ کلاسی به مؤسسهٔ درخواست‌دهنده را تضمین می‌کند.
+
+    Args:
+        session: نمونهٔ جلسهٔ کلاس.
+        institution: مؤسسهٔ درخواست‌کننده.
+
+    Raises:
+        CustomValidationError: اگر جلسه به مؤسسهٔ مورد انتظار تعلق نداشته باشد.
+    """
 
     if session.institution_id != getattr(institution, "id", None):
         raise CustomValidationError(
@@ -53,7 +75,17 @@ def _check_duplicate_cancellation(
     cancellation_date: date,
     exclude_id: int | None = None,
 ) -> None:
-    """پیش از ثبت، وجود لغوی دیگر در همان تاریخ برای جلسهٔ داده‌شده را کنترل می‌کند."""
+    """پیش از ثبت، وجود لغوی دیگر در همان تاریخ برای جلسهٔ داده‌شده را کنترل می‌کند.
+
+    Args:
+        session: جلسهٔ مرجع.
+        institution: مؤسسهٔ مالک.
+        cancellation_date: تاریخ لغو مدنظر.
+        exclude_id: شناسهٔ لغوی که باید از بررسی مستثنی شود (برای به‌روزرسانی).
+
+    Raises:
+        CustomValidationError: اگر لغوی با مشخصات مشابه از قبل وجود داشته باشد.
+    """
 
     if schedule_repository.cancellation_exists_for_session_and_date(
         class_session_id=session.id,
@@ -79,7 +111,14 @@ _CANCELLATION_DATE_MISMATCH_MESSAGES = {
 
 
 def _normalize_error_details(errors):
-    """Convert DRF ``ErrorDetail`` structures to plain Python objects."""
+    """Convert DRF ``ErrorDetail`` structures to plain Python objects.
+
+    Args:
+        errors: ساختار خطای برگشتی از سریالایزر.
+
+    Returns:
+        Any: ساختاری از دیکشنری‌ها و لیست‌های پایتونی قابل سریال شدن.
+    """
 
     if isinstance(errors, dict):
         return {key: _normalize_error_details(value) for key, value in errors.items()}
@@ -89,7 +128,14 @@ def _normalize_error_details(errors):
 
 
 def _raise_cancellation_validation_error(raw_errors) -> None:
-    """Translate serializer errors into domain-specific validation failures."""
+    """Translate serializer errors into domain-specific validation failures.
+
+    Args:
+        raw_errors: دادهٔ خطای سریالایزر.
+
+    Raises:
+        CustomValidationError: با پیام و کد مناسب برای مصرف‌کنندهٔ API.
+    """
 
     errors = _normalize_error_details(raw_errors)
     date_errors = []
@@ -119,7 +165,18 @@ def _raise_cancellation_validation_error(raw_errors) -> None:
 
 
 def create_class_cancellation(data: dict, institution) -> dict:
-    """لغو یک جلسه را با اعتبارسنجی‌های لازم ایجاد و دادهٔ سریال‌شده را برمی‌گرداند."""
+    """لغو یک جلسه را با اعتبارسنجی‌های لازم ایجاد و دادهٔ سریال‌شده را برمی‌گرداند.
+
+    Args:
+        data: دیکشنری داده‌های خام برای ساخت لغو.
+        institution: مؤسسهٔ درخواست‌کننده.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ لغو تازه ثبت‌شده.
+
+    Raises:
+        CustomValidationError: در صورت شکست اعتبارسنجی یا عدم تعلق جلسه.
+    """
 
     _ensure_institution(institution)
     serializer = CreateClassCancellationSerializer(data=data)
@@ -144,7 +201,18 @@ def create_class_cancellation(data: dict, institution) -> dict:
 def update_class_cancellation(
     cancellation: ClassCancellation, data: dict
 ) -> dict:
-    """لغو ثبت‌شده را ویرایش کرده و در صورت تغییرات حیاتی کش نمایش را نامعتبر می‌کند."""
+    """لغو ثبت‌شده را ویرایش کرده و در صورت تغییرات حیاتی کش نمایش را نامعتبر می‌کند.
+
+    Args:
+        cancellation: نمونهٔ لغوی که باید ویرایش شود.
+        data: داده‌های جدید برای اعمال.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ لغو پس از به‌روزرسانی.
+
+    Raises:
+        CustomValidationError: اگر اعتبارسنجی شکست بخورد یا جلسهٔ جدید متعلق نباشد.
+    """
 
     _ensure_institution(cancellation.institution)
     serializer = UpdateClassCancellationSerializer(
@@ -174,7 +242,14 @@ def update_class_cancellation(
 
 
 def list_class_cancellations(institution) -> list[dict]:
-    """لیست لغوهای فعال مؤسسه را در قالب سریال‌شده بازمی‌گرداند."""
+    """لیست لغوهای فعال مؤسسه را در قالب سریال‌شده بازمی‌گرداند.
+
+    Args:
+        institution: مؤسسهٔ مالک لغوها.
+
+    Returns:
+        list[dict]: داده‌های سریال‌شدهٔ لغوها برای پاسخ API.
+    """
 
     _ensure_institution(institution)
     queryset = schedule_repository.list_class_cancellations_by_institution(institution)
@@ -184,7 +259,18 @@ def list_class_cancellations(institution) -> list[dict]:
 def get_class_cancellation_instance_or_404(
     cancellation_id: int, institution
 ) -> ClassCancellation:
-    """نمونهٔ لغو کلاس را در صورت وجود می‌یابد یا خطای کنترل‌شده پرتاب می‌کند."""
+    """نمونهٔ لغو کلاس را در صورت وجود می‌یابد یا خطای کنترل‌شده پرتاب می‌کند.
+
+    Args:
+        cancellation_id: شناسهٔ لغو مورد نظر.
+        institution: مؤسسهٔ درخواست‌کننده.
+
+    Returns:
+        ClassCancellation: نمونهٔ مدل در صورت وجود.
+
+    Raises:
+        CustomValidationError: اگر لغو مطابق با مؤسسه یافت نشود.
+    """
 
     _ensure_institution(institution)
     cancellation = schedule_repository.get_class_cancellation_by_id_and_institution(
@@ -209,7 +295,11 @@ def get_class_cancellation_by_id_or_404(cancellation_id: int, institution) -> di
 
 
 def delete_class_cancellation(cancellation: ClassCancellation) -> None:
-    """لغو کلاس را حذف نرم کرده و نمایش‌های مرتبط را برای بازسازی مجبور می‌سازد."""
+    """لغو کلاس را حذف نرم کرده و نمایش‌های مرتبط را برای بازسازی مجبور می‌سازد.
+
+    Args:
+        cancellation: نمونهٔ لغویی که باید حذف نرم شود.
+    """
 
     _ensure_institution(cancellation.institution)
     schedule_repository.soft_delete_class_cancellation(cancellation)
@@ -230,7 +320,20 @@ def _check_makeup_conflict(
     institution,
     exclude_id: int | None = None,
 ) -> None:
-    """تداخل‌های احتمالی جلسهٔ جبرانی با دیگر جلسات ثبت‌شده را تحلیل می‌کند."""
+    """تداخل‌های احتمالی جلسهٔ جبرانی با دیگر جلسات ثبت‌شده را تحلیل می‌کند.
+
+    Args:
+        session: جلسهٔ مرجع.
+        makeup_date: تاریخ پیشنهادی.
+        start_time: ساعت شروع.
+        end_time: ساعت پایان.
+        classroom: کلاس درس پیشنهادی.
+        institution: مؤسسهٔ درخواست‌کننده.
+        exclude_id: شناسهٔ جلسهٔ جبرانی برای استثنا در حالت ویرایش.
+
+    Raises:
+        CustomValidationError: اگر تداخل زمانی تشخیص داده شود.
+    """
 
     if schedule_repository.makeup_time_conflict_exists(
         institution=institution,
@@ -251,7 +354,18 @@ def _check_makeup_conflict(
 
 
 def create_makeup_class_session(data: dict, institution) -> dict:
-    """جلسهٔ جبرانی تازه‌ای ایجاد کرده و دادهٔ آمادهٔ ارسال به API را بازمی‌گرداند."""
+    """جلسهٔ جبرانی تازه‌ای ایجاد کرده و دادهٔ آمادهٔ ارسال به API را بازمی‌گرداند.
+
+    Args:
+        data: داده‌های خام شامل تاریخ و مکان جلسهٔ جبرانی.
+        institution: مؤسسهٔ مالک.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ جلسهٔ جبرانی.
+
+    Raises:
+        CustomValidationError: در صورت شکست اعتبارسنجی، عدم تعلق یا تداخل زمانی.
+    """
 
     _ensure_institution(institution)
     serializer = CreateMakeupClassSessionSerializer(
@@ -299,7 +413,18 @@ def create_makeup_class_session(data: dict, institution) -> dict:
 def update_makeup_class_session(
     makeup_session: MakeupClassSession, data: dict
 ) -> dict:
-    """جلسهٔ جبرانی موجود را با بررسی تضادهای احتمالی ویرایش می‌کند."""
+    """جلسهٔ جبرانی موجود را با بررسی تضادهای احتمالی ویرایش می‌کند.
+
+    Args:
+        makeup_session: نمونهٔ ثبت‌شدهٔ جلسهٔ جبرانی.
+        data: داده‌های ورودی برای ویرایش.
+
+    Returns:
+        dict: خروجی سریال‌شده پس از ذخیرهٔ تغییرات.
+
+    Raises:
+        CustomValidationError: در صورت شکست اعتبارسنجی یا تشخیص تداخل.
+    """
 
     _ensure_institution(makeup_session.institution)
     serializer = UpdateMakeupClassSessionSerializer(
@@ -352,7 +477,14 @@ def update_makeup_class_session(
 
 
 def list_makeup_class_sessions(institution) -> list[dict]:
-    """تمام جلسات جبرانی فعال مؤسسه را در قالب سریال‌شده برمی‌شمارد."""
+    """تمام جلسات جبرانی فعال مؤسسه را در قالب سریال‌شده برمی‌شمارد.
+
+    Args:
+        institution: مؤسسهٔ مالک جلسات.
+
+    Returns:
+        list[dict]: داده‌های سریال‌شدهٔ جلسات جبرانی.
+    """
 
     _ensure_institution(institution)
     queryset = schedule_repository.list_makeup_class_sessions_by_institution(institution)
@@ -362,7 +494,18 @@ def list_makeup_class_sessions(institution) -> list[dict]:
 def get_makeup_class_session_instance_or_404(
     makeup_id: int, institution
 ) -> MakeupClassSession:
-    """نمونهٔ مدل جلسهٔ جبرانی را با اعتبارسنجی مؤسسه برمی‌گرداند یا خطا می‌دهد."""
+    """نمونهٔ مدل جلسهٔ جبرانی را با اعتبارسنجی مؤسسه برمی‌گرداند یا خطا می‌دهد.
+
+    Args:
+        makeup_id: شناسهٔ جلسهٔ جبرانی.
+        institution: مؤسسهٔ درخواست‌کننده.
+
+    Returns:
+        MakeupClassSession: نمونهٔ مدل در صورت وجود.
+
+    Raises:
+        CustomValidationError: اگر رکورد متعلق به مؤسسه یافت نشود.
+    """
 
     _ensure_institution(institution)
     makeup_session = schedule_repository.get_makeup_class_session_by_id_and_institution(
@@ -380,14 +523,26 @@ def get_makeup_class_session_instance_or_404(
 
 
 def get_makeup_class_session_by_id_or_404(makeup_id: int, institution) -> dict:
-    """نمایش سریال‌شدهٔ جلسهٔ جبرانی متعلق به مؤسسه را در صورت وجود بازمی‌گرداند."""
+    """نمایش سریال‌شدهٔ جلسهٔ جبرانی متعلق به مؤسسه را در صورت وجود بازمی‌گرداند.
+
+    Args:
+        makeup_id: شناسهٔ جلسهٔ جبرانی.
+        institution: مؤسسهٔ درخواست‌کننده.
+
+    Returns:
+        dict: دادهٔ سریال‌شدهٔ جلسهٔ جبرانی.
+    """
 
     makeup_session = get_makeup_class_session_instance_or_404(makeup_id, institution)
     return MakeupClassSessionSerializer(makeup_session).data
 
 
 def delete_makeup_class_session(makeup_session: MakeupClassSession) -> None:
-    """جلسهٔ جبرانی را حذف نرم کرده و کش نمایش‌های مؤثر را بی‌اعتبار می‌کند."""
+    """جلسهٔ جبرانی را حذف نرم کرده و کش نمایش‌های مؤثر را بی‌اعتبار می‌کند.
+
+    Args:
+        makeup_session: نمونهٔ جلسه‌ای که باید حذف شود.
+    """
 
     _ensure_institution(makeup_session.institution)
     schedule_repository.soft_delete_makeup_class_session(makeup_session)

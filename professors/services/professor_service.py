@@ -1,3 +1,11 @@
+"""Service helpers that encapsulate professor CRUD workflows.
+
+این ماژول منطق دامنه‌ای ساخت، به‌روزرسانی، لیست و حذف استادان را متمرکز
+می‌کند تا viewها تنها وظیفهٔ مدیریت درخواست و پاسخ را بر عهده داشته باشند.
+هر تابع وظیفهٔ اعتبارسنجی داده‌ها، فراخوانی مخازن و تولید خطاهای
+``CustomValidationError`` با جزئیات ساخت‌یافته را بر عهده دارد.
+"""
+
 from django.db import IntegrityError
 from rest_framework import serializers
 
@@ -13,7 +21,18 @@ from professors.models import Professor
 
 
 def create_professor(data: dict, institution) -> dict:
-    """Create a new professor belonging to the given institution."""
+    """Create a new professor belonging to the given institution.
+
+    Args:
+        data: دیکشنری داده‌های خام شامل اطلاعات هویتی استاد.
+        institution: مؤسسه‌ای که استاد باید به آن نسبت داده شود.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ استاد تازه ایجاد شده.
+
+    Raises:
+        CustomValidationError: اگر اعتبارسنجی شکست بخورد یا کد ملی تکراری باشد.
+    """
     serializer = CreateProfessorSerializer(data=data, context={"institution": institution})
 
     try:
@@ -46,7 +65,18 @@ def create_professor(data: dict, institution) -> dict:
 
 
 def get_professor_instance_or_404(professor_id: int, institution) -> Professor:
-    """Return a professor instance or raise a not found error."""
+    """Return a professor instance or raise a not found error.
+
+    Args:
+        professor_id: شناسهٔ استاد مورد نظر.
+        institution: مؤسسه‌ای که استاد باید به آن تعلق داشته باشد.
+
+    Returns:
+        Professor: نمونهٔ مدل در صورت وجود.
+
+    Raises:
+        CustomValidationError: اگر استاد پیدا نشود یا به مؤسسه تعلق نداشته باشد.
+    """
     professor = professor_repository.get_professor_by_id_and_institution(
         professor_id=professor_id,
         institution=institution
@@ -64,13 +94,35 @@ def get_professor_instance_or_404(professor_id: int, institution) -> Professor:
 
 
 def get_professor_by_id_or_404(professor_id: int, institution) -> dict:
-    """Return serialized professor data for the given identifier."""
+    """Return serialized professor data for the given identifier.
+
+    Args:
+        professor_id: شناسهٔ استاد هدف.
+        institution: مؤسسهٔ درخواست‌کننده.
+
+    Returns:
+        dict: دادهٔ سریال‌شدهٔ استاد.
+
+    Raises:
+        CustomValidationError: همان خطای ``get_professor_instance_or_404`` در صورت فقدان.
+    """
     professor = get_professor_instance_or_404(professor_id, institution)
     return ProfessorSerializer(professor).data
 
 
 def update_professor(professor, data: dict) -> dict:
-    """Update an existing professor instance and return serialized data."""
+    """Update an existing professor instance and return serialized data.
+
+    Args:
+        professor: نمونهٔ مدل که باید ویرایش شود.
+        data: داده‌های جدید (می‌تواند جزئی باشد).
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ استاد بعد از اعمال تغییرات.
+
+    Raises:
+        CustomValidationError: اگر سریالایزر اعتبارسنجی را رد کند.
+    """
     serializer = UpdateProfessorSerializer(instance=professor, data=data, partial=True)
     if not serializer.is_valid():
         raise CustomValidationError(
@@ -85,11 +137,22 @@ def update_professor(professor, data: dict) -> dict:
 
 
 def delete_professor(professor) -> None:
-    """Soft delete the provided professor instance."""
+    """Soft delete the provided professor instance.
+
+    Args:
+        professor: نمونهٔ استادی که باید به صورت نرم حذف شود.
+    """
     professor_repository.soft_delete_professor(professor)
 
 
 def list_professors(institution) -> list[dict]:
-    """Return serialized data for all professors of the institution."""
+    """Return serialized data for all professors of the institution.
+
+    Args:
+        institution: مؤسسه‌ای که باید فهرست استادان آن بازگردانده شود.
+
+    Returns:
+        list[dict]: مجموعه‌ای از داده‌های سریال‌شدهٔ استادان فعال.
+    """
     queryset = professor_repository.list_professors_by_institution(institution)
     return ProfessorSerializer(queryset, many=True).data

@@ -1,3 +1,10 @@
+"""Service functions for managing classroom resources within buildings.
+
+این ماژول عملیات ساخت، به‌روزرسانی، فهرست و حذف کلاس‌ها را متمرکز کرده و
+با استفاده از خطاهای ساخت‌یافته، یکپارچگی چندمؤسسه‌ای داده‌ها را تضمین
+می‌کند.
+"""
+
 from locations.repositories import classroom_repository
 from locations.serializers.classroom_serializer import (
     ClassroomSerializer,
@@ -14,6 +21,16 @@ def create_classroom(data: dict, building) -> dict:
     ``CreateClassroomSerializer`` checks that a title is provided before the
     room is associated with the supplied building, ensuring incomplete payloads
     are rejected prior to persistence.
+
+    Args:
+        data: داده‌های خام کلاس شامل عنوان و ظرفیت.
+        building: ساختمان والد که کلاس به آن تعلق می‌گیرد.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ کلاس تازه ایجاد شده.
+
+    Raises:
+        CustomValidationError: اگر سریالایزر داده‌ها را نامعتبر تشخیص دهد.
     """
     serializer = CreateClassroomSerializer(data=data)
     if not serializer.is_valid():
@@ -36,6 +53,16 @@ def get_classroom_instance_or_404(classroom_id: int, building):
 
     Only returns classrooms linked to the provided building and not soft
     deleted, so it validates both ownership and active status.
+
+    Args:
+        classroom_id: شناسهٔ کلاس مورد نظر.
+        building: ساختمان مالک.
+
+    Returns:
+        Classroom: نمونهٔ مدل در صورت وجود.
+
+    Raises:
+        CustomValidationError: اگر کلاس متعلق به ساختمان یافت نشود.
     """
     classroom = classroom_repository.get_classroom_by_id_and_building(classroom_id, building)
     if not classroom:
@@ -53,6 +80,13 @@ def get_classroom_by_id_or_404(classroom_id: int, building) -> dict:
 
     Ensures the classroom exists within the supplied building before
     serialization, preventing information leaks across buildings.
+
+    Args:
+        classroom_id: شناسهٔ کلاس.
+        building: ساختمان مالک.
+
+    Returns:
+        dict: دادهٔ سریال‌شدهٔ کلاس.
     """
     classroom = get_classroom_instance_or_404(classroom_id, building)
     return ClassroomSerializer(classroom).data
@@ -63,6 +97,16 @@ def update_classroom(classroom, data: dict) -> dict:
 
     The ``UpdateClassroomSerializer`` performs partial validation (e.g. title
     cannot be blank) before saving, protecting against invalid edits.
+
+    Args:
+        classroom: نمونهٔ کلاس موجود.
+        data: داده‌های جدید برای اعمال تغییر.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ کلاس به‌روزشده.
+
+    Raises:
+        CustomValidationError: اگر سریالایزر اعتبارسنجی را رد کند.
     """
     serializer = UpdateClassroomSerializer(instance=classroom, data=data, partial=True)
     if not serializer.is_valid():
@@ -82,6 +126,9 @@ def delete_classroom(classroom) -> None:
 
     The caller must fetch the classroom through the institution-aware helpers
     so we only mark authorized records as deleted.
+
+    Args:
+        classroom: نمونهٔ کلاسی که باید حذف نرم شود.
     """
     classroom_repository.soft_delete_classroom(classroom)
 
@@ -91,6 +138,12 @@ def list_classrooms_for_institution(institution) -> list[dict]:
 
     Uses repository filtering to include only classrooms tied to the
     institution's buildings with ``is_deleted=False``.
+
+    Args:
+        institution: مؤسسهٔ مالک ساختمان‌ها.
+
+    Returns:
+        list[dict]: دادهٔ سریال‌شدهٔ کلاس‌های فعال.
     """
     queryset = classroom_repository.list_classrooms_by_institution(institution)
     return ClassroomSerializer(queryset, many=True).data
@@ -101,6 +154,12 @@ def list_classrooms(building) -> list[dict]:
 
     The repository query scopes by building and ``is_deleted=False`` to only
     expose currently available rooms.
+
+    Args:
+        building: ساختمان هدف.
+
+    Returns:
+        list[dict]: آرایه‌ای از داده‌های سریال‌شدهٔ کلاس‌ها.
     """
     queryset = classroom_repository.list_classrooms_by_building(building)
     return ClassroomSerializer(queryset, many=True).data
@@ -111,6 +170,16 @@ def get_classroom_by_id_and_institution_or_404(classroom_id: int, institution) -
 
     Ensures the classroom exists, belongs to the institution and is active
     before exposing its data to the caller.
+
+    Args:
+        classroom_id: شناسهٔ کلاس.
+        institution: مؤسسهٔ درخواست‌کننده.
+
+    Returns:
+        dict: دادهٔ سریال‌شدهٔ کلاس.
+
+    Raises:
+        CustomValidationError: اگر کلاس متعلق به مؤسسه یافت نشود.
     """
     classroom = classroom_repository.get_classroom_by_id_and_institution(classroom_id, institution)
 
@@ -130,6 +199,16 @@ def get_classroom_instance_by_institution_or_404(classroom_id: int, institution)
 
     Limits access to classrooms linked to the institution and not soft-deleted,
     safeguarding against cross-institution edits or deletions.
+
+    Args:
+        classroom_id: شناسهٔ کلاس.
+        institution: مؤسسهٔ مالک.
+
+    Returns:
+        Classroom: نمونهٔ مدل در صورت وجود.
+
+    Raises:
+        CustomValidationError: اگر کلاس مطابق با مؤسسه یافت نشود.
     """
     classroom = classroom_repository.get_classroom_by_id_and_institution(classroom_id, institution)
 
