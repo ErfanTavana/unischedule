@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+"""Display screen service helpers for building real-time timetable payloads.
+
+این ماژول تمام منطق مربوط به صفحه‌نمایش‌های عمومی را شامل می‌شود؛ از ایجاد و
+به‌روزرسانی تنظیمات نمایش گرفته تا ساخت خروجی کش‌شده برای سامانه‌های
+دیجیتال ساینج. توابع موجود ضمن اعتبارسنجی داده‌ها، کش را مدیریت کرده و
+دسترسی به پایگاه داده را از طریق لایهٔ مخزن هماهنگ می‌کنند.
+"""
+
 from datetime import date, time as time_cls, timedelta
 from typing import Iterable, List
 
@@ -36,6 +44,15 @@ DAY_ORDER = {value: index for index, (value, _) in enumerate(ClassSession.DAY_OF
 
 
 def _ensure_institution(institution) -> None:
+    """اطمینان می‌دهد که عملیات به یک مؤسسه معتبر مرتبط است.
+
+    Args:
+        institution: نمونهٔ مؤسسه یا ``None`` اگر کاربر احراز هویت نشده باشد.
+
+    Raises:
+        CustomValidationError: زمانی که مؤسسه ارائه نشده باشد تا مصرف‌کننده خطای
+        قابل‌درک API دریافت کند.
+    """
     if not institution:
         raise CustomValidationError(
             message=ErrorCodes.INSTITUTION_REQUIRED["message"],
@@ -47,6 +64,14 @@ def _ensure_institution(institution) -> None:
 
 
 def _validate_serializer(serializer) -> None:
+    """Execute serializer validation and normalise any errors.
+
+    Args:
+        serializer: نمونهٔ سریالایزر DRF که باید اعتبارسنجی شود.
+
+    Raises:
+        CustomValidationError: اگر ``is_valid`` خروجی ناموفق داشته باشد.
+    """
     if not serializer.is_valid():
         raise CustomValidationError(
             message=ErrorCodes.VALIDATION_FAILED["message"],
@@ -62,6 +87,15 @@ def list_display_screens(institution) -> QuerySet[DisplayScreen]:
     Pagination is applied at the view layer via :func:`BaseResponse.paginate_queryset`
     to leverage the shared response envelope while keeping the repository focused on
     queryset construction.
+    
+    Args:
+        institution: مؤسسهٔ مالک صفحه‌نمایش‌ها.
+
+    Returns:
+        QuerySet[DisplayScreen]: کوئری‌ستی آماده برای صفحه‌بندی در لایهٔ بالاتر.
+
+    Raises:
+        CustomValidationError: اگر کاربر فاقد مؤسسه معتبر باشد.
     """
 
     _ensure_institution(institution)
@@ -69,6 +103,16 @@ def list_display_screens(institution) -> QuerySet[DisplayScreen]:
 
 
 def create_display_screen(data: dict, institution) -> dict:
+    """Create a display screen scoped to the given institution.
+
+    Args:
+        data: داده‌های خام شامل تنظیمات صفحه‌نمایش.
+        institution: مؤسسهٔ مالک صفحه‌نمایش.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ صفحه‌نمایش تازه ایجاد شده.
+    """
+
     _ensure_institution(institution)
     serializer = DisplayScreenWriteSerializer(data=data, context={"institution": institution})
     _validate_serializer(serializer)
@@ -77,6 +121,19 @@ def create_display_screen(data: dict, institution) -> dict:
 
 
 def get_display_screen_instance_or_404(screen_id: int, institution) -> DisplayScreen:
+    """Fetch a screen instance or raise a structured error.
+
+    Args:
+        screen_id: شناسهٔ صفحه‌نمایش.
+        institution: مؤسسهٔ مالک که باید با رکورد هم‌خوان باشد.
+
+    Returns:
+        DisplayScreen: نمونهٔ مدل در صورت وجود.
+
+    Raises:
+        CustomValidationError: اگر صفحه‌نمایش پیدا نشود یا به مؤسسهٔ دیگری تعلق داشته باشد.
+    """
+
     _ensure_institution(institution)
     screen = display_repository.get_display_screen_by_id(screen_id, institution)
     if not screen:
@@ -90,11 +147,23 @@ def get_display_screen_instance_or_404(screen_id: int, institution) -> DisplaySc
 
 
 def get_display_screen_by_id_or_404(screen_id: int, institution) -> dict:
+    """Return serialized data for a screen after ownership validation."""
+
     screen = get_display_screen_instance_or_404(screen_id, institution)
     return DisplayScreenSerializer(screen).data
 
 
 def update_display_screen(screen: DisplayScreen, data: dict) -> dict:
+    """Apply partial updates to a screen and refresh its cache entry.
+
+    Args:
+        screen: نمونهٔ صفحه‌نمایش فعلی.
+        data: داده‌های جدید برای به‌روزرسانی (می‌تواند جزئی باشد).
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ صفحه‌نمایش پس از ذخیره.
+    """
+
     serializer = DisplayScreenWriteSerializer(
         instance=screen,
         data=data,
@@ -108,12 +177,26 @@ def update_display_screen(screen: DisplayScreen, data: dict) -> dict:
 
 
 def delete_display_screen(screen: DisplayScreen) -> None:
+    """Soft delete a screen and purge any cached payloads."""
+
     slug = screen.slug
     display_repository.soft_delete_display_screen(screen)
     cache.delete(f"display:{slug}")
 
 
 def get_display_screen_by_slug_or_404(slug: str) -> DisplayScreen:
+    """Return a screen by slug regardless of authentication context.
+
+    Args:
+        slug: شناسهٔ متنی که در URL عمومی استفاده می‌شود.
+
+    Returns:
+        DisplayScreen: نمونهٔ صفحه‌نمایش فعال.
+
+    Raises:
+        CustomValidationError: اگر صفحه‌نمایش یافت نشود.
+    """
+
     screen = display_repository.get_display_screen_by_slug(slug)
     if not screen:
         raise CustomValidationError(
@@ -132,6 +215,13 @@ def _apply_week_type_filter(qs, week_type: str | None):
     sessions that are marked to occur every week.  This helper encapsulates
     that behaviour so it can be reused by both cached and uncached payload
     builders.
+
+    Args:
+        qs: کوئری‌ست اولیه‌ای که قرار است فیلتر شود.
+        week_type: مقدار انتخابی (odd/even/every) یا ``None``.
+
+    Returns:
+        QuerySet: کوئری‌ست فیلترشده بر اساس نوع هفته.
     """
     if not week_type:
         return qs
@@ -143,6 +233,14 @@ def _apply_week_type_filter(qs, week_type: str | None):
 
 
 def _base_session_queryset(screen: DisplayScreen):
+    """Construct the base queryset for class sessions tied to a screen.
+
+    Args:
+        screen: نمونهٔ صفحه‌نمایش که مؤسسهٔ آن برای فیلتر استفاده می‌شود.
+
+    Returns:
+        QuerySet: کوئری‌ست اولیه با ``select_related`` مناسب برای کاهش تعداد کوئری‌ها.
+    """
     return (
         ClassSession.objects.filter(
             institution=screen.institution,
@@ -153,6 +251,15 @@ def _base_session_queryset(screen: DisplayScreen):
 
 
 def _sort_sessions(sessions: Iterable[dict]) -> List[dict]:
+    """Sort session payloads deterministically for display stability.
+
+    Args:
+        sessions: iterable‌ای از دیکشنری‌ها که شامل داده‌های جلسه هستند.
+
+    Returns:
+        List[dict]: نسخه مرتب‌شده بر اساس تاریخ، روز، زمان و عنوان درس.
+    """
+
     def _normalise_date(value):
         if isinstance(value, date):
             return value
@@ -181,6 +288,15 @@ def _sort_sessions(sessions: Iterable[dict]) -> List[dict]:
 
 
 def _resolve_target_date(screen: DisplayScreen, computed_day: str | None) -> date | None:
+    """Determine the calendar date that should anchor the payload.
+
+    Args:
+        screen: صفحه‌نمایشی که تنظیمات فیلتر از آن خوانده می‌شود.
+        computed_day: مقدار روز هفته (به فارسی) که از تنظیمات محاسبه شده است.
+
+    Returns:
+        date | None: تاریخ هدف یا ``None`` اگر نیازی به محدودسازی روز نباشد.
+    """
     override = parse_date(screen.filter_date_override)
     if override:
         return override
@@ -201,6 +317,16 @@ def _resolve_target_date(screen: DisplayScreen, computed_day: str | None) -> dat
 def _load_cancellations(
     screen: DisplayScreen, sessions: Iterable[ClassSession], target_date: date | None
 ):
+    """Load cancellation instances relevant to the computed session set.
+
+    Args:
+        screen: صفحه‌نمایشی که مؤسسه‌اش مبنای جستجو قرار می‌گیرد.
+        sessions: لیست جلسات اصلی که شناسهٔ آن‌ها برای فیلتر استفاده می‌شود.
+        target_date: تاریخ هدف برای محدودسازی لغوها.
+
+    Returns:
+        dict[int, ClassCancellation]: نگاشت شناسهٔ جلسه به شیء لغو متناظر.
+    """
     if not target_date:
         return {}
     session_ids = [session.id for session in sessions]
@@ -224,6 +350,16 @@ def _build_session_payload(
     target_date: date | None,
     cancellation: ClassCancellation | None,
 ) -> dict:
+    """Construct the API payload for a canonical class session.
+
+    Args:
+        session: نمونهٔ جلسه.
+        target_date: تاریخ نهایی نمایش داده شده.
+        cancellation: لغو متناظر (در صورت وجود).
+
+    Returns:
+        dict: ساختار داده‌ای آماده برای سریالایزر عمومی.
+    """
     professor = session.professor
     classroom = session.classroom
     building = classroom.building if classroom else None
@@ -262,6 +398,15 @@ def _build_session_payload(
 
 
 def _week_type_for_date(semester, target_date: date | None) -> str | None:
+    """Compute the week type (odd/even) for a specific calendar date.
+
+    Args:
+        semester: نمونهٔ ترم مرتبط با جلسهٔ کلاس.
+        target_date: تاریخی که باید نوع هفته برای آن تعیین شود.
+
+    Returns:
+        str | None: مقدار نوع هفته یا ``None`` اگر محاسبه امکان‌پذیر نباشد.
+    """
     if not semester or not target_date:
         return None
     start_date = getattr(semester, "start_date", None)
@@ -282,6 +427,16 @@ def _makeup_matches_week_type(
     session_week_type: str,
     date_week_type: str | None,
 ) -> bool:
+    """Determine whether a makeup session satisfies week-type filters.
+
+    Args:
+        screen_week_type: نوع هفته انتخاب‌شده در تنظیمات صفحه.
+        session_week_type: نوع هفتهٔ جلسهٔ پایه.
+        date_week_type: نوع هفته محاسبه‌شده برای تاریخ خاص.
+
+    Returns:
+        bool: ``True`` اگر جلسهٔ جبرانی باید در خروجی باقی بماند.
+    """
     if not screen_week_type or screen_week_type == ClassSession.WeekTypeChoices.EVERY:
         return True
     valid_types = {screen_week_type, ClassSession.WeekTypeChoices.EVERY}
@@ -293,6 +448,14 @@ def _makeup_matches_week_type(
 
 
 def _build_makeup_payload(makeup: MakeupClassSession) -> dict:
+    """Construct the API payload for a makeup class session.
+
+    Args:
+        makeup: نمونهٔ جلسهٔ جبرانی ثبت‌شده.
+
+    Returns:
+        dict: دیکشنری آماده برای ادغام با لیست جلسات اصلی.
+    """
     session = makeup.class_session
     professor = session.professor
     classroom = makeup.classroom
@@ -328,6 +491,16 @@ def _collect_makeup_payloads(
     target_date: date | None,
     computed_week_type: str | None,
 ) -> List[dict]:
+    """Gather serialized payloads for makeup sessions that match filters.
+
+    Args:
+        screen: صفحه‌نمایش مبنا.
+        target_date: تاریخ انتخاب شده برای نمایش.
+        computed_week_type: نوع هفتهٔ استخراج شده از تنظیمات.
+
+    Returns:
+        list[dict]: آرایه‌ای از دیکشنری‌های جلسهٔ جبرانی.
+    """
     if not target_date:
         return []
 
@@ -402,6 +575,12 @@ def _collect_sessions_for_screen(screen: DisplayScreen) -> List[ClassSession]:
     payload is fetched from cache and when it is rebuilt.  It honours the
     activation flag, the user-provided selectors, and computed fallbacks such
     as day-of-week and week-type rules.
+
+    Args:
+        screen: صفحه‌نمایش که فیلترها از آن خوانده می‌شوند.
+
+    Returns:
+        list[ClassSession]: لیست جلساتی که معیارها را پاس می‌کنند.
     """
     qs = _base_session_queryset(screen)
 
@@ -490,6 +669,13 @@ def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> di
     the session list is calculated, sorted and serialised together with the
     computed filter metadata.  Newly generated payloads are stored in the cache
     for the screen ``refresh_interval``.
+
+    Args:
+        screen: صفحه‌نمایش هدف.
+        use_cache: آیا از کش استفاده شود یا خیر.
+
+    Returns:
+        dict: ساختار کامل شامل متادیتای فیلتر، جلسات و زمان تولید.
     """
     # Cache keys are namespaced with the ``display:`` prefix so they do not
     # collide with other app caches; the slug uniquely identifies each screen.
@@ -536,7 +722,11 @@ def build_public_payload(screen: DisplayScreen, *, use_cache: bool = True) -> di
 
 
 def invalidate_screen_cache(screen: DisplayScreen) -> None:
-    """Remove the cached payload for the provided screen."""
+    """Remove the cached payload for the provided screen.
+
+    Args:
+        screen: صفحه‌نمایشی که کش آن باید پاک شود.
+    """
     # Mirrors the naming strategy in ``build_public_payload`` to target only the
     # affected screen without disturbing other cached responses.
     cache.delete(f"display:{screen.slug}")

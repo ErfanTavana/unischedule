@@ -1,3 +1,11 @@
+"""High-level operations for managing institutions and their media assets.
+
+The helpers in this module coordinate serializer validation, repository
+queries, and cache invalidation to keep the view layer minimal. They provide
+comprehensive error reporting through :class:`CustomValidationError` so API
+responses remain consistent across the project.
+"""
+
 from django.core.files.storage import default_storage
 
 from institutions import repositories as institution_repository
@@ -12,6 +20,15 @@ from unischedule.core.exceptions import CustomValidationError
 
 
 def _ensure_institution(institution) -> None:
+    """Validate that an institution instance is present.
+
+    Args:
+        institution: نمونه‌ای از مدل مؤسسه که انتظار می‌رود خالی نباشد.
+
+    Raises:
+        CustomValidationError: اگر مقدار ورودی تهی باشد تا درخواست‌کننده از نبود
+        دسترسی یا مقدار مطلع شود.
+    """
     if not institution:
         raise CustomValidationError(
             message=ErrorCodes.INSTITUTION_REQUIRED["message"],
@@ -23,6 +40,16 @@ def _ensure_institution(institution) -> None:
 
 
 def _invalidate_display_caches(institution) -> None:
+    """Invalidate cached display payloads for screens owned by the institution.
+
+    Args:
+        institution: مؤسسه‌ای که صفحه‌نمایش‌های وابسته به آن باید ریفرش شوند.
+
+    Notes:
+        این تابع واردات تنبل انجام می‌دهد تا از حلقه‌های وابستگی جلوگیری کند و
+        سپس کش هر نمایش فعال را پاک می‌کند تا تغییر لوگو یا مشخصات مؤسسه در
+        لحظه منعکس شود.
+    """
     from displays.repositories import display_screen_repository
     from displays.services import display_service
 
@@ -32,14 +59,30 @@ def _invalidate_display_caches(institution) -> None:
 
 
 def list_institutions() -> list[dict]:
-    """Return serialized data for all active institutions."""
+    """Return serialized data for all active institutions.
+
+    Returns:
+        list[dict]: مجموعه‌ای از دیکشنری‌ها که توسط ``InstitutionSerializer``
+        ساخته شده و برای پاسخ‌های API آماده هستند.
+    """
 
     queryset = institution_repository.list_institutions()
     return InstitutionSerializer(queryset, many=True).data
 
 
 def create_institution(data: dict) -> dict:
-    """Create a new institution after validating input data."""
+    """Create a new institution after validating input data.
+
+    Args:
+        data: دیکشنری داده‌های خام که معمولاً از بدنهٔ درخواست API دریافت می‌شود.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ مؤسسهٔ تازه ایجاد شده.
+
+    Raises:
+        CustomValidationError: در صورت شکست اعتبارسنجی سریالایزر یا وجود اسلاگ
+        تکراری برای مؤسسهٔ فعال دیگری.
+    """
 
     serializer = CreateInstitutionSerializer(data=data)
     if not serializer.is_valid():
@@ -67,7 +110,17 @@ def create_institution(data: dict) -> dict:
 
 
 def get_institution_instance_or_404(institution_id: int):
-    """Return an institution instance or raise a structured not-found error."""
+    """Return an institution instance or raise a structured not-found error.
+
+    Args:
+        institution_id: شناسهٔ عددی مؤسسهٔ مورد نظر.
+
+    Returns:
+        institutions.models.Institution: نمونهٔ بازیابی شده از پایگاه داده.
+
+    Raises:
+        CustomValidationError: اگر مؤسسه‌ای با شناسه و وضعیت فعال یافت نشود.
+    """
 
     institution = institution_repository.get_institution_by_id(institution_id)
     if not institution:
@@ -81,14 +134,36 @@ def get_institution_instance_or_404(institution_id: int):
 
 
 def get_institution_by_id_or_404(institution_id: int) -> dict:
-    """Serialize a single institution by ID, raising an error when missing."""
+    """Serialize a single institution by ID, raising an error when missing.
+
+    Args:
+        institution_id: شناسهٔ مؤسسه‌ای که باید واکشی شود.
+
+    Returns:
+        dict: دادهٔ سریال‌شدهٔ مؤسسه برای مصرف در پاسخ API.
+
+    Raises:
+        CustomValidationError: اگر مؤسسه‌ای با شناسهٔ ورودی وجود نداشته باشد.
+    """
 
     institution = get_institution_instance_or_404(institution_id)
     return InstitutionSerializer(institution).data
 
 
 def update_institution(institution, data: dict) -> dict:
-    """Update an institution instance with validated payload."""
+    """Update an institution instance with a validated payload.
+
+    Args:
+        institution: نمونهٔ مؤسسه که باید ویرایش شود.
+        data: دیکشنری داده‌های جدید که می‌تواند بخشی از فیلدها را شامل شود.
+
+    Returns:
+        dict: خروجی سریال‌شدهٔ مؤسسه پس از ذخیرهٔ تغییرات.
+
+    Raises:
+        CustomValidationError: اگر اعتبارسنجی شکست بخورد یا اسلاگ جدید با مؤسسهٔ
+        فعال دیگری در تضاد باشد.
+    """
 
     previous_logo_name = institution.logo.name if getattr(institution.logo, "name", None) else None
     serializer = UpdateInstitutionSerializer(instance=institution, data=data, partial=True)
@@ -129,7 +204,14 @@ def update_institution(institution, data: dict) -> dict:
 
 
 def delete_institution(institution) -> None:
-    """Soft delete the provided institution instance."""
+    """Soft delete the provided institution instance.
+
+    Args:
+        institution: نمونهٔ مؤسسه‌ای که باید حذف نرم شود.
+
+    Raises:
+        CustomValidationError: در صورت بروز خطا در لایهٔ مخزن که مانع حذف می‌شود.
+    """
 
     try:
         institution_repository.soft_delete_institution(institution)
@@ -143,7 +225,18 @@ def delete_institution(institution) -> None:
 
 
 def get_institution_logo(institution, *, context: dict | None = None) -> dict:
-    """Return the serialized logo metadata for the provided institution."""
+    """Return the serialized logo metadata for the provided institution.
+
+    Args:
+        institution: نمونهٔ مؤسسه‌ای که قرار است لوگوی آن خوانده شود.
+        context: تنظیمات اضافی برای سریالایزر لوگو.
+
+    Returns:
+        dict: متادیتای لوگوی مؤسسه شامل آدرس و ابعاد در صورت وجود.
+
+    Raises:
+        CustomValidationError: اگر مؤسسه ارائه نشده باشد.
+    """
 
     _ensure_institution(institution)
     serializer = InstitutionLogoSerializer(institution, context=context or {})
@@ -151,7 +244,19 @@ def get_institution_logo(institution, *, context: dict | None = None) -> dict:
 
 
 def update_institution_logo(institution, data: dict, *, context: dict | None = None) -> dict:
-    """Update the institution logo with a new file payload."""
+    """Update the institution logo with a new file payload.
+
+    Args:
+        institution: مؤسسه‌ای که لوگوی آن باید تغییر کند.
+        data: دیکشنری شامل فایل و متادیتای لوگو.
+        context: تنظیمات اختیاری سریالایزر، مانند درخواست فعلی.
+
+    Returns:
+        dict: متادیتای لوگوی جدید پس از ذخیره‌سازی و پاکسازی کش‌های مرتبط.
+
+    Raises:
+        CustomValidationError: در صورت نبود مؤسسه یا شکست اعتبارسنجی سریالایزر.
+    """
 
     _ensure_institution(institution)
     serializer = InstitutionLogoSerializer(
@@ -183,7 +288,18 @@ def update_institution_logo(institution, data: dict, *, context: dict | None = N
 
 
 def delete_institution_logo(institution, *, context: dict | None = None) -> dict:
-    """Remove the stored logo from the institution profile."""
+    """Remove the stored logo from the institution profile.
+
+    Args:
+        institution: نمونهٔ مؤسسه‌ای که باید لوگوی آن حذف شود.
+        context: تنظیمات اختیاری سریالایزر برای شکل‌دهی خروجی.
+
+    Returns:
+        dict: متادیتای به‌روز شدهٔ لوگو پس از حذف (معمولاً مقادیر تهی).
+
+    Raises:
+        CustomValidationError: اگر مؤسسه ارائه نشود.
+    """
 
     _ensure_institution(institution)
 
