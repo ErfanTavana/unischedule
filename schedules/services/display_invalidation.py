@@ -38,6 +38,8 @@ def invalidate_related_displays(session: ClassSession, *, force: bool = False) -
 
 
 def _session_might_affect_screen(screen: DisplayScreen, session: ClassSession) -> bool:
+    """برآورد می‌کند که تغییرات جلسه بر خروجی نمایش موردنظر اثرگذار است یا خیر."""
+
     if not screen.filter_is_active:
         return True
 
@@ -105,6 +107,8 @@ def _session_might_affect_screen(screen: DisplayScreen, session: ClassSession) -
 
 
 def _collect_selectors(screen: DisplayScreen) -> Iterable[bool]:
+    """مجموعه‌ای از وضعیت فیلترهای فعال نمایش را به صورت بولین بازمی‌گرداند."""
+
     return (
         bool(screen.filter_classroom_id),
         bool(screen.filter_building_id),

@@ -16,6 +16,8 @@ from schedules.services import class_adjustment_service
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_class_cancellations_view(request):
+    """لیست لغوهای ثبت‌شدهٔ مؤسسه را به صورت پاسخ استاندارد بازمی‌گرداند."""
+
     institution = request.user.institution
     try:
         cancellations = class_adjustment_service.list_class_cancellations(institution)
@@ -37,6 +39,8 @@ def list_class_cancellations_view(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_class_cancellation_view(request):
+    """لغو جدیدی برای کلاس ثبت کرده و پیام مناسب موفقیت یا خطا برمی‌گرداند."""
+
     institution = request.user.institution
     try:
         cancellation = class_adjustment_service.create_class_cancellation(
@@ -75,6 +79,8 @@ def create_class_cancellation_view(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def retrieve_class_cancellation_view(request, cancellation_id: int):
+    """جزئیات لغو مشخص را در قالب خروجی مشترک API فراهم می‌کند."""
+
     institution = request.user.institution
     try:
         cancellation = class_adjustment_service.get_class_cancellation_by_id_or_404(
@@ -98,6 +104,8 @@ def retrieve_class_cancellation_view(request, cancellation_id: int):
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_class_cancellation_view(request, cancellation_id: int):
+    """لغو ثبت‌شده را به‌روزرسانی کرده و خطاها را به ساختار قابل‌پیش‌بینی تبدیل می‌کند."""
+
     institution = request.user.institution
     try:
         cancellation_instance = (
@@ -140,6 +148,8 @@ def update_class_cancellation_view(request, cancellation_id: int):
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def delete_class_cancellation_view(request, cancellation_id: int):
+    """لغو کلاس را حذف نرم کرده و نتیجهٔ عملیات را به صورت استاندارد گزارش می‌دهد."""
+
     institution = request.user.institution
     try:
         cancellation_instance = (

@@ -11,6 +11,8 @@ from schedules.services.display_invalidation import invalidate_related_displays
 
 
 def _ensure_institution(institution) -> None:
+    """اطمینان حاصل می‌کند که درخواست به یک مؤسسه معتبر متصل است."""
+
     if not institution:
         raise CustomValidationError(
             message=ErrorCodes.INSTITUTION_REQUIRED["message"],
@@ -86,6 +88,8 @@ def update_class_session(session: ClassSession, data: dict) -> dict:
 
 
 def get_class_session_instance_or_404(session_id: int, institution) -> ClassSession:
+    """نمونهٔ مدل را با اعتبارسنجی مؤسسه بازیابی کرده یا خطای دامنه‌ای پرتاب می‌کند."""
+
     _ensure_institution(institution)
     session = class_session_repository.get_class_session_by_id_and_institution(session_id, institution)
     if not session:
@@ -99,17 +103,23 @@ def get_class_session_instance_or_404(session_id: int, institution) -> ClassSess
 
 
 def get_class_session_by_id_or_404(session_id: int, institution) -> dict:
+    """دادهٔ سریال‌شدهٔ جلسه را در صورت وجود و تعلق به مؤسسه بازمی‌گرداند."""
+
     session = get_class_session_instance_or_404(session_id, institution)
     return ClassSessionSerializer(session).data
 
 
 def delete_class_session(session: ClassSession) -> None:
+    """جلسهٔ داده‌شده را حذف نرم کرده و کش نمایش‌های مرتبط را نامعتبر می‌کند."""
+
     _ensure_institution(session.institution)
     class_session_repository.soft_delete_class_session(session)
     invalidate_related_displays(session)
 
 
 def list_class_sessions(institution) -> list[dict]:
+    """لیست سریال‌شدهٔ جلسات فعال مؤسسهٔ ورودی را تولید می‌کند."""
+
     _ensure_institution(institution)
     queryset = class_session_repository.list_class_sessions_by_institution(institution)
     return ClassSessionSerializer(queryset, many=True).data
