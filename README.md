@@ -1,138 +1,52 @@
-# یونی‌شدول
+# Unischedule
 
-«یونی‌شدول» یک مونو‌لیث جنگویی است که با ترکیب Django 5 و Django REST Framework چرخهٔ کامل برنامه‌ریزی آموزشی را از مدیریت مؤسسات تا انتشار برنامهٔ نهایی روی مانیتورهای اطلاع‌رسانی پوشش می‌دهد. این سند تلاش می‌کند تصویری جامع از پروژه ارائه کند تا توسعه‌دهندگان تازه‌وارد سریع‌تر با معماری، دامنهٔ مسئله و نحوهٔ مشارکت آشنا شوند.
+Unischedule is a Django 5 + Django REST Framework monolith for managing academic schedules and publishing curated views to public display screens.
 
-## معرفی سریع
+## Project Overview
+- Custom user model ties each account to an `Institution`, providing a simple multi-tenant boundary for all domain objects.
+- Domain models such as courses, professors, classrooms, semesters, sessions, cancellations, makeups, and display screens inherit shared conventions for timestamps and soft deletion.
+- API responses are normalized through a single helper to keep success and error payloads consistent across apps.
+- Display payloads are cached per screen slug so kiosks can poll lightweight JSON feeds without recomputing filters on each request.
 
-- **چند-سازمانی (Multi-tenant):** هر کاربر به یک مؤسسه متصل است و دسترسی به داده‌ها بر همین اساس کنترل می‌شود. مدل کاربر سفارشی `accounts.User` روی Django `AbstractUser` ساخته شده است تا وابستگی به مؤسسه در سطح پایگاه داده اعمال شود.
-- **مدل دادهٔ یکپارچه:** همهٔ مدل‌های دامنه (درس، استاد، کلاس، ترم، نمایشگر و غیره) از `BaseModel` ارث می‌برند تا حذف نرم و زمان‌مهر استاندارد داشته باشند و کوئری‌های روزمره فقط رکوردهای فعال را ببینند.
-- **پاسخ‌های پایدار:** هستهٔ `unischedule.core` مجموعه‌ای از کدهای موفق/خطا و کلاس پاسخ مشترک `BaseResponse` را در اختیار می‌گذارد تا تمام APIها خروجی هم‌شکل با متادیتای صفحه‌بندی تولید کنند.
-- **پروسهٔ زمان‌بندی:** سرویس‌های اپ `schedules` از رخداد تداخل زمانی میان استاد، کلاس و بازهٔ زمانی جلوگیری می‌کنند و پس از هر تغییر، کش نمایشگرهای مرتبط را بی‌درنگ پاک می‌کنند تا دادهٔ به‌روز روی مانیتورها نمایش داده شود.
-- **مانیتورینگ برنامه‌ها:** اپ `displays` اجازه می‌دهد برای هر مانیتور مجموعه‌ای از فیلترهای پویا تعریف شود (روز، نوع هفته، ساختمان، گروه و ...). خروجی نهایی با caching سطح slug منتشر می‌شود و شامل اطلاعات مؤسسه و کلاس‌ها به‌صورت مرتب‌شده است.
-- **ابزارهای جانبی:** اسکریپت کمکی `scripts/clean_postman_fragments.py` خروجی Postman را از تگ‌های ناخواستهٔ StartFragment/EndFragment پاک می‌کند تا داکیومنت API تمیز بماند.
+## Key Features
+- **Institution-scoped authentication:** `accounts.User` extends Django's `AbstractUser` with a foreign key to `Institution`, ensuring every request can be constrained to the caller's institution.
+- **Soft deletion with audit fields:** `BaseModel` and `ActiveManager` add `created_at`/`updated_at` timestamps, an `is_deleted` flag, and a manager that hides deleted rows while still allowing access via `objects_with_deleted`.
+- **Uniform API envelopes:** `BaseResponse` centralizes success/error helpers and pagination so view functions only provide payload data and codes.
+- **Schedule conflict detection:** `schedules` services validate that class sessions do not overlap for the same professor or classroom before persisting changes, and invalidate display caches after modifications.
+- **Cancellations and makeups:** Dedicated models capture single-day cancellations and compensatory sessions so displays can merge base schedules with adjustments.
+- **Display filtering and caching:** Display screens store filter rules (day-of-week, week type, building, course, professor, time ranges, etc.). Public payloads are cached under `display:<slug>` for the configured `refresh_interval`.
+- **Postman cleaner utility:** `scripts/clean_postman_fragments.py` removes `StartFragment`/`EndFragment` markers from exported Postman collections for cleaner documentation.
 
-## معماری در یک نگاه
+## Architecture / Structure
+- Each app follows a consistent layout: `models` define data structures, `repositories` encapsulate queryset logic, `serializers` validate and shape payloads, `services` host business rules, and `views` expose DRF endpoints.
+- The core layer (`unischedule/core`) provides shared building blocks such as the base model, response helpers, and domain-specific success/error codes.
+- URL routing under `unischedule/urls.py` mounts each app under `/api/...`, plus a public `/displays/<slug>/` namespace for anonymous display feeds.
 
-پروژه از الگوی «ویو نازک، سرویس پرمایه» پیروی می‌کند: ویوها صرفاً دادهٔ خام را از درخواست می‌گیرند و به سرویس‌ها پاس می‌دهند. سرویس‌ها نیز برای دسترسی به پایگاه داده از لایهٔ مخزن (Repository) استفاده می‌کنند. این جداسازی باعث می‌شود منطق دامنهٔ هر اپ قابل‌تست و قابل‌استفادهٔ مجدد باشد.
+## How It Works
+- **Authentication:** DRF Token Authentication is enabled by default. Authenticated endpoints use the token to resolve the associated institution and enforce scope. CORS is open for all origins to support kiosk or SPA clients.
+- **Request flow:** Views are intentionally thin; they validate authentication, delegate to services, and wrap results with `BaseResponse`. Services perform validation, conflict checks, cache invalidation, and call repositories for database access.
+- **Display payloads:** Public display requests resolve the target screen by slug, compute day/week filters (or override by date), merge base sessions with cancellations and makeups, sort results, and cache the serialized payload for reuse.
 
-```
-unischedule/
-├── accounts/          # کاربران سفارشی، ورود و مدیریت پروفایل مؤسسه
-├── institutions/      # موجودیت مؤسسه و لوگو/مشخصات تکمیلی
-├── semesters/         # ترم‌های فعال و تنظیم ترم جاری
-├── professors/        # مشخصات استادان و جست‌وجوی آن‌ها
-├── courses/           # دروس، ارتباط با استاد/کد ارائه و واحدها
-├── locations/         # ساختمان‌ها و کلاس‌ها با ظرفیت
-├── schedules/         # جلسات کلاس، جلوگیری از تداخل و حذف نرم
-├── displays/          # پیکربندی مانیتورها، کش و خروجی عمومی
-├── unischedule/core/  # مدل پایه، پاسخ‌های مشترک، کد خطا/موفقیت
-├── scripts/           # ابزارهای خط فرمان کمکی (Postman cleaner)
-└── Unischedule API.postman_collection.json
-```
+## Requirements & Dependencies
+- Python environment with the packages listed in `requirements.txt`, including Django 5.2.4, Django REST Framework 3.16.0, `django-cors-headers`, and `rest_framework.authtoken`.
 
-### لایهٔ هسته (Core)
+## Configuration
+- Default database is SQLite (`db.sqlite3`); change `DATABASES` in `unischedule/settings.py` for other backends.
+- `DEBUG` is enabled and `ALLOWED_HOSTS` is empty by default; adjust for production deployments.
+- Time zone defaults to `Asia/Tehran` with timezone-aware datetimes enabled.
+- `AUTH_USER_MODEL` is set to `accounts.User`.
+- Static/media handling uses `MEDIA_URL` and `MEDIA_ROOT = BASE_DIR / 'media'` when `DEBUG` is on.
 
-- `BaseModel` و `ActiveManager` رفتار حذف نرم را در تمام مدل‌ها پیاده می‌کنند تا حذف داده‌ها قابل بازگشت باشد.
-- `BaseResponse` قالب پاسخ موفق/ناموفق و ابزار صفحه‌بندی را فراهم می‌کند تا تمام ویوها JSON همسان تولید کنند.
-- `ErrorCodes` و `SuccessCodes` دیکشنری‌های استانداردی تعریف می‌کنند که سرویس‌ها می‌توانند مستقیماً در خطاها از آن استفاده کنند تا پیام انسانی و کد منطقی هماهنگ باقی بماند.
+## How to Run / Use
+1. Create and activate a virtual environment.
+2. Install dependencies: `pip install -r requirements.txt`.
+3. Apply migrations: `python manage.py migrate`.
+4. Create an admin user (optional): `python manage.py createsuperuser`.
+5. Start the development server: `python manage.py runserver`.
+6. Authenticate via `/api/auth/login/` to obtain a token, then pass `Authorization: Token <value>` to access protected endpoints.
+7. Public display payloads are available without authentication at `/displays/<slug>/`.
 
-### لایهٔ دامنه
-
-| اپلیکیشن | نقش | نکات برجسته |
-| --- | --- | --- |
-| `accounts` | احراز هویت و پروفایل مؤسسه | احراز هویت توکنی DRF، نقطهٔ مدیریت لوگوی مؤسسه، mixin‌های اطمینان از اتصال کاربر به مؤسسه |
-| `institutions` | مشخصات مؤسسات آموزشی | CRUD کامل با سریالایزرهای تفکیک‌شده برای ورودی/خروجی و اعتبارسنجی یکتایی نامک |
-| `semesters` | مدیریت ترم‌های درسی | جلوگیری از فعال‌سازی همزمان چند ترم و نگهداری تاریخ شروع/پایان برای فیلترهای نمایشگر |
-| `professors` و `courses` | دیکشنری استاد و درس | اتصال درس به استاد اصلی و اطلاعات واحد/کد ارائه، پشتیبانی از جست‌وجو و فیلتر در API |
-| `locations` | ساختمان و کلاس | نگهداری ظرفیت کلاس و ارتباط با ساختمان برای استفاده در فیلترهای نمایشگر |
-| `schedules` | جلسات کلاس | جلوگیری از تداخل زمانی (استاد یا کلاس)، حذف نرم، و همگام‌سازی کش نمایشگرها پس از هر تغییر |
-| `displays` | مانیتورهای اطلاع‌رسانی | فیلترهای پویا بر اساس روز/نوع هفته/ساختمان/گروه، محاسبهٔ اتوماتیک فیلتر روز/هفته و خروجی JSON مرتب برای مصرف عمومی |
-
-## جریان‌های کلیدی
-
-1. **ورود و اتصال به مؤسسه:** کاربر پس از دریافت توکن از `/api/accounts/login/`، از طریق هدر `Authorization: Token <token>` با API تعامل می‌کند. همهٔ سرویس‌ها قبل از عملیات، وجود مؤسسه را بررسی می‌کنند تا دسترسی خارج از محدوده رخ ندهد.
-2. **مدیریت دادهٔ پایه:** مدیر مؤسسه با استفاده از اپ‌های دامنه (درس، استاد، ساختمان، کلاس، ترم) اطلاعات پایه را ثبت می‌کند. همهٔ عملیات با حذف نرم محافظت شده‌اند تا تاریخچهٔ داده در دسترس باشد.
-3. **برنامه‌ریزی جلسات:** هنگام ثبت یا ویرایش جلسه، سرویس `class_session_service` با کمک مخزن داده بررسی می‌کند که بازهٔ زمانی در همان ترم، کلاس یا استاد تداخل نداشته باشد؛ در صورت تشخیص، خطایی با کد استاندارد بازگردانده می‌شود.
-4. **انتشار روی نمایشگرها:** هر نمایشگر می‌تواند فیلترهای متفاوتی داشته باشد (مثلاً فقط کلاس‌های ساختمان A در هفتهٔ زوج). سرویس `display_service` ابتدا محتوای مناسب را انتخاب و مرتب می‌کند و سپس نتیجه را در کش با کلید `display:<slug>` قرار می‌دهد. تغییر هر جلسه یا ویرایش نمایشگر کش مربوطه را پاک می‌کند تا دادهٔ تازه ارائه شود.
-
-## تکنولوژی‌ها و وابستگی‌ها
-
-- **زبان و فریم‌ورک:** Python 3.12، Django 5، Django REST Framework
-- **احراز هویت:** `rest_framework.authtoken`
-- **پایگاه دادهٔ پیش‌فرض:** SQLite (قابل تعویض از طریق `unischedule/settings.py`)
-- **کش:** backend پیش‌فرض Django؛ می‌توان برای محیط عملیاتی به Redis یا Memcached مهاجرت کرد.
-- **اسکریپت‌ها:** ابزار خط فرمان برای پاکسازی توضیحات Postman و آماده‌سازی کالکشن.
-
-## راه‌اندازی در محیط توسعه
-
-```bash
-python -m venv .venv
-source .venv/bin/activate          # در ویندوز: .venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser   # برای ورود به پنل مدیریت
-python manage.py runserver
-```
-
-نکات پیکربندی:
-
-- `DEBUG` در محیط توسعه فعال است؛ برای استقرار حتماً آن را غیرفعال و کلید مخفی را از متغیر محیطی دریافت کنید.
-- منطقهٔ زمانی پیش‌فرض `Asia/Tehran` است. در صورت نیاز می‌توانید `TIME_ZONE` و `USE_TZ` را در تنظیمات تغییر دهید.
-- فایل کالکشن Postman همراه پروژه قرار دارد؛ با import آن می‌توانید همهٔ endpointها را تست کنید.
-
-## تست و تضمین کیفیت
-
-پوشش تست به‌صورت ترکیبی از تست‌های واحد و انتها-به-انتها انجام می‌شود. برای اجرای کامل تست‌ها:
-
-```bash
-python manage.py test
-```
-
-نمونهٔ تست‌های کلیدی:
-
-- جلوگیری از تداخل برنامه‌ریزی جلسه‌ها و صحت حذف نرم در مدل `ClassSession`.
-- اطمینان از اینکه کاربران بدون مؤسسه نمی‌توانند به سرویس‌ها دسترسی داشته باشند و پیام خطای استاندارد دریافت می‌کنند.
-
-## مستندات و ابزارهای API
-
-- فایل [Unischedule API.postman_collection.json](Unischedule%20API.postman_collection.json) حاوی درخواست‌های آماده برای تمام سناریوهای CRUD و خروجی عمومی نمایشگرها است.
-- ساختار پایهٔ پاسخ‌ها در همهٔ endpointها مشابه نمونهٔ زیر است:
-
-```json
-{
-  "success": true,
-  "code": "1000",
-  "message": "عملیات موفقیت‌آمیز بود.",
-  "data": {"...": "..."},
-  "warnings": [],
-  "meta": {}
-}
-```
-
-- برای پاکسازی تگ‌های StartFragment/EndFragment پس از export از Postman می‌توانید دستور زیر را اجرا کنید:
-
-```bash
-python scripts/clean_postman_fragments.py "Unischedule API.postman_collection.json"
-```
-
-### لغو جلسه و کلاس‌های جبرانی
-مجموعهٔ جدید «Class Adjustments» در کالکشن Postman تمام عملیات مرتبط با لغو جلسه و ثبت کلاس‌های جبرانی را پوشش می‌دهد:
-- `GET /api/schedules/cancellations/`، `POST /api/schedules/cancellations/create/` و سایر متدهای هم‌خانواده برای مدیریت لغوها با کدهای موفقیت `2606` تا `2610`.
-- `GET /api/schedules/makeups/`، `POST /api/schedules/makeups/create/` و متدهای تکمیلی برای جبرانی‌ها با کدهای موفقیت `2611` تا `2615`.
-توضیحات هر درخواست شامل نمونهٔ ورودی/خروجی، سناریوهای خطا (کدهای خطای `4605`، `4606`، `4610`، `4611` و ...) و الزامات احراز هویت است تا تیم پشتیبانی بتواند سریعاً فرایند لغو و جبرانی را مدیریت کند.
-
-## پیشنهادهای توسعهٔ آینده
-
-- افزودن داشبورد مدیریتی برای مشاهدهٔ وضعیت نمایشگرها، آخرین به‌روزرسانی کش و پیام‌های خطا.
-- پیاده‌سازی موتور زمان‌بندی خودکار بر اساس ظرفیت کلاس‌ها، محدودیت استادان و الگوهای هفته.
-- توسعهٔ لایهٔ گزارش‌گیری (به‌عنوان مثال، تعداد ساعات تدریس هر استاد در بازهٔ زمانی مشخص یا استفاده از کلاس‌ها بر اساس ساختمان).
-
-## مشارکت
-
-Pull Requestها خوش‌آمد می‌گویند! پیش از ارسال:
-
-1. تست‌ها را اجرا کنید.
-2. پیام Commit و PR را با توضیح شفاف تغییرات بنویسید.
-3. در صورت افزودن ویژگی جدید، بخش مرتبط در این README یا کالکشن Postman را به‌روزرسانی کنید.
-
-با دنبال کردن این راهنما می‌توانید در کوتاه‌ترین زمان در توسعهٔ «یونی‌شدول» مشارکت کنید.
+## Notes & Limitations
+- Cache invalidation for display screens relies on Django's configured cache backend; the default in settings will store entries in process memory.
+- Schedule and display services assume each request provides an institution context; attempts without it raise structured validation errors.
+- The provided `db.sqlite3` is suitable for local development only.
