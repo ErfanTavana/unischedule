@@ -1,52 +1,73 @@
 # Unischedule
 
-Unischedule is a Django 5 + Django REST Framework monolith for managing academic schedules and publishing curated views to public display screens.
+Unischedule is a Django 5 + Django REST Framework monolith for managing university schedules and publishing filtered, cacheable feeds for public displays. The project ships with a custom user model tied to institutions, uniform API envelopes, and services that keep display payloads in sync whenever schedules change.
 
-## Project Overview
-- Custom user model ties each account to an `Institution`, providing a simple multi-tenant boundary for all domain objects.
-- Domain models such as courses, professors, classrooms, semesters, sessions, cancellations, makeups, and display screens inherit shared conventions for timestamps and soft deletion.
-- API responses are normalized through a single helper to keep success and error payloads consistent across apps.
-- Display payloads are cached per screen slug so kiosks can poll lightweight JSON feeds without recomputing filters on each request.
+## Overview
+- **Institution-scoped authentication:** `accounts.User` extends Django's `AbstractUser` with an `institution` relation so every request can be constrained to a tenant.
+- **Consistent models:** `BaseModel` adds timestamps, a soft-delete flag, and paired managers (`objects` vs `objects_with_deleted`) that hide archived rows by default.
+- **Shared response contract:** `BaseResponse` provides success/error helpers and paginated responses so all endpoints emit the same envelope and metadata.
+- **Schedule lifecycle:** Class sessions enforce conflict checks for professors/classrooms, support cancellations and makeup sessions, and invalidate any display caches that might be affected.
+- **Display feeds:** Display screens store filters (day/week rules, building/classroom, course, professor, time range, capacity, etc.) and expose a public `/displays/<slug>/` JSON feed that is cached under `display:<slug>`.
 
-## Key Features
-- **Institution-scoped authentication:** `accounts.User` extends Django's `AbstractUser` with a foreign key to `Institution`, ensuring every request can be constrained to the caller's institution.
-- **Soft deletion with audit fields:** `BaseModel` and `ActiveManager` add `created_at`/`updated_at` timestamps, an `is_deleted` flag, and a manager that hides deleted rows while still allowing access via `objects_with_deleted`.
-- **Uniform API envelopes:** `BaseResponse` centralizes success/error helpers and pagination so view functions only provide payload data and codes.
-- **Schedule conflict detection:** `schedules` services validate that class sessions do not overlap for the same professor or classroom before persisting changes, and invalidate display caches after modifications.
-- **Cancellations and makeups:** Dedicated models capture single-day cancellations and compensatory sessions so displays can merge base schedules with adjustments.
-- **Display filtering and caching:** Display screens store filter rules (day-of-week, week type, building, course, professor, time ranges, etc.). Public payloads are cached under `display:<slug>` for the configured `refresh_interval`.
-- **Postman cleaner utility:** `scripts/clean_postman_fragments.py` removes `StartFragment`/`EndFragment` markers from exported Postman collections for cleaner documentation.
+## Application map
+| App | Responsibility |
+| --- | --- |
+| `accounts/` | Token-based login/logout/password change plus the custom `User` model tied to an `Institution`. |
+| `institutions/` | CRUD for institutions and logo management. |
+| `semesters/` | Manage academic terms and mark the active semester per institution. |
+| `professors/`, `courses/` | Faculty and course catalogs used by schedules. |
+| `locations/` | Buildings and classrooms referenced by sessions and display filters. |
+| `schedules/` | Class sessions with conflict detection, cancellations, and makeup sessions; cache invalidation for impacted displays. |
+| `displays/` | Display screen definitions, filtered payload generation, and public, unauthenticated feeds backed by Django's cache. |
+| `unischedule/core/` | Cross-cutting concerns: base model, response helpers, logical success/error codes, and shared exceptions. |
+| `scripts/` | Utility scripts such as cleaning exported Postman collections. |
 
-## Architecture / Structure
-- Each app follows a consistent layout: `models` define data structures, `repositories` encapsulate queryset logic, `serializers` validate and shape payloads, `services` host business rules, and `views` expose DRF endpoints.
-- The core layer (`unischedule/core`) provides shared building blocks such as the base model, response helpers, and domain-specific success/error codes.
-- URL routing under `unischedule/urls.py` mounts each app under `/api/...`, plus a public `/displays/<slug>/` namespace for anonymous display feeds.
+## API behavior
+- **Routing:** API endpoints live under `/api/...` (e.g., `/api/auth/login/`, `/api/schedules/...`), while public display payloads are served from `/displays/<slug>/`.
+- **Authentication:** DRF Token Authentication is enabled by default; unauthenticated access is allowed only for explicit public endpoints (e.g., display feeds). CORS is open to all origins for kiosk/SPA clients.
+- **Responses:** All views return the `BaseResponse` envelope with `success`, `code`, `message`, `data`, optional `warnings`, and `meta` for pagination.
+- **Pagination:** `BaseResponse.paginate_queryset` wraps DRF's page number pagination with configurable `page_size` and includes totals, current page, navigation links, and timestamps.
 
-## How It Works
-- **Authentication:** DRF Token Authentication is enabled by default. Authenticated endpoints use the token to resolve the associated institution and enforce scope. CORS is open for all origins to support kiosk or SPA clients.
-- **Request flow:** Views are intentionally thin; they validate authentication, delegate to services, and wrap results with `BaseResponse`. Services perform validation, conflict checks, cache invalidation, and call repositories for database access.
-- **Display payloads:** Public display requests resolve the target screen by slug, compute day/week filters (or override by date), merge base sessions with cancellations and makeups, sort results, and cache the serialized payload for reuse.
+## Scheduling and display flow
+- **Creating/updating sessions:** Session serializers validate input, enforce an institution context, and reject overlaps for the same professor/classroom/semester/day/time/week type. On save or soft delete, related display caches are invalidated to keep public feeds current.
+- **Cancellations & makeups:** `ClassCancellation` records single-day skips; `MakeupClassSession` stores compensatory meetings with their own time/classroom/group code. Both adjustments are merged into display payloads.
+- **Display filters:** Each display screen can scope results by semester, course, professor, building/classroom, day of week (including auto-detect), week type, date override, time window, group code, capacity threshold, and activation flags. Titles, layout theme, refresh interval, and per-filter durations are persisted alongside an auto-generated slug and access token.
+- **Caching strategy:** Public payloads are cached per screen slug; any changes to sessions, cancellations, makeup sessions, or display settings clear the corresponding cache entries.
 
-## Requirements & Dependencies
-- Python environment with the packages listed in `requirements.txt`, including Django 5.2.4, Django REST Framework 3.16.0, `django-cors-headers`, and `rest_framework.authtoken`.
+## Running locally
+1. Create and activate a Python 3.12+ virtual environment.
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Apply migrations against the bundled SQLite database:
+   ```bash
+   python manage.py migrate
+   ```
+4. (Optional) Create a superuser:
+   ```bash
+   python manage.py createsuperuser
+   ```
+5. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
+6. Authenticate via `/api/auth/login/` to obtain a token and include it in `Authorization: Token <value>` for protected routes. Public display feeds require only the screen slug.
 
-## Configuration
-- Default database is SQLite (`db.sqlite3`); change `DATABASES` in `unischedule/settings.py` for other backends.
-- `DEBUG` is enabled and `ALLOWED_HOSTS` is empty by default; adjust for production deployments.
-- Time zone defaults to `Asia/Tehran` with timezone-aware datetimes enabled.
-- `AUTH_USER_MODEL` is set to `accounts.User`.
-- Static/media handling uses `MEDIA_URL` and `MEDIA_ROOT = BASE_DIR / 'media'` when `DEBUG` is on.
+## Utilities
+- **Postman collection:** `Unischedule API.postman_collection.json` contains sample requests for the API surface. The `scripts/clean_postman_fragments.py` helper strips `StartFragment`/`EndFragment` artifacts from exported collections:
+  ```bash
+  python scripts/clean_postman_fragments.py Unischedule\ API.postman_collection.json
+  ```
 
-## How to Run / Use
-1. Create and activate a virtual environment.
-2. Install dependencies: `pip install -r requirements.txt`.
-3. Apply migrations: `python manage.py migrate`.
-4. Create an admin user (optional): `python manage.py createsuperuser`.
-5. Start the development server: `python manage.py runserver`.
-6. Authenticate via `/api/auth/login/` to obtain a token, then pass `Authorization: Token <value>` to access protected endpoints.
-7. Public display payloads are available without authentication at `/displays/<slug>/`.
+## Configuration & defaults
+- Database defaults to SQLite (`db.sqlite3`).
+- `DEBUG` is enabled; `ALLOWED_HOSTS` is empty. Adjust before deploying.
+- Time zone is set to `Asia/Tehran` with timezone-aware datetimes.
+- Static/media paths default to `MEDIA_URL=/media/` and `MEDIA_ROOT=media/` when `DEBUG` is on.
+- Django cache settings control display payload storage; the default in-memory backend is sufficient for local testing.
 
-## Notes & Limitations
-- Cache invalidation for display screens relies on Django's configured cache backend; the default in settings will store entries in process memory.
-- Schedule and display services assume each request provides an institution context; attempts without it raise structured validation errors.
-- The provided `db.sqlite3` is suitable for local development only.
+## Notes and limitations
+- All domain models use soft deletion; deleted rows remain in the database but are hidden from default querysets.
+- Institution context is mandatory for most operations; missing institutions raise structured validation errors.
+- The included SQLite database is intended for development only. Configure `DATABASES` for production use.
